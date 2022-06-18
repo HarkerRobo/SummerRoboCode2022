@@ -14,6 +14,14 @@ public class OI {
         driver = new XboxGamepad(RobotMap.DRIVER_ID);
     }
 
+    public XboxGamepad getDriverGamepad() {
+        return driver;
+    }
+
+    public XboxGamepad getOperatorGamepad() {
+        return operator;
+    }
+
     public static OI getInstance() {
         if(instance == null) {
             instance = new OI();
