@@ -17,6 +17,7 @@ public class Intake {
     private static final double CONTINUOUS_CURRENT_LIMIT = 30;
     private static final double PEAK_CURRENT = 40;
     private static final double PEAK_DUR = 0.1;
+    private static final boolean INVERT = false;
 
     private Intake() {
         intake = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD ,RobotMap.INTAKE_BACKWARD);
@@ -26,6 +27,7 @@ public class Intake {
 
     public void initMotor() {
         roller.configFactoryDefault();
+        roller.setInverted(INVERT);
         roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
     }
 
