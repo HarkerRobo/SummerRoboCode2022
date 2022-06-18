@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import frc.robot.RobotMap;
@@ -11,6 +14,10 @@ public class Intake {
     private DoubleSolenoid intake;
     private HSFalcon roller;
 
+    private static final double CONTINUOUS_CURRENT_LIMIT = 30;
+    private static final double PEAK_CURRENT = 40;
+    private static final double PEAK_DUR = 0.1;
+
     private Intake() {
         intake = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD ,RobotMap.INTAKE_BACKWARD);
         roller = new HSFalcon(RobotMap.INTAKE_MOTOR);
@@ -19,7 +26,7 @@ public class Intake {
 
     public void initMotor() {
         roller.configFactoryDefault();
-        roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration());
+        roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
     }
 
     public void setForward() {
