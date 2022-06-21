@@ -90,7 +90,7 @@ public class SwerveModule {
         return rotation.getSelectedSensorPosition() * Units.ENCODER_TICKS_TO_DEGREES / ROTATION_GEAR_RATIO;
     }
 
-    public void resetEncoder() {
+    public void setRotationOffset() {
         double position = canCoder.getAbsolutePosition() - Drivetrain.CANCODER_OFFSETS[swerveID];
         rotation.setSelectedSensorPosition(position * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO);
     }

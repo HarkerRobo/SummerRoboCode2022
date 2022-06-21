@@ -12,6 +12,11 @@ public class OI {
     private OI() {
         operator = new XboxGamepad(RobotMap.OPERATOR_ID);
         driver = new XboxGamepad(RobotMap.DRIVER_ID);
+        initBindings();
+    }
+
+    public void initBindings() {
+
     }
 
     public XboxGamepad getDriverGamepad() {
