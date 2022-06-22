@@ -8,8 +8,7 @@ import harkerrobolib.commands.IndefiniteCommand;
 import harkerrobolib.util.MathUtil;
 
 public class SwerveManual extends IndefiniteCommand {
-    public SwerveManual()
-    {
+    public SwerveManual() {
         addRequirements(Drivetrain.getInstance());
     }
 
@@ -18,9 +17,9 @@ public class SwerveManual extends IndefiniteCommand {
     }
 
     public void execute() {
-        double vx = Drivetrain.MAX_TRANSLATION_VEL * MathUtil.mapJoystickOutput(OI.getInstance().getDriverGamepad().getLeftX(), OI.DEADBAND);
-        double vy = Drivetrain.MAX_TRANSLATION_VEL * MathUtil.mapJoystickOutput(-OI.getInstance().getDriverGamepad().getLeftY(), OI.DEADBAND);
-        double omega = Drivetrain.MAX_ROTATION_VEL * MathUtil.mapJoystickOutput(OI.getInstance().getDriverGamepad().getRightX(), OI.DEADBAND);
+        double vx = Drivetrain.MAX_TRANSLATION_VEL * MathUtil.mapJoystickOutput(OI.getInstance().getDriverGamepad().getLeftX(), OI.DEFAULT_DEADBAND);
+        double vy = Drivetrain.MAX_TRANSLATION_VEL * MathUtil.mapJoystickOutput(-OI.getInstance().getDriverGamepad().getLeftY(), OI.DEFAULT_DEADBAND);
+        double omega = Drivetrain.MAX_ROTATION_VEL * MathUtil.mapJoystickOutput(OI.getInstance().getDriverGamepad().getRightX(), OI.DEFAULT_DEADBAND);
         Drivetrain.getInstance().setAngleAndDrive(ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, omega, Rotation2d.fromDegrees(Drivetrain.getInstance().getRobotHeading())));
     }
 }

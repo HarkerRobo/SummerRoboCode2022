@@ -1,25 +1,34 @@
 package frc.robot.commands.intake;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
+import frc.robot.OI;
 import frc.robot.subsystems.Intake;
 import harkerrobolib.commands.IndefiniteCommand;
 
 public class IntakeManual extends IndefiniteCommand{
 
-    private double speed;
+    private static final double INTAKE_SPEED_PERCENT_OUTPUT= 0.6;
 
-    public IntakeManual(double speed) {
+    public IntakeManual() {
         addRequirements(Intake.getInstance());
-        this.speed = speed;
     }
 
     public void execute() {
-
-        Intake.getInstance().setRollerOutput(speed / Intake.MAX_ROLLER_SPEED);
+        if (OI.getInstance().getDriverGamepad().getRightTrigger() > OI.DEFAULT_DEADBAND) {
+            Intake.getInstance().setRollerOutput(INTAKE_SPEED_PERCENT_OUTPUT);
+            Intake.getInstance().setCurrIntakeState(Intake.State.INTAKE);
+        }
+        else if (OI.getInstance().getDriverGamepad().getLeftTrigger() > OI.DEFAULT_DEADBAND) {
+            Intake.getInstance().setRollerOutput(-INTAKE_SPEED_PERCENT_OUTPUT);
+            Intake.getInstance().setCurrIntakeState(Intake.State.OUTTAKE);
+        }
+        else {
+            Intake.getInstance().setRollerOutput(0);
+            Intake.getInstance().setCurrIntakeState(Intake.State.NEUTRAL);
+        }
     }
 
-    public void end() {
+    public void end(boolean interrupted) {
+        Intake.getInstance().setCurrIntakeState(Intake.State.NEUTRAL);
         Intake.getInstance().setRollerOutput(0);
     }
 

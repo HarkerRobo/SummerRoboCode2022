@@ -9,7 +9,8 @@ public class OI {
     private XboxGamepad operator;
     private XboxGamepad driver;
     
-    public static final double DEADBAND = 0.15;
+    public static final double DEFAULT_DEADBAND = 0.15;
+    
 
     private OI() {
         operator = new XboxGamepad(RobotMap.OPERATOR_ID);

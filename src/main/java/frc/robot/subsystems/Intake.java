@@ -1,11 +1,11 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import harkerrobolib.wrappers.HSFalcon;
@@ -27,6 +27,14 @@ public class Intake extends SubsystemBase {
     private static final double PEAK_DUR = 0.1;
     private static final boolean INVERT = false;
 
+    private State currIntakeState;
+
+    public static enum State {
+        INTAKE,
+        NEUTRAL,
+        OUTTAKE
+    }
+
     private Intake() {
         intake = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD ,RobotMap.INTAKE_BACKWARD);
         roller = new HSFalcon(RobotMap.INTAKE_MOTOR);
@@ -35,10 +43,13 @@ public class Intake extends SubsystemBase {
 
     public void initMotor() {
         roller.configFactoryDefault();
+        roller.setInverted(INVERT);
+        roller.selectProfileSlot(RobotMap.DEFAULT_SLOT_ID, RobotMap.DEFAULT_LOOP_ID);
+        roller.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.DEFAULT_LOOP_ID);
+        roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
         roller.config_kP(RobotMap.DEFAULT_SLOT_ID, kP);
         roller.configNominalOutputForward(kS);
-        roller.setInverted(INVERT);
-        roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
+
     }
 
     public void setForward() {
@@ -51,6 +62,14 @@ public class Intake extends SubsystemBase {
 
     public void setRollerOutput(double rollerOutput) {
         roller.set(ControlMode.PercentOutput, rollerOutput);
+    }
+
+    public State getCurrIntakeState() {
+        return currIntakeState;
+    }
+
+    public void setCurrIntakeState(State s) {
+        currIntakeState = s;
     }
     
     public static Intake getInstance() {

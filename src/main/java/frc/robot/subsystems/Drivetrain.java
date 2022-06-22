@@ -26,7 +26,7 @@ public class Drivetrain extends SubsystemBase {
     public static final double MAX_TRANSLATION_VEL = 3.0; // in m/s
     public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
 
-    public static final double SPEED_MULTIPLIER = 0.1;
+    public static final double SPEED_MULTIPLIER = 0.1; // change later
 
     private SwerveModule[] swerveModules;
     private SwerveDriveKinematics kinematics;
@@ -45,13 +45,12 @@ public class Drivetrain extends SubsystemBase {
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
         for (int i = 0; i < 4; i++) {
             states[i] = SwerveModuleState.optimize(states[i], Rotation2d.fromDegrees(swerveModules[i].getCurrentAngle()));
-            swerveModules[i].setAngleAndDrive(states[i].angle.getDegrees(), states[i].speedMetersPerSecond, true);
+            swerveModules[i].setAngleAndDrive(states[i].angle.getDegrees(), states[i].speedMetersPerSecond*SPEED_MULTIPLIER, true);
         }
 
     }
 
-    public void setDrivetrainOffset()
-    {
+    public void setDrivetrainOffset() {
         for (int i = 0; i < 4; i++)
             swerveModules[i].setRotationOffset();
     }
