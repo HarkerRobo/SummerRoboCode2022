@@ -17,10 +17,13 @@ public class Drivetrain extends SubsystemBase {
     public static final boolean[] ROTATION_INVERTS = {false, false, false, false};
     public static final boolean[] DRIVE_INVERTS = {true, true, true, false};
 
-    public static final double[] CANCODER_OFFSETS = {195.468750, 178.330078, 109.951172, 32.255859};
+    public static final double[] CANCODER_OFFSETS = {195.468750, 178.330078, 109.951172, 32.255859}; // in deg
 
     private static final double DT_WIDTH = 0.5461; // 0.93345 bumper to bumper
     private static final double DT_LENGTH = 0.5969; // 0.88265
+
+    public static final double MAX_TRANSLATION_VEL = 3.0; // in m/s
+    public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
 
     private SwerveModule[] swerveModules;
     private SwerveDriveKinematics kinematics;
@@ -45,9 +48,8 @@ public class Drivetrain extends SubsystemBase {
 
     public void setDrivetrainOffset()
     {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++)
             swerveModules[i].setRotationOffset();
-        }
     }
 
     public double getRobotHeading() {

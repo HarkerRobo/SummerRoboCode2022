@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
@@ -74,6 +75,7 @@ public class SwerveModule {
         rotation.config_kP(RobotMap.SLOT_ID, ROTATION_KP);
         rotation.config_kI(RobotMap.SLOT_ID, ROTATION_KI);
         rotation.config_kD(RobotMap.SLOT_ID, ROTATION_KD);
+        
         rotation.config_IntegralZone(RobotMap.SLOT_ID, ROTATION_IZONE);
         rotation.selectProfileSlot(RobotMap.SLOT_ID, RobotMap.LOOP_ID);
         rotation.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_5Ms);
@@ -81,9 +83,17 @@ public class SwerveModule {
         rotation.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.SLOT_ID);
     }
 
-    public void setAngleAndDrive(double rotationAngle, double driveOutput) {
+    public void setAngleAndDrive(double rotationAngle, double driveOutput, boolean drivePercentOutput) {
         rotation.set(ControlMode.Position, (rotationAngle * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO));
-        drive.set(ControlMode.PercentOutput, driveOutput);
+        if(drivePercentOutput)
+            drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
+        else {
+            //TODO: implement swerve module drive loop
+        }
+    }
+
+    public void setAngleAndDrive(double rotationAngle, double driveOutput) {
+        setAngleAndDrive(rotationAngle, driveOutput, false);
     }
 
     public double getCurrentAngle() {
