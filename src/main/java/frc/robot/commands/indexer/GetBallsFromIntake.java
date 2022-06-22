@@ -22,6 +22,7 @@ public class GetBallsFromIntake extends IndefiniteCommand {
                         Indexer.getInstance().setBothOutput(INDEXER_SPEED_PERCENT_OUTPUT);
                     }
                     else if (Indexer.getInstance().isBallInTop()) {
+                        Indexer.getInstance().setTopOutput(0);
                         Indexer.getInstance().setBottomOutput(INDEXER_SPEED_PERCENT_OUTPUT);
                     }
                 }
