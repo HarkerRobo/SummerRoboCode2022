@@ -3,8 +3,8 @@ package frc.robot;
 public final class RobotMap {
     public static final String CANBUS = "BINGCHILLING";
 
-    public static final int SLOT_ID = 0;
-    public static final int LOOP_ID = 0;
+    public static final int DEFAULT_LOOP_ID = 0;
+    public static final int DEFAULT_SLOT_ID = 0;
 
     public static final int[] TRANSLATION_IDS = {13, 4, 2, 6}; //FL, FR, BL, BR
     public static final int[] ROTATION_IDS = {1, 5, 3, 7};

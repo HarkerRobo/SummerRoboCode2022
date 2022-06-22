@@ -5,14 +5,22 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import harkerrobolib.wrappers.HSFalcon;
 
 
-public class Intake {
+public class Intake extends SubsystemBase {
     private static Intake instance;
     private DoubleSolenoid intake;
     private HSFalcon roller;
+
+    private static final double kP = 1; // tune later
+    private static final double kS = 0.02;
+
+    public static final double MAX_ROLLER_SPEED = 60; //rotations/sec
+    public static final double INTAKE_GEAR_RATIO = 0.6;
 
     private static final double CONTINUOUS_CURRENT_LIMIT = 30;
     private static final double PEAK_CURRENT = 40;
@@ -27,6 +35,8 @@ public class Intake {
 
     public void initMotor() {
         roller.configFactoryDefault();
+        roller.config_kP(RobotMap.DEFAULT_SLOT_ID, kP);
+        roller.configNominalOutputForward(kS);
         roller.setInverted(INVERT);
         roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
     }

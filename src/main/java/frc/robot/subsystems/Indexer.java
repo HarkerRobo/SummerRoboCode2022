@@ -4,12 +4,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import harkerrobolib.wrappers.HSFalcon;
 
-public class Indexer {
+public class Indexer extends SubsystemBase{
     private static Indexer instance;
-    private  HSFalcon top;
+    private HSFalcon top;
     private HSFalcon bottom;
     private DigitalInput topProximity;
     private DigitalInput bottomProximity;

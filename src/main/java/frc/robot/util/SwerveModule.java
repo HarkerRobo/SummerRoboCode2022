@@ -72,23 +72,26 @@ public class SwerveModule {
         rotation.configOpenloopRamp(0.1);
         rotation.configForwardSoftLimitEnable(false);
         rotation.configReverseSoftLimitEnable(false);
-        rotation.config_kP(RobotMap.SLOT_ID, ROTATION_KP);
-        rotation.config_kI(RobotMap.SLOT_ID, ROTATION_KI);
-        rotation.config_kD(RobotMap.SLOT_ID, ROTATION_KD);
+        rotation.config_kP(RobotMap.DEFAULT_SLOT_ID, ROTATION_KP);
+        rotation.config_kI(RobotMap.DEFAULT_SLOT_ID, ROTATION_KI);
+        rotation.config_kD(RobotMap.DEFAULT_SLOT_ID, ROTATION_KD);
         
-        rotation.config_IntegralZone(RobotMap.SLOT_ID, ROTATION_IZONE);
-        rotation.selectProfileSlot(RobotMap.SLOT_ID, RobotMap.LOOP_ID);
+        rotation.config_IntegralZone(RobotMap.DEFAULT_SLOT_ID, ROTATION_IZONE);
+        rotation.selectProfileSlot(RobotMap.DEFAULT_SLOT_ID, RobotMap.DEFAULT_LOOP_ID);
         rotation.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_5Ms);
         rotation.configVoltageMeasurementFilter(16);
-        rotation.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.SLOT_ID);
+        rotation.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.DEFAULT_SLOT_ID);
     }
 
     public void setAngleAndDrive(double rotationAngle, double driveOutput, boolean drivePercentOutput) {
         rotation.set(ControlMode.Position, (rotationAngle * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO));
-        if(drivePercentOutput)
-            drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
+        if(drivePercentOutput) {
+
+            drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL * Drivetrain.SPEED_MULTIPLIER);
+        }
+            
         else {
-            //TODO: implement swerve module drive loop
+            // TODO
         }
     }
 
@@ -104,4 +107,5 @@ public class SwerveModule {
         double position = canCoder.getAbsolutePosition() - Drivetrain.CANCODER_OFFSETS[swerveID];
         rotation.setSelectedSensorPosition(position * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO);
     }
+
 }

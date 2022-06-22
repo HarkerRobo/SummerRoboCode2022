@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.SwerveModule;
@@ -25,6 +26,8 @@ public class Drivetrain extends SubsystemBase {
     public static final double MAX_TRANSLATION_VEL = 3.0; // in m/s
     public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
 
+    public static final double SPEED_MULTIPLIER = 0.1;
+
     private SwerveModule[] swerveModules;
     private SwerveDriveKinematics kinematics;
     private Pigeon2 pigeon;
@@ -42,8 +45,9 @@ public class Drivetrain extends SubsystemBase {
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
         for (int i = 0; i < 4; i++) {
             states[i] = SwerveModuleState.optimize(states[i], Rotation2d.fromDegrees(swerveModules[i].getCurrentAngle()));
-            swerveModules[i].setAngleAndDrive(states[i].angle.getDegrees(), states[i].speedMetersPerSecond);
+            swerveModules[i].setAngleAndDrive(states[i].angle.getDegrees(), states[i].speedMetersPerSecond, true);
         }
+
     }
 
     public void setDrivetrainOffset()
@@ -59,5 +63,9 @@ public class Drivetrain extends SubsystemBase {
     public static Drivetrain getInstance() {
         if(drivetrain == null) drivetrain = new Drivetrain();
         return drivetrain;
+    }
+
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Drivetrain");
     }
 }

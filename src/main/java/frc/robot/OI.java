@@ -8,6 +8,8 @@ public class OI {
     private static OI instance;
     private XboxGamepad operator;
     private XboxGamepad driver;
+    
+    public static final double DEADBAND = 0.15;
 
     private OI() {
         operator = new XboxGamepad(RobotMap.OPERATOR_ID);
@@ -16,7 +18,6 @@ public class OI {
     }
 
     public void initBindings() {
-
     }
 
     public XboxGamepad getDriverGamepad() {
