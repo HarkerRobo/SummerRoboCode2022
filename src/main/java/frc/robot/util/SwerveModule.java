@@ -100,17 +100,22 @@ public class SwerveModule {
         }
         else {
             drive.set(ControlMode.PercentOutput, MathUtil.clamp(
-                translationLoop.updateAndPredict(driveOutput, drive.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND * Units.FOUR_INCH_WHEEL_ROT_TO_METER)
-                    + Math.signum(driveOutput) * DRIVE_KS, -RobotMap.MAX_MOTOR_VOLTAGE, RobotMap.MAX_MOTOR_VOLTAGE));
+                translationLoop.updateAndPredict(driveOutput, getCurrentSpeed())
+                    + Math.signum(driveOutput) * DRIVE_KS, -RobotMap.MAX_MOTOR_VOLTAGE, RobotMap.MAX_MOTOR_VOLTAGE) / RobotMap.MAX_MOTOR_VOLTAGE);
         }
     }
 
     public void setAngleAndDrive(double rotationAngle, double driveOutput) {
+        System.out.println(rotationAngle);
         setAngleAndDrive(rotationAngle, driveOutput, false);
     }
 
     public double getCurrentAngle() {
         return rotation.getSelectedSensorPosition() * Units.ENCODER_TICKS_TO_DEGREES / ROTATION_GEAR_RATIO;
+    }
+
+    public double getCurrentSpeed() {
+        return drive.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND * Units.FOUR_INCH_WHEEL_ROT_TO_METER / DRIVE_GEAR_RATIO;
     }
 
     public void setRotationOffset() {
@@ -120,5 +125,13 @@ public class SwerveModule {
 
     public SimpleVelocityLoop getTranslationLoop() {
         return translationLoop;
+    }
+
+    public HSFalcon getDriveMotor() {
+        return drive;
+    }
+
+    public HSFalcon getRotationMotor() {
+        return rotation;
     }
 }

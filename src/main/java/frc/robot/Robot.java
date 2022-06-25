@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     
     SmartDashboard.putData(Drivetrain.getInstance());
+    SmartDashboard.putData(Intake.getInstance());
   }
 
   /**
