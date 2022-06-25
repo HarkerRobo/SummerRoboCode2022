@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
+import edu.wpi.first.math.MathUtil;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import harkerrobolib.wrappers.HSFalcon;
@@ -17,8 +18,9 @@ public class SwerveModule {
 
     private CANCoder canCoder;
 
-
     private int swerveID;
+
+    private SimpleVelocityLoop translationLoop;
 
     private static final double ROTATION_MOTOR_CURRENT_CONTINUOUS = 25;
     private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
@@ -33,6 +35,14 @@ public class SwerveModule {
     public static final double ROTATION_KD = 0.0;
     public static final double ROTATION_IZONE = 0.0;
 
+    private static final double DRIVE_KS = 0.3;
+	private static final double DRIVE_KV = 2.2819;
+	private static final double DRIVE_KA = 0.3621;
+
+    private static final double MAX_ERROR = 1;  
+    private static final double MODEL_STANDARD_DEVIATION = 0.5;
+    private static final double ENCODER_STANDARD_DEVIATION = 0.035;
+
     public static final double ROTATION_GEAR_RATIO = 12.8;
     public static final double DRIVE_GEAR_RATIO = 6.75;
     
@@ -41,6 +51,7 @@ public class SwerveModule {
         rotation = new HSFalcon(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
         drive = new HSFalcon(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
         canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
+        translationLoop = new SimpleVelocityLoop(DRIVE_KV, DRIVE_KA, MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
         initMotors();
     }
 
@@ -85,12 +96,12 @@ public class SwerveModule {
     public void setAngleAndDrive(double rotationAngle, double driveOutput, boolean drivePercentOutput) {
         rotation.set(ControlMode.Position, (rotationAngle * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO));
         if(drivePercentOutput) {
-
             drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
         }
-            
         else {
-            // TODO
+            drive.set(ControlMode.PercentOutput, MathUtil.clamp(
+                translationLoop.updateAndPredict(driveOutput, drive.getSelectedSensorVelocity() * Units.TALON_VELOCITY_TO_ROT_PER_SECOND * Units.FOUR_INCH_WHEEL_ROT_TO_METER)
+                    + Math.signum(driveOutput) * DRIVE_KS, -RobotMap.MAX_MOTOR_VOLTAGE, RobotMap.MAX_MOTOR_VOLTAGE));
         }
     }
 
@@ -107,4 +118,7 @@ public class SwerveModule {
         rotation.setSelectedSensorPosition(position * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO);
     }
 
+    public SimpleVelocityLoop getTranslationLoop() {
+        return translationLoop;
+    }
 }

@@ -45,7 +45,7 @@ public class Drivetrain extends SubsystemBase {
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
         for (int i = 0; i < 4; i++) {
             states[i] = SwerveModuleState.optimize(states[i], Rotation2d.fromDegrees(swerveModules[i].getCurrentAngle()));
-            swerveModules[i].setAngleAndDrive(states[i].angle.getDegrees(), states[i].speedMetersPerSecond*SPEED_MULTIPLIER, true);
+            swerveModules[i].setAngleAndDrive(states[i].angle.getDegrees(), states[i].speedMetersPerSecond*SPEED_MULTIPLIER, false);
         }
 
     }
@@ -66,5 +66,6 @@ public class Drivetrain extends SubsystemBase {
 
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Drivetrain");
+        builder.addDoubleProperty("Swerve Module 0 Drive Error", () -> swerveModules[0].getTranslationLoop().getError(), null);
     }
 }

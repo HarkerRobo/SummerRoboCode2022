@@ -2,6 +2,8 @@ package frc.robot;
 
 public final class RobotMap {
     public static final String CANBUS = "BINGCHILLING";
+    public static final double ROBOT_LOOP = 0.02;
+    public static final double MAX_MOTOR_VOLTAGE = 12;
 
     public static final int DEFAULT_LOOP_ID = 0;
     public static final int DEFAULT_SLOT_ID = 0;
