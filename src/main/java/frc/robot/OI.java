@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.intake.ToggleIntake;
 import harkerrobolib.wrappers.HSMotorController;
 import harkerrobolib.wrappers.XboxGamepad;
 
@@ -19,6 +20,7 @@ public class OI {
     }
 
     public void initBindings() {
+        driver.getButtonA().whenPressed(new ToggleIntake());
     }
 
     public XboxGamepad getDriverGamepad() {

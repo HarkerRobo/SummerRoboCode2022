@@ -4,10 +4,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
+import frc.robot.util.Units;
 import harkerrobolib.wrappers.HSFalcon;
 
 
@@ -16,16 +19,13 @@ public class Intake extends SubsystemBase {
     private DoubleSolenoid intake;
     private HSFalcon roller;
 
-    private static final double kP = 1; // tune later
-    private static final double kS = 0.02;
-
     public static final double MAX_ROLLER_SPEED = 60; //rotations/sec
     public static final double INTAKE_GEAR_RATIO = 0.6;
 
     private static final double CONTINUOUS_CURRENT_LIMIT = 30;
     private static final double PEAK_CURRENT = 40;
     private static final double PEAK_DUR = 0.1;
-    private static final boolean INVERT = false;
+    private static final boolean INVERT = true;
 
     private State currIntakeState;
 
@@ -47,9 +47,6 @@ public class Intake extends SubsystemBase {
         roller.selectProfileSlot(RobotMap.DEFAULT_SLOT_ID, RobotMap.DEFAULT_LOOP_ID);
         roller.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.DEFAULT_LOOP_ID);
         roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
-        roller.config_kP(RobotMap.DEFAULT_SLOT_ID, kP);
-        roller.configNominalOutputForward(kS);
-
     }
 
     public void setForward() {
@@ -60,8 +57,15 @@ public class Intake extends SubsystemBase {
         intake.set(DoubleSolenoid.Value.kReverse);
     }
 
+    public void toggle() {
+        if(intake.get() == Value.kOff)
+            setForward();
+        else
+            intake.toggle();
+    }
+
     public void setRollerOutput(double rollerOutput) {
-        roller.set(ControlMode.PercentOutput, rollerOutput);
+        roller.set(ControlMode.Velocity, rollerOutput * INTAKE_GEAR_RATIO / Units.FALCON_ENCODER_TICKS);
     }
 
     public State getCurrIntakeState() {
@@ -77,4 +81,8 @@ public class Intake extends SubsystemBase {
             instance = new Intake();
         return instance;
     }
+
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Intake");
+    } 
 }

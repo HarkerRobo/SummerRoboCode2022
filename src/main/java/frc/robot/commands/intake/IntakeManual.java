@@ -6,7 +6,7 @@ import harkerrobolib.commands.IndefiniteCommand;
 
 public class IntakeManual extends IndefiniteCommand{
 
-    private static final double INTAKE_SPEED_PERCENT_OUTPUT= 0.6;
+    private static final double INTAKE_SPEED = 36.0;
 
     public IntakeManual() {
         addRequirements(Intake.getInstance());
@@ -14,11 +14,11 @@ public class IntakeManual extends IndefiniteCommand{
 
     public void execute() {
         if (OI.getInstance().getDriverGamepad().getRightTrigger() > OI.DEFAULT_DEADBAND) {
-            Intake.getInstance().setRollerOutput(INTAKE_SPEED_PERCENT_OUTPUT);
+            Intake.getInstance().setRollerOutput(INTAKE_SPEED);
             Intake.getInstance().setCurrIntakeState(Intake.State.INTAKE);
         }
         else if (OI.getInstance().getDriverGamepad().getLeftTrigger() > OI.DEFAULT_DEADBAND) {
-            Intake.getInstance().setRollerOutput(-INTAKE_SPEED_PERCENT_OUTPUT);
+            Intake.getInstance().setRollerOutput(-INTAKE_SPEED);
             Intake.getInstance().setCurrIntakeState(Intake.State.OUTTAKE);
         }
         else {
