@@ -82,7 +82,7 @@ public class Intake extends SubsystemBase {
     }
     
     public double getIntakeRPS() {
-        return roller.getSelectedSensorVelocity() * INTAKE_GEAR_RATIO / Units.FALCON_ENCODER_TICKS;
+        return roller.getSelectedSensorVelocity() * INTAKE_GEAR_RATIO * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND;
     }
     
     public HSFalcon getRollerMotor() {

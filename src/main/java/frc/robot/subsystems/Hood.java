@@ -19,7 +19,7 @@ public class Hood extends SubsystemBase{
     private static final int HOOD_MIN_DEGREE = 0;
 
     private Hood() {
-        hood = new HSFalcon(RobotMap.HOOD_ID);
+        hood = new HSFalcon(RobotMap.HOOD_ID, RobotMap.CANBUS);
     }
 
     public void initMotors() {

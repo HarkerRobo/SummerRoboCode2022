@@ -106,7 +106,6 @@ public class SwerveModule {
     }
 
     public void setAngleAndDrive(double rotationAngle, double driveOutput) {
-        System.out.println(rotationAngle);
         setAngleAndDrive(rotationAngle, driveOutput, false);
     }
 
