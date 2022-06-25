@@ -27,6 +27,9 @@ public class Intake extends SubsystemBase {
     private static final double PEAK_DUR = 0.1;
     private static final boolean INVERT = true;
 
+    private static final double kP = 1;
+    private static final double kF = 0.02;
+
     private State currIntakeState;
 
     public static enum State {
@@ -47,6 +50,8 @@ public class Intake extends SubsystemBase {
         roller.selectProfileSlot(RobotMap.DEFAULT_SLOT_ID, RobotMap.DEFAULT_LOOP_ID);
         roller.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.DEFAULT_LOOP_ID);
         roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
+        roller.config_kP(RobotMap.DEFAULT_SLOT_ID, kP);
+        roller.config_kF(RobotMap.DEFAULT_SLOT_ID, kF);
     }
 
     public void setForward() {
@@ -76,6 +81,14 @@ public class Intake extends SubsystemBase {
         currIntakeState = s;
     }
     
+    public double getIntakeRPS() {
+        return roller.getSelectedSensorVelocity() * INTAKE_GEAR_RATIO / Units.FALCON_ENCODER_TICKS;
+    }
+    
+    public HSFalcon getRollerMotor() {
+        return roller;
+    }
+
     public static Intake getInstance() {
         if (instance == null)
             instance = new Intake();
@@ -84,5 +97,9 @@ public class Intake extends SubsystemBase {
 
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Intake");
+        builder.addDoubleProperty("Current Intake Roller Sensor Velocity", () -> roller.getSelectedSensorVelocity(), null);
+        builder.addDoubleProperty("Current Intake Roller RPS", () -> getIntakeRPS(), null);
+        builder.addDoubleProperty("Intake kP", () -> kP, (double d) -> {roller.config_kP(RobotMap.DEFAULT_SLOT_ID, d);});
+
     } 
 }

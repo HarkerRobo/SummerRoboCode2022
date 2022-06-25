@@ -1,6 +1,7 @@
 package frc.robot.commands.intake;
 
 import frc.robot.OI;
+import frc.robot.RobotMap;
 import frc.robot.subsystems.Intake;
 import harkerrobolib.commands.IndefiniteCommand;
 

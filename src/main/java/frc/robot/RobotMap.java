@@ -20,12 +20,13 @@ public final class RobotMap {
     public static final int INDEXER_TOP = 10;
     public static final int INDEXER_BOTTOM = 9;
 
+    public static final int HOOD_ID = 14;
+
     public static final int TOP_PROXIMITY = 7;
     public static final int BOTTOM_PROXIMITY = 6;
 
-    public static final int SHOOTER_MASTER = 11;
-    public static final int SHOOTER_FOLLOWER = 12;
-
     public static final int OPERATOR_ID = 1;
     public static final int DRIVER_ID = 0;
+
+
 }

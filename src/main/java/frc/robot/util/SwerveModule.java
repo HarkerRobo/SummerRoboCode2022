@@ -100,7 +100,7 @@ public class SwerveModule {
         }
         else {
             drive.set(ControlMode.PercentOutput, MathUtil.clamp(
-                translationLoop.updateAndPredict(driveOutput, drive.getSelectedSensorVelocity() * Units.TALON_VELOCITY_TO_ROT_PER_SECOND * Units.FOUR_INCH_WHEEL_ROT_TO_METER)
+                translationLoop.updateAndPredict(driveOutput, drive.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND * Units.FOUR_INCH_WHEEL_ROT_TO_METER)
                     + Math.signum(driveOutput) * DRIVE_KS, -RobotMap.MAX_MOTOR_VOLTAGE, RobotMap.MAX_MOTOR_VOLTAGE));
         }
     }
