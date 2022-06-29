@@ -8,6 +8,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import harkerrobolib.wrappers.HSFalcon;
