@@ -20,7 +20,7 @@ public class SwerveModule {
 
     private int swerveID;
 
-    private SimpleVelocityLoop translationLoop;
+    private LinearSystemRegulationLoop translationLoop;
 
     private static final double ROTATION_MOTOR_CURRENT_CONTINUOUS = 25;
     private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
@@ -51,7 +51,7 @@ public class SwerveModule {
         rotation = new HSFalcon(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
         drive = new HSFalcon(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
         canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
-        translationLoop = new SimpleVelocityLoop(DRIVE_KV, DRIVE_KA, MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
+        translationLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(DRIVE_KV, DRIVE_KA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
         initMotors();
     }
 
@@ -122,7 +122,7 @@ public class SwerveModule {
         rotation.setSelectedSensorPosition(position * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO);
     }
 
-    public SimpleVelocityLoop getTranslationLoop() {
+    public LinearSystemRegulationLoop getTranslationLoop() {
         return translationLoop;
     }
 

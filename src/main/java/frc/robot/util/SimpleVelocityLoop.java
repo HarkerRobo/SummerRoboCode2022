@@ -10,15 +10,15 @@ import edu.wpi.first.math.system.LinearSystemLoop;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import frc.robot.RobotMap;
 
-public class SimpleVelocityLoop {
-    private LinearSystemLoop<N1, N1, N1> loop;
-    private LinearQuadraticRegulator<N1, N1, N1> controller;
-    private LinearSystem<N1, N1, N1> plant;
-    private KalmanFilter<N1, N1, N1> observer;
+public class LinearSystemRegulationLoop {
+    private LinearSystemLoop loop;
+    private LinearQuadraticRegulator controller;
+    private LinearSystem plant;
+    private KalmanFilter observer;
 
-    public SimpleVelocityLoop(double kV, double kA, double  modelStdDevs, double measurementStdDevs,
+    public LinearSystemRegulationLoop(LinearSystem plant, double  modelStdDevs, double measurementStdDevs,
         double velError, double controlEffortTolerance) {
-        plant = LinearSystemId.identifyVelocitySystem(kV, kA);
+        this.plant = plant;
         observer = new KalmanFilter<>(Nat.N1(), Nat.N1(), plant, VecBuilder.fill(modelStdDevs), 
             VecBuilder.fill(measurementStdDevs), RobotMap.ROBOT_LOOP);
         controller = new LinearQuadraticRegulator<>(plant, VecBuilder.fill(velError), 

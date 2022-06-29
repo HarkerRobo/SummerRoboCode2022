@@ -7,7 +7,7 @@ import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
-import frc.robot.util.SimpleVelocityLoop;
+import frc.robot.util.LinearSystemRegulationLoop;
 import frc.robot.util.Units;
 import harkerrobolib.wrappers.HSFalcon;
 
@@ -17,7 +17,7 @@ public class Shooter extends SubsystemBase {
     private HSFalcon master;
     private HSFalcon follower;
 
-    private SimpleVelocityLoop velocityLoop;
+    private LinearSystemRegulationLoop velocityLoop;
 
     private static final boolean MASTER_INVERT = true; 
     private static final boolean FOLLOWER_INVERT = false;
@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
     private Shooter() {
         master = new HSFalcon(RobotMap.SHOOTER_MASTER, RobotMap.CANBUS);
         follower = new HSFalcon(RobotMap.SHOOTER_FOLLOWER, RobotMap.CANBUS);
-        velocityLoop = new SimpleVelocityLoop(kV, kA, MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
+        velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
         initMotors();
     }
 
