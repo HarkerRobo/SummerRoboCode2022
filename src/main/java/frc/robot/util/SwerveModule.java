@@ -8,6 +8,8 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
@@ -100,9 +102,8 @@ public class SwerveModule {
             drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
         }
         else {
-            drive.set(ControlMode.PercentOutput, MathUtil.clamp(
-                translationLoop.updateAndPredict(driveOutput, getCurrentSpeed())
-                    + Math.signum(driveOutput) * DRIVE_KS, -RobotMap.MAX_MOTOR_VOLTAGE, RobotMap.MAX_MOTOR_VOLTAGE) / RobotMap.MAX_MOTOR_VOLTAGE);
+            drive.setVoltage(MathUtil.clamp(translationLoop.updateAndPredict(driveOutput, getCurrentSpeed())
+                    + Math.signum(driveOutput) * DRIVE_KS, -RobotMap.MAX_MOTOR_VOLTAGE, RobotMap.MAX_MOTOR_VOLTAGE));
         }
     }
 
@@ -114,8 +115,16 @@ public class SwerveModule {
         return rotation.getSelectedSensorPosition() * Units.ENCODER_TICKS_TO_DEGREES / ROTATION_GEAR_RATIO;
     }
 
+    public Rotation2d getCurrentRotation() {
+        return Rotation2d.fromDegrees(getCurrentAngle());
+    }
+
     public double getCurrentSpeed() {
-        return drive.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND * Units.FOUR_INCH_WHEEL_ROT_TO_METER / DRIVE_GEAR_RATIO;
+        return drive.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND * Units.wheelRotsToMeter(4) / DRIVE_GEAR_RATIO;
+    }
+
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(getCurrentSpeed(), getCurrentRotation());
     }
 
     public void setRotationOffset() {

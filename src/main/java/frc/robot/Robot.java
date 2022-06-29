@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -20,6 +21,7 @@ import frc.robot.subsystems.Intake;
  * project.
  */
 public class Robot extends TimedRobot {
+  Field2d field = new Field2d();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -44,6 +46,7 @@ public class Robot extends TimedRobot {
     
     SmartDashboard.putData(Drivetrain.getInstance());
     SmartDashboard.putData(Intake.getInstance());
+    field.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
   }
 
   /**

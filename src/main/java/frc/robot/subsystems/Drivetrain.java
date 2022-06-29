@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,6 +11,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
@@ -28,13 +32,13 @@ public class Drivetrain extends SubsystemBase {
     public static final double MAX_TRANSLATION_VEL =  3.0; // in m/s
     public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
 
-    private static final double ODOMETRY_MODEL_STDEV = 0.0;
-    private static final double ODOMEDTRY_ENCODER_STDEV = 0.0;
-    private static final double ODOMETRY_VISION_STDEV = 0.0;
+    private static final Matrix<N3, N1> ODOMETRY_STATE_STDDEV = VecBuilder.fill(1.0, 1.0, 1.0);
+    private static final Matrix<N1, N1> ODOMETRY_ENCODER_STDDEV = VecBuilder.fill(1.0);
+    private static final Matrix<N3, N1> ODOMETRY_VISION_STDDEV = VecBuilder.fill(1.0, 1.0, 1.0);
 
     private SwerveModule[] swerveModules;
     private SwerveDriveKinematics kinematics;
-    private SwerveDrivePoseEstimator estimator;
+    private SwerveDrivePoseEstimator poseEstimator;
     private Pigeon2 pigeon;
 
     private Drivetrain() {
@@ -45,7 +49,12 @@ public class Drivetrain extends SubsystemBase {
 
         pigeon = new Pigeon2(RobotMap.PIGEON_ID, RobotMap.CANBUS);
 
-        // estimator = new SwerveDrivePoseEstimator(getRobotHeading(), new Pose2d(0, 0, Rotation2d.fromDegrees(getRobotHeading())), kinematics, ODOMETRY_MODEL_STDEV, ODOMEDTRY_ENCODER_STDEV, ODOMETRY_VISION_STDEV);
+        poseEstimator = new SwerveDrivePoseEstimator(Rotation2d.fromDegrees(getRobotHeading()), new Pose2d(0, 0, Rotation2d.fromDegrees(getRobotHeading())), 
+            kinematics, ODOMETRY_STATE_STDDEV, ODOMETRY_ENCODER_STDDEV, ODOMETRY_VISION_STDDEV);
+    }
+
+    public void updatePoseEstimator() {
+        poseEstimator.update(getRobotRotation(), swerveModules[0].getState(), swerveModules[1].getState(), swerveModules[2].getState(), swerveModules[3].getState());
     }
 
     public void setAngleAndDrive(ChassisSpeeds chassisSpeeds) {
@@ -63,6 +72,14 @@ public class Drivetrain extends SubsystemBase {
 
     public double getRobotHeading() {
         return pigeon.getYaw();
+    }
+
+    public Rotation2d getRobotRotation() {
+        return Rotation2d.fromDegrees(getRobotHeading());
+    }
+
+    public SwerveDrivePoseEstimator getPoseEstimator() {
+        return poseEstimator;
     }
 
     public static Drivetrain getInstance() {
