@@ -1,15 +1,19 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
+import frc.robot.util.LinearSystemRegulationLoop;
 import frc.robot.util.Units;
 import harkerrobolib.wrappers.HSFalcon;
 
@@ -20,15 +24,22 @@ public class Intake extends SubsystemBase {
     private HSFalcon roller;
 
     public static final double MAX_ROLLER_SPEED = 60; //rotations/sec
-    public static final double INTAKE_GEAR_RATIO = 0.6;
+    public static final double INTAKE_GEAR_RATIO = 5.0/3.0;
 
     private static final double CONTINUOUS_CURRENT_LIMIT = 30;
     private static final double PEAK_CURRENT = 40;
     private static final double PEAK_DUR = 0.1;
     private static final boolean INVERT = true;
 
-    private static final double kP = 1;
-    private static final double kF = 0.02;
+    private static final double kS = 0; // tune later
+    private static final double kV = 0;
+    private static final double kA = 0;
+
+    private static final double MAX_ERROR = 1;  
+    private static final double MODEL_STANDARD_DEVIATION = 0.5;
+    private static final double ENCODER_STANDARD_DEVIATION = 0.035;
+
+    private LinearSystemRegulationLoop velocityLoop;
 
     private State currIntakeState;
 
@@ -41,6 +52,7 @@ public class Intake extends SubsystemBase {
     private Intake() {
         intake = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD ,RobotMap.INTAKE_BACKWARD);
         roller = new HSFalcon(RobotMap.INTAKE_MOTOR);
+        velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
         initMotor();
     }
 
@@ -50,8 +62,6 @@ public class Intake extends SubsystemBase {
         roller.selectProfileSlot(RobotMap.DEFAULT_SLOT_ID, RobotMap.DEFAULT_LOOP_ID);
         roller.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.DEFAULT_LOOP_ID);
         roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
-        roller.config_kP(RobotMap.DEFAULT_SLOT_ID, kP);
-        roller.config_kF(RobotMap.DEFAULT_SLOT_ID, kF);
     }
 
     public void setForward() {
@@ -70,7 +80,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setRollerOutput(double rollerOutput) {
-        roller.set(ControlMode.Velocity, rollerOutput * INTAKE_GEAR_RATIO / Units.FALCON_ENCODER_TICKS);
+        roller.setVoltage(velocityLoop.updateAndPredict(rollerOutput, getIntakeRPS()) + Math.signum(rollerOutput) * kS);
     }
 
     public State getCurrIntakeState() {
@@ -82,7 +92,7 @@ public class Intake extends SubsystemBase {
     }
     
     public double getIntakeRPS() {
-        return roller.getSelectedSensorVelocity() * INTAKE_GEAR_RATIO * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND;
+        return roller.getSelectedSensorVelocity() / INTAKE_GEAR_RATIO * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND;
     }
     
     public HSFalcon getRollerMotor() {
@@ -99,7 +109,5 @@ public class Intake extends SubsystemBase {
         builder.setSmartDashboardType("Intake");
         builder.addDoubleProperty("Current Intake Roller Sensor Velocity", () -> roller.getSelectedSensorVelocity(), null);
         builder.addDoubleProperty("Current Intake Roller RPS", () -> getIntakeRPS(), null);
-        builder.addDoubleProperty("Intake kP", () -> kP, (double d) -> {roller.config_kP(RobotMap.DEFAULT_SLOT_ID, d);});
-
     } 
 }

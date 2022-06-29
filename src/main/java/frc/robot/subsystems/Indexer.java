@@ -4,10 +4,12 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
+import frc.robot.util.LinearSystemRegulationLoop;
 import frc.robot.util.Units;
 import harkerrobolib.wrappers.HSFalcon;
 
@@ -18,25 +20,42 @@ public class Indexer extends SubsystemBase{
     private DigitalInput topProximity;
     private DigitalInput bottomProximity;
 
-    private static final double BOTTOM_kP = 1; // tune later
-    private static final double BOTTOM_kF = 0.02;
-    private static final double TOP_kP = 1; // tune later
-    private static final double TOP_kF = 0.02;
-
     private static final double INDEXER_CURRENT_CONTINUOUS = 30;
     private static final double INDEXER_CURRENT_PEAK = 60;
     private static final double INDEXER_CURRENT_PEAK_DUR = 0.2;
     private static final boolean TOP_INVERT = true;
     private static final boolean BOTTOM_INVERT = false;
 
-    private static final double INDEXER_TOP_GEAR_RATIO = 2; // replace
-    private static final double INDEXER_BOTTOM_GEAR_RATIO = 2;
+    private static final double INDEXER_TOP_GEAR_RATIO = 5.0;
+    private static final double INDEXER_BOTTOM_GEAR_RATIO = 1.5;
+
+    //tune later
+    private static final double TOP_kS = 0;
+    private static final double TOP_kV = 0;
+    private static final double TOP_kA = 0;
+    private static final double BOTTOM_kS = 0;
+    private static final double BOTTOM_kV = 0;
+    private static final double BOTTOM_kA = 0;
+
+    //tune later
+    private static final double TOP_MAX_ERROR = 0.5;
+    private static final double TOP_MODEL_STANDARD_DEVIATION = 0.5;
+    private static final double TOP_ENCODER_STANDARD_DEVIATION = 0.035;
+
+    private static final double BOTTOM_MAX_ERROR = 0.5;
+    private static final double BOTTOM_MODEL_STANDARD_DEVIATION = 0.5;
+    private static final double BOTTOM_ENCODER_STANDARD_DEVIATION = 0.035;
+
+    private LinearSystemRegulationLoop bottomVelocityLoop;
+    private LinearSystemRegulationLoop topVelocityLoop;
 
     private Indexer() {
         top = new HSFalcon(RobotMap.INDEXER_TOP);
         bottom = new HSFalcon(RobotMap.INDEXER_BOTTOM);
         topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);
         bottomProximity = new DigitalInput(RobotMap.BOTTOM_PROXIMITY);
+        topVelocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(TOP_kV, TOP_kA), TOP_MODEL_STANDARD_DEVIATION, TOP_ENCODER_STANDARD_DEVIATION, TOP_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
+        bottomVelocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(BOTTOM_kV, BOTTOM_kA), BOTTOM_MODEL_STANDARD_DEVIATION, BOTTOM_ENCODER_STANDARD_DEVIATION, BOTTOM_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
         initMotors();
     }
 
@@ -48,8 +67,6 @@ public class Indexer extends SubsystemBase{
         top.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, INDEXER_CURRENT_CONTINUOUS, INDEXER_CURRENT_PEAK, INDEXER_CURRENT_PEAK_DUR));
         top.configClosedloopRamp(0.3);
         top.configOpenloopRamp(0.3);
-        top.config_kP(RobotMap.DEFAULT_SLOT_ID, TOP_kP);
-        top.config_kF(RobotMap.DEFAULT_SLOT_ID, TOP_kF);
 
         bottom.configFactoryDefault();
         bottom.setInverted(BOTTOM_INVERT);
@@ -58,16 +75,15 @@ public class Indexer extends SubsystemBase{
         bottom.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, INDEXER_CURRENT_CONTINUOUS, INDEXER_CURRENT_PEAK, INDEXER_CURRENT_PEAK_DUR));
         bottom.configClosedloopRamp(0.3);
         bottom.configOpenloopRamp(0.3);
-        bottom.config_kP(RobotMap.DEFAULT_SLOT_ID, BOTTOM_kP);
-        bottom.config_kF(RobotMap.DEFAULT_SLOT_ID, BOTTOM_kF);
     }
 
     public void setTopOutput(double topOutput) {
-        top.set(ControlMode.Velocity, topOutput);
+        top.setVoltage(topVelocityLoop.updateAndPredict(topOutput, Units.wheelRotsToMeter(4.0) * getTopRPS()) + TOP_kS * Math.signum(topOutput));
     }
 
     public void setBottomOutput(double bottomOutput) {
-        bottom.set(ControlMode.Velocity, bottomOutput);
+        bottom.setVoltage(bottomVelocityLoop.updateAndPredict(bottomOutput, Units.wheelRotsToMeter(3.0) * getBottomRPS()) + BOTTOM_kS * Math.signum(bottomOutput));
+
     }
 
     public void setBothOutput(double output) {
@@ -90,6 +106,7 @@ public class Indexer extends SubsystemBase{
     public double getBottomRPS() {
         return bottom.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / INDEXER_BOTTOM_GEAR_RATIO;
     }
+
     public static Indexer getInstance() {
         if(instance == null) {
             instance = new Indexer();
@@ -102,9 +119,6 @@ public class Indexer extends SubsystemBase{
         builder.addDoubleProperty("Current Indexer Top Velocity",  () -> getTopRPS(), null);
         builder.addDoubleProperty("Current Indexer Bottom Velocity", () -> getBottomRPS(), null);
         builder.addDoubleProperty("Current Indexer Top Sensor Velocity", () -> top.getSelectedSensorVelocity(), null);
-        builder.addDoubleProperty("Current Indexer Bottom Sensor Velocity", () -> bottom.getSelectedSensorVelocity(), null);
-        builder.addDoubleProperty("Indexer Top kP", () -> TOP_kP, (double d) -> {top.config_kP(RobotMap.DEFAULT_SLOT_ID, d);});
-        builder.addDoubleProperty("Indexer Bottom kP", () -> BOTTOM_kP, (double d) -> {bottom.config_kP(RobotMap.DEFAULT_SLOT_ID, d);});
-        
+        builder.addDoubleProperty("Current Indexer Bottom Sensor Velocity", () -> bottom.getSelectedSensorVelocity(), null);        
     }
 }

@@ -21,8 +21,10 @@ public class LinearSystemRegulationLoop {
         this.plant = plant;
         observer = new KalmanFilter<>(Nat.N1(), Nat.N1(), plant, VecBuilder.fill(modelStdDevs), 
             VecBuilder.fill(measurementStdDevs), RobotMap.ROBOT_LOOP);
+
         controller = new LinearQuadraticRegulator<>(plant, VecBuilder.fill(velError), 
             VecBuilder.fill(controlEffortTolerance), RobotMap.ROBOT_LOOP);
+            
         loop = new LinearSystemLoop<>(plant, controller, observer, RobotMap.MAX_MOTOR_VOLTAGE, RobotMap.ROBOT_LOOP);
     }
 
