@@ -17,6 +17,7 @@ public class IntakeManual extends IndefiniteCommand{
         if (OI.getInstance().getDriverGamepad().getRightTrigger() > OI.DEFAULT_DEADBAND) {
             Intake.getInstance().setRollerOutput(INTAKE_SPEED);
             Intake.getInstance().setCurrIntakeState(Intake.State.INTAKE);
+            
         }
         else if (OI.getInstance().getDriverGamepad().getLeftTrigger() > OI.DEFAULT_DEADBAND) {
             Intake.getInstance().setRollerOutput(-INTAKE_SPEED);

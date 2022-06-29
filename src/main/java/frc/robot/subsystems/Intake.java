@@ -53,6 +53,7 @@ public class Intake extends SubsystemBase {
         intake = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD ,RobotMap.INTAKE_BACKWARD);
         roller = new HSFalcon(RobotMap.INTAKE_MOTOR);
         velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
+        currIntakeState = State.NEUTRAL;
         initMotor();
     }
 
@@ -72,13 +73,6 @@ public class Intake extends SubsystemBase {
         intake.set(DoubleSolenoid.Value.kReverse);
     }
 
-    public void toggle() {
-        if(intake.get() == Value.kOff)
-            setForward();
-        else
-            intake.toggle();
-    }
-
     public void setRollerOutput(double rollerOutput) {
         roller.setVoltage(velocityLoop.updateAndPredict(rollerOutput, getIntakeRPS()) + Math.signum(rollerOutput) * kS);
     }
@@ -88,7 +82,16 @@ public class Intake extends SubsystemBase {
     }
 
     public void setCurrIntakeState(State s) {
-        currIntakeState = s;
+        if(s != currIntakeState) {
+            switch(s) {
+                case NEUTRAL:
+                    setForward();
+                    break;
+                default:
+                    setBackward();
+            }
+            currIntakeState = s;
+        }
     }
     
     public double getIntakeRPS() {
