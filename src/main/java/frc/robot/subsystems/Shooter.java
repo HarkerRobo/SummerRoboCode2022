@@ -30,8 +30,8 @@ public class Shooter extends SubsystemBase {
     private static final double kS = 0.0;
     private static final double kV = 0.0; // TODO: update shooter Linear System constants
     private static final double kA = 0.0;
-    private static final double ENCODER_STANDARD_DEVIATION = 0.0;
-    private static final double MODEL_STANDARD_DEVIATION = 0.0;
+    private static final double ENCODER_STANDARD_DEVIATION = 0.035;
+    private static final double MODEL_STANDARD_DEVIATION = 0.5;
     private static final double MAX_ERROR = 1.0;
 
     private static final double SHOOTER_GEAR_RATIO = 1.5; // TODO: update shooter gear ratio

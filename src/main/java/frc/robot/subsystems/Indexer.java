@@ -50,8 +50,8 @@ public class Indexer extends SubsystemBase{
     private LinearSystemRegulationLoop topVelocityLoop;
 
     private Indexer() {
-        top = new HSFalcon(RobotMap.INDEXER_TOP);
-        bottom = new HSFalcon(RobotMap.INDEXER_BOTTOM);
+        top = new HSFalcon(RobotMap.INDEXER_TOP, RobotMap.CANBUS);
+        bottom = new HSFalcon(RobotMap.INDEXER_BOTTOM, RobotMap.CANBUS);
         topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);
         bottomProximity = new DigitalInput(RobotMap.BOTTOM_PROXIMITY);
         topVelocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(TOP_kV, TOP_kA), TOP_MODEL_STANDARD_DEVIATION, TOP_ENCODER_STANDARD_DEVIATION, TOP_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);

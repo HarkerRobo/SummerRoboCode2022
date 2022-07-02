@@ -1,6 +1,10 @@
 package frc.robot.subsystems;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,12 +36,16 @@ public class Hood extends SubsystemBase{
     private static final double MODEL_STANDARD_DEVIATION = 0.5;
     private static final double ENCODER_STANDARD_DEVIATION = 0.035;
 
+    private static final double HOOD_STALLING_CURRENT = 10;
+    
+    private boolean isHoodZeroed;
 
     private LinearSystemRegulationLoop positionLoop;
 
     private Hood() {
         hood = new HSFalcon(RobotMap.HOOD_ID, RobotMap.CANBUS);
         positionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
+        isHoodZeroed = false;
     }
 
     public void initMotors() {
@@ -45,17 +53,33 @@ public class Hood extends SubsystemBase{
         hood.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, HOOD_CURRENT_CONTINUOUS, HOOD_CURRENT_PEAK, HOOD_CURRENT_PEAK_DUR));
         hood.setNeutralMode(NeutralMode.Brake);
         hood.configForwardSoftLimitEnable(true);
-        hood.configReverseSoftLimitEnable(true);
         hood.configForwardSoftLimitThreshold(HOOD_MAX_DEGREE);
-        hood.configReverseSoftLimitThreshold(HOOD_MIN_DEGREE);
+        hood.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms);
+        hood.configVoltageMeasurementFilter(16);
     }
 
     public void setHoodPosition(double position) {
-        hood.setVoltage(positionLoop.updateAndPredict(position, getHoodPosition()) + kS * Math.signum(getHoodPosition()-position) + kG);
+        hood.setVoltage(positionLoop.updateAndPredict(position, getHoodPosition()) + kS * Math.signum(getHoodPosition()-position) + kG); // potentially change
+    }
+
+    public void setHoodPercentOutput(double percentOutput) {
+        hood.set(ControlMode.PercentOutput, percentOutput);
+    }
+
+    public void setHoodEncoderZero() {
+        hood.setSelectedSensorPosition(0);
+    }
+
+    public void setIsHoodZeroed(boolean zeroed) {
+        isHoodZeroed = zeroed;
     }
 
     public double getHoodPosition() {
         return hood.getSelectedSensorPosition() * Units.ENCODER_TICKS_TO_DEGREES / HOOD_GEAR_RATIO;
+    }
+
+    public boolean isHoodZero() {
+        return hood.getStatorCurrent() >= HOOD_STALLING_CURRENT;
     }
 
     public static Hood getInstance() {

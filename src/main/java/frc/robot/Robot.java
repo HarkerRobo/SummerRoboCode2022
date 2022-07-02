@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drivetrain.SwerveManual;
 import frc.robot.commands.intake.IntakeManual;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 
 /**
@@ -21,7 +22,7 @@ import frc.robot.subsystems.Intake;
  * project.
  */
 public class Robot extends TimedRobot {
-  Field2d field = new Field2d();
+  private static final Field2d FIELD = new Field2d();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -46,7 +47,8 @@ public class Robot extends TimedRobot {
     
     SmartDashboard.putData(Drivetrain.getInstance());
     SmartDashboard.putData(Intake.getInstance());
-    field.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
+    SmartDashboard.putData(Indexer.getInstance());
+    FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
   }
 
   /**

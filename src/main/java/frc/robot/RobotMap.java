@@ -28,6 +28,13 @@ public final class RobotMap {
     public static final int SHOOTER_MASTER = 11;
     public static final int SHOOTER_FOLLOWER = 12;
 
+    public static final int RIGHT_CLIMBER = 15;
+    public static final int LEFT_CLIMBER = 16;
+    public static final int CLIMBER_FORWARD = 2;
+    public static final int CLIMBER_BACKWARD = 6;
+    public static final int CLIMBER_RIGHT_LIMIT_SWTICH = 4;
+    public static final int CLIMBER_LEFT_LIMIT_SWITCH = 5;
+
     public static final int OPERATOR_ID = 1;
     public static final int DRIVER_ID = 0;
 
