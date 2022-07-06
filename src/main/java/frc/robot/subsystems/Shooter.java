@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.LinearSystemRegulationLoop;
@@ -27,14 +28,14 @@ public class Shooter extends SubsystemBase {
     private static final double CURRENT_PEAK = 45;
     private static final double CURRENT_PEAK_DUR = 0.5;
 
-    private static final double kS = 0.0;
-    private static final double kV = 0.0; // TODO: update shooter Linear System constants
-    private static final double kA = 0.0;
-    private static final double ENCODER_STANDARD_DEVIATION = 0.035;
+    private static final double kS = 0.1432;
+    private static final double kV = 0.51368;
+    private static final double kA = 0.038625;
     private static final double MODEL_STANDARD_DEVIATION = 0.5;
+    private static final double ENCODER_STANDARD_DEVIATION = 0.015;
     private static final double MAX_ERROR = 1.0;
 
-    private static final double SHOOTER_GEAR_RATIO = 1.5; // TODO: update shooter gear ratio
+    private static final double SHOOTER_GEAR_RATIO = 1.5;
 
     private Shooter() {
         master = new HSFalcon(RobotMap.SHOOTER_MASTER, RobotMap.CANBUS);
@@ -46,6 +47,7 @@ public class Shooter extends SubsystemBase {
     private void initMotors() {
         follower.follow(master);
         master.configFactoryDefault();
+        follower.configFactoryDefault();
         master.setNeutralMode(NeutralMode.Coast);
         follower.setNeutralMode(NeutralMode.Coast);
         master.setInverted(MASTER_INVERT);
@@ -58,16 +60,22 @@ public class Shooter extends SubsystemBase {
     }
 
     public void set(double speed) {
-        master.set(ControlMode.PercentOutput, (velocityLoop.updateAndPredict(speed, getCurrentRPS()) + kS * Math.signum(speed)) / RobotMap.MAX_MOTOR_VOLTAGE);
+        master.set(ControlMode.PercentOutput, (velocityLoop.updateAndPredict(speed, getShooterSpeed()) + kS * Math.signum(speed)) / RobotMap.MAX_MOTOR_VOLTAGE);
     }
 
-    public double getCurrentRPS() {
-        return master.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / SHOOTER_GEAR_RATIO;
+    public double getShooterSpeed() {
+        return master.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / SHOOTER_GEAR_RATIO * Units.wheelRotsToMeter(4);
     }
 
     public static Shooter getInstance() {
         if(instance == null)
             instance = new Shooter();
         return instance;
+    }
+
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Shooter");
+        builder.addDoubleProperty("Shooter Speed", () -> getShooterSpeed(), null);
+        builder.addDoubleProperty("Shooter Voltage", () -> master.getMotorOutputVoltage(), null);
     }
 }

@@ -15,7 +15,7 @@ public class ShooterManual extends IndefiniteCommand{
 
     public double calculateShooterSpeed() {
         if(OI.getInstance().getDriverGamepad().getButtonYState())
-            return 30;
+            return 5;
         return 0;
     }
 }

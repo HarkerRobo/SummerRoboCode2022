@@ -11,11 +11,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import harkerrobolib.wrappers.HSFalcon;
 
-public class SwerveModule {
+public class SwerveModule implements Sendable{
     private HSFalcon rotation;
     private HSFalcon drive;
 
@@ -142,5 +144,15 @@ public class SwerveModule {
 
     public HSFalcon getRotationMotor() {
         return rotation;
+    }
+
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Swerve Module " + swerveID);
+        builder.addDoubleProperty("Drive Velocity",  () -> getCurrentSpeed(), null);
+        builder.addDoubleProperty("Current Rotation",  () -> getCurrentAngle(), null);
+        builder.addDoubleProperty("Drive Voltage",  () -> drive.getMotorOutputVoltage(), null);
+        builder.addDoubleProperty("Rotation Voltage", () -> rotation.getMotorOutputVoltage(), null);
+        builder.addDoubleProperty("Drive Error", () -> translationLoop.getError(), null);
+        builder.addDoubleProperty("Rotation Error", () -> rotation.getClosedLoopError(), null);
     }
 }

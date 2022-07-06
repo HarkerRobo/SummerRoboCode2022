@@ -13,23 +13,14 @@ public class GetBallsFromIntake extends IndefiniteCommand {
     }
 
     public void execute() {
-        switch (Intake.getInstance().getCurrIntakeState()) {
+        switch (Intake.getInstance().getState()) {
             case INTAKE:
-                if (Indexer.getInstance().isBallInBottom() != Indexer.getInstance().isBallInTop()) {
-                    if (Indexer.getInstance().isBallInBottom()) {
-                        Indexer.getInstance().setBothOutput(INDEXER_SPEED);
-                    }
-                    else if (Indexer.getInstance().isBallInTop()) {
-                        Indexer.getInstance().setTopOutput(0);
-                        Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
-                    }
-                }
-                else if (!Indexer.getInstance().isBallInBottom()) { // && !Indexer.getInstance().isBallInTop()
-                    Indexer.getInstance().setBothOutput(INDEXER_SPEED);
-                }
-                else {
-                    Indexer.getInstance().setBothOutput(0);
-                }
+                if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(0);
+                else Indexer.getInstance().setTopOutput(INDEXER_SPEED);
+                if (Indexer.getInstance().isBallInBottom())
+                    if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setBottomOutput(0);
+                    else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
+                else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
                 break;
             case OUTTAKE:
                 Indexer.getInstance().setBothOutput(INDEXER_OUTTAKE_SPEED);

@@ -60,8 +60,18 @@ public class Drivetrain extends SubsystemBase {
     public void setAngleAndDrive(ChassisSpeeds chassisSpeeds) {
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
         for (int i = 0; i < 4; i++) {
-            states[i] = SwerveModuleState.optimize(states[i], Rotation2d.fromDegrees(swerveModules[i].getCurrentAngle()));
-            swerveModules[i].setAngleAndDrive(states[i].angle.getDegrees(), states[i].speedMetersPerSecond);
+            double driveOutput = states[i].speedMetersPerSecond;
+            double angle = states[i].angle.getDegrees();
+            double diff = angle - swerveModules[i].getCurrentAngle();
+            diff = diff % 360.0;
+            if(Math.abs(diff) > 270.0) {
+                diff -= Math.signum(diff) * 360.0;
+            }
+            else if (Math.abs(diff) > 90.0) {
+                diff -= Math.signum(diff) * 180.0;
+                driveOutput = -driveOutput;
+            }
+            swerveModules[i].setAngleAndDrive(diff + swerveModules[i].getCurrentAngle(), driveOutput);
         }
     }
 
@@ -82,6 +92,10 @@ public class Drivetrain extends SubsystemBase {
         return poseEstimator;
     }
 
+    public SwerveModule getSwerveModule(int id) {
+        return swerveModules[id];
+    }
+
     public static Drivetrain getInstance() {
         if(instance == null) instance = new Drivetrain();
         return instance;
@@ -89,8 +103,5 @@ public class Drivetrain extends SubsystemBase {
 
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Drivetrain");
-        builder.addDoubleProperty("Swerve Module 0 Drive Error", () -> swerveModules[0].getTranslationLoop().getError(), null);
-        builder.addDoubleProperty("Swerve Module 0 Drive Voltage", () -> swerveModules[0].getDriveMotor().getMotorOutputVoltage(), null);
-        builder.addDoubleProperty("Swerve Module 0 Rotation Voltage", () -> swerveModules[0].getRotationMotor().getMotorOutputVoltage(), null);
     }
 }

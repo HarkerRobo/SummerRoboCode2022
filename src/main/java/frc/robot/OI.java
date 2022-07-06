@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.Intake;
 import harkerrobolib.wrappers.HSMotorController;
 import harkerrobolib.wrappers.XboxGamepad;
 

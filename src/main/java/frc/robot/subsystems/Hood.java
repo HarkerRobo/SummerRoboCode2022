@@ -22,8 +22,7 @@ public class Hood extends SubsystemBase{
     private static final double HOOD_CURRENT_CONTINUOUS = 10;
     private static final double HOOD_CURRENT_PEAK = 10;
     private static final double HOOD_CURRENT_PEAK_DUR = 0.05;
-    private static final int HOOD_MAX_DEGREE = 26;
-    private static final int HOOD_MIN_DEGREE = 0;
+    private static final int HOOD_RANGE = 23;
 
     private static final double kS = 0;
     private static final double kV = 0;
@@ -53,7 +52,7 @@ public class Hood extends SubsystemBase{
         hood.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, HOOD_CURRENT_CONTINUOUS, HOOD_CURRENT_PEAK, HOOD_CURRENT_PEAK_DUR));
         hood.setNeutralMode(NeutralMode.Brake);
         hood.configForwardSoftLimitEnable(true);
-        hood.configForwardSoftLimitThreshold(HOOD_MAX_DEGREE);
+        hood.configForwardSoftLimitThreshold(HOOD_RANGE * HOOD_GEAR_RATIO * Units.DEGREES_TO_ENCODER_TICKS);
         hood.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms);
         hood.configVoltageMeasurementFilter(16);
     }

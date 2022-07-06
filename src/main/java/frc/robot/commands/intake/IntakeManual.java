@@ -1,7 +1,6 @@
 package frc.robot.commands.intake;
 
 import frc.robot.OI;
-import frc.robot.RobotMap;
 import frc.robot.subsystems.Intake;
 import harkerrobolib.commands.IndefiniteCommand;
 
@@ -14,24 +13,17 @@ public class IntakeManual extends IndefiniteCommand{
     }
 
     public void execute() {
-        if (OI.getInstance().getDriverGamepad().getRightTrigger() > OI.DEFAULT_DEADBAND) {
-            Intake.getInstance().setRollerOutput(INTAKE_SPEED);
-            Intake.getInstance().setCurrIntakeState(Intake.State.INTAKE);
-            
-        }
-        else if (OI.getInstance().getDriverGamepad().getLeftTrigger() > OI.DEFAULT_DEADBAND) {
-            Intake.getInstance().setRollerOutput(-INTAKE_SPEED);
-            Intake.getInstance().setCurrIntakeState(Intake.State.OUTTAKE);
-        }
-        else {
-            Intake.getInstance().setRollerOutput(0);
-            Intake.getInstance().setCurrIntakeState(Intake.State.NEUTRAL);
-        }
+        if(OI.getInstance().getDriverGamepad().getButtonTriggerLeft().get())
+            Intake.getInstance().setState(Intake.State.OUTTAKE);
+        else if(OI.getInstance().getDriverGamepad().getButtonTriggerLeft().get())
+            Intake.getInstance().setState(Intake.State.INTAKE);
+        else
+            Intake.getInstance().setState(Intake.State.NEUTRAL);
+        Intake.getInstance().actOnState(INTAKE_SPEED);
     }
 
     public void end(boolean interrupted) {
-        Intake.getInstance().setCurrIntakeState(Intake.State.NEUTRAL);
-        Intake.getInstance().setRollerOutput(0);
+        Intake.getInstance().setState(Intake.State.NEUTRAL);
+        Intake.getInstance().actOnState(INTAKE_SPEED);
     }
-
 }

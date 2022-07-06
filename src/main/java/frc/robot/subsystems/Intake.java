@@ -31,17 +31,17 @@ public class Intake extends SubsystemBase {
     private static final double PEAK_DUR = 0.1;
     private static final boolean INVERT = true;
 
-    private static final double kS = 0; // tune later
-    private static final double kV = 0;
-    private static final double kA = 0;
+    private static final double kS = 0.0836; // tune later
+    private static final double kV = 1.1553;
+    private static final double kA = 0.147;
 
-    private static final double MAX_ERROR = 1;  
+    private static final double MAX_ERROR = 0.1;  
     private static final double MODEL_STANDARD_DEVIATION = 0.5;
-    private static final double ENCODER_STANDARD_DEVIATION = 0.035;
+    private static final double ENCODER_STANDARD_DEVIATION = 0.015;
 
     private LinearSystemRegulationLoop velocityLoop;
 
-    private State currIntakeState;
+    private State state;
 
     public static enum State {
         INTAKE,
@@ -53,7 +53,7 @@ public class Intake extends SubsystemBase {
         intake = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD ,RobotMap.INTAKE_BACKWARD);
         roller = new HSFalcon(RobotMap.INTAKE_MOTOR);
         velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
-        currIntakeState = State.NEUTRAL;
+        state = State.NEUTRAL;
         initMotor();
     }
 
@@ -74,28 +74,36 @@ public class Intake extends SubsystemBase {
     }
 
     public void setRollerOutput(double rollerOutput) {
-        roller.setVoltage(velocityLoop.updateAndPredict(rollerOutput, getIntakeRPS()) + Math.signum(rollerOutput) * kS);
+        roller.setVoltage(velocityLoop.updateAndPredict(rollerOutput, getIntakeSpeed()) + Math.signum(rollerOutput) * kS);
     }
 
-    public State getCurrIntakeState() {
-        return currIntakeState;
+    public State getState() {
+        return state;
     }
 
-    public void setCurrIntakeState(State s) {
-        if(s != currIntakeState) {
-            switch(s) {
-                case NEUTRAL:
-                    setForward();
-                    break;
-                default:
-                    setBackward();
-            }
-            currIntakeState = s;
+    public void setState(State s) {
+        state = s;
+    }
+
+    public void actOnState(double intakeSpeed) {
+        switch(Intake.getInstance().getState()) {
+            case NEUTRAL:
+            setRollerOutput(0);
+            roller.set(ControlMode.PercentOutput, 0);
+            setForward();
+            break;
+            case INTAKE:
+            setRollerOutput(intakeSpeed);
+            setBackward();
+            break;
+            case OUTTAKE:
+            setBackward();
+            setRollerOutput(-intakeSpeed);
         }
     }
     
-    public double getIntakeRPS() {
-        return roller.getSelectedSensorVelocity() / INTAKE_GEAR_RATIO * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND;
+    public double getIntakeSpeed() {
+        return roller.getSelectedSensorVelocity() / INTAKE_GEAR_RATIO * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND * Units.wheelRotsToMeter(2);
     }
     
     public HSFalcon getRollerMotor() {
@@ -110,7 +118,8 @@ public class Intake extends SubsystemBase {
 
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Intake");
-        builder.addDoubleProperty("Current Intake Roller Sensor Velocity", () -> roller.getSelectedSensorVelocity(), null);
-        builder.addDoubleProperty("Current Intake Roller RPS", () -> getIntakeRPS(), null);
+        builder.addDoubleProperty("Intake Roller Sensor Velocity", () -> roller.getSelectedSensorVelocity(), null);
+        builder.addDoubleProperty("Intake Roller Speed", () -> getIntakeSpeed(), null);
+        builder.addDoubleProperty("Intake Voltage", () -> roller.getMotorOutputVoltage(), null);
     } 
 }

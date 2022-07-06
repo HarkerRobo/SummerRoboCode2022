@@ -56,7 +56,6 @@ public class Climber extends SubsystemBase{
         rightPositionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(RIGHT_kV, RIGHT_kA), RIGHT_MODEL_STANDARD_DEVIATION, RIGHT_ENCODER_STANDARD_DEVIATION, RIGHT_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
         initRightMotor();
         initLeftMotor();
-
     }
 
     public void initRightMotor() {

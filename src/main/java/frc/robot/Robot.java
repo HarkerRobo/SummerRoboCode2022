@@ -11,9 +11,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drivetrain.SwerveManual;
 import frc.robot.commands.intake.IntakeManual;
+import frc.robot.commands.shooter.ShooterManual;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -32,6 +34,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     CommandScheduler.getInstance().setDefaultCommand(Drivetrain.getInstance(), new SwerveManual());
     CommandScheduler.getInstance().setDefaultCommand(Intake.getInstance(), new IntakeManual());
+    CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
   }
 
   /**
@@ -46,8 +49,13 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     
     SmartDashboard.putData(Drivetrain.getInstance());
+    SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(0));
+    SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(1));
+    SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(2));
+    SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(3));
     SmartDashboard.putData(Intake.getInstance());
     SmartDashboard.putData(Indexer.getInstance());
+    SmartDashboard.putData(Shooter.getInstance());
     FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
   }
 

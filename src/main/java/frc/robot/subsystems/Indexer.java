@@ -116,9 +116,9 @@ public class Indexer extends SubsystemBase{
 
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Indexer");
-        builder.addDoubleProperty("Current Indexer Top Velocity",  () -> getTopRPS(), null);
-        builder.addDoubleProperty("Current Indexer Bottom Velocity", () -> getBottomRPS(), null);
-        builder.addDoubleProperty("Current Indexer Top Sensor Velocity", () -> top.getSelectedSensorVelocity(), null);
-        builder.addDoubleProperty("Current Indexer Bottom Sensor Velocity", () -> bottom.getSelectedSensorVelocity(), null);        
+        builder.addDoubleProperty("Top Indexer Velocity",  () -> getTopRPS(), null);
+        builder.addDoubleProperty("Bottom Indexer Velocity", () -> getBottomRPS(), null);
+        // builder.addDoubleProperty("Top Indexer Sensor Velocity", () -> top.getSelectedSensorVelocity(), null);
+        // builder.addDoubleProperty("Bottom Indexer Sensor Velocity", () -> bottom.getSelectedSensorVelocity(), null);        
     }
 }
