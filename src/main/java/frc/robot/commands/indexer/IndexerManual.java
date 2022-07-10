@@ -4,11 +4,11 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import harkerrobolib.commands.IndefiniteCommand;
 
-public class GetBallsFromIntake extends IndefiniteCommand {
+public class IndexerManual extends IndefiniteCommand {
     public static final double INDEXER_SPEED = 11.5; // meters per second
     public static final double INDEXER_OUTTAKE_SPEED = -16; // meters per second
 
-    public GetBallsFromIntake() {
+    public IndexerManual() {
         addRequirements(Indexer.getInstance());
     }
 

@@ -88,17 +88,18 @@ public class Intake extends SubsystemBase {
     public void actOnState(double intakeSpeed) {
         switch(Intake.getInstance().getState()) {
             case NEUTRAL:
-            setRollerOutput(0);
-            roller.set(ControlMode.PercentOutput, 0);
-            setForward();
-            break;
+                setRollerOutput(0);
+                roller.set(ControlMode.PercentOutput, 0);
+                setForward();
+                break;
             case INTAKE:
-            setRollerOutput(intakeSpeed);
-            setBackward();
-            break;
+                setRollerOutput(intakeSpeed);
+                setBackward();
+                break;
             case OUTTAKE:
-            setBackward();
-            setRollerOutput(-intakeSpeed);
+                setBackward();
+                setRollerOutput(-intakeSpeed);
+                break;
         }
     }
     

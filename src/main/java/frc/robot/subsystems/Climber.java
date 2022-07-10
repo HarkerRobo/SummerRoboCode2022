@@ -65,7 +65,6 @@ public class Climber extends SubsystemBase{
         right.setNeutralMode(NeutralMode.Brake);
         right.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms);
         right.configVoltageMeasurementFilter(16);
-        right.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
 
     }
 
@@ -76,7 +75,6 @@ public class Climber extends SubsystemBase{
         left.setNeutralMode(NeutralMode.Brake);
         left.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms);
         left.configVoltageMeasurementFilter(16);
-        left.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);
     }
 
     public void setRightClimberPos(double pos) {

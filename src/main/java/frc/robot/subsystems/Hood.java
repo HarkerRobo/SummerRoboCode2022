@@ -67,18 +67,19 @@ public class Hood extends SubsystemBase{
 
     public void setHoodEncoderZero() {
         hood.setSelectedSensorPosition(0);
-    }
-
-    public void setIsHoodZeroed(boolean zeroed) {
-        isHoodZeroed = zeroed;
+        isHoodZeroed = true;
     }
 
     public double getHoodPosition() {
         return hood.getSelectedSensorPosition() * Units.ENCODER_TICKS_TO_DEGREES / HOOD_GEAR_RATIO;
     }
 
-    public boolean isHoodZero() {
+    public boolean isHoodStalling() {
         return hood.getStatorCurrent() >= HOOD_STALLING_CURRENT;
+    }
+
+    public boolean isHoodZeroed() {
+        return isHoodZeroed;
     }
 
     public static Hood getInstance() {

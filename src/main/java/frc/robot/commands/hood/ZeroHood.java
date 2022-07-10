@@ -15,14 +15,13 @@ public class ZeroHood extends CommandBase{
     }
 
     public boolean isFinished() {
-        return Hood.getInstance().isHoodZero();
+        return Hood.getInstance().isHoodStalling();
     }
     
     public void end(boolean interrupted) {
         if(!interrupted) {
             Hood.getInstance().setHoodPercentOutput(0);
             Hood.getInstance().setHoodEncoderZero();
-            Hood.getInstance().setIsHoodZeroed(true);
         }
     }
 }
