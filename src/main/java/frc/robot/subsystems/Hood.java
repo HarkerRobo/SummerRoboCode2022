@@ -41,7 +41,7 @@ public class Hood extends SubsystemBase{
 
     private Hood() {
         hood = new HSFalcon(RobotMap.HOOD_ID, RobotMap.CANBUS);
-        positionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, kS);
+        positionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, kS, kG, true);
         isHoodZeroed = false;
     }
 
@@ -52,7 +52,7 @@ public class Hood extends SubsystemBase{
     }
 
     public void setHoodPosition(double position) {
-        hood.setVoltage(positionLoop.updateAndPredict(position, getHoodPosition()) + kS * Math.signum(getHoodPosition()-position) + kG); // potentially change
+        hood.setVoltage(positionLoop.updateAndPredict(position, getHoodVelocity(), getHoodPosition()));
     }
 
     public void setHoodPercentOutput(double percentOutput) {
@@ -66,6 +66,10 @@ public class Hood extends SubsystemBase{
 
     public double getHoodPosition() {
         return hood.getSelectedSensorPosition() * Units.ENCODER_TICKS_TO_DEGREES / GEAR_RATIO;
+    }
+
+    public double getHoodVelocity() {
+        return hood.getSelectedSensorVelocity() * Units.ENCODER_TICKS_TO_DEGREES / GEAR_RATIO;
     }
 
     public boolean isHoodStalling() {

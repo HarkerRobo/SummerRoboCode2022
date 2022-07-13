@@ -58,16 +58,14 @@ public class Climber extends SubsystemBase{
     public void initMotors() {
         HSFalconConfigurator.configure(right, RIGHT_INVERT, new double[]{1.0, CURRENT_CONTINUOUS, CURRENT_PEAK, CURRENT_PEAK_DUR}, true);
         HSFalconConfigurator.configure(left, LEFT_INVERT, new double[]{1.0, CURRENT_CONTINUOUS, CURRENT_PEAK, CURRENT_PEAK_DUR}, true);
-        right.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
-        left.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);
     }
 
     public void setRightClimberPos(double pos) {
-        right.setVoltage(rightPositionLoop.updateAndPredict(pos, getRightClimberPos()));
+        right.setVoltage(rightPositionLoop.updateAndPredict(pos, getRightClimberPos(), getRightClimberVel()));
     }
 
     public void setLeftClimberPos(double pos) {
-        left.setVoltage(leftPositionLoop.updateAndPredict(pos, getLeftClimberPos()));
+        left.setVoltage(leftPositionLoop.updateAndPredict(pos, getLeftClimberPos(), getLeftClimberVel()));
     }
 
     public boolean limitSwitchHit() {
@@ -79,12 +77,28 @@ public class Climber extends SubsystemBase{
         setLeftClimberPos(pos);
     }
 
+    public void setClimberForward() {
+        climber.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    public void setClimberBackward() {
+        climber.set(DoubleSolenoid.Value.kForward);
+    }
+
     public double getRightClimberPos() {
         return right.getSelectedSensorPosition();
     }
 
     public double getLeftClimberPos() {
         return left.getSelectedSensorPosition();
+    }
+
+    public double getRightClimberVel() {
+        return right.getSelectedSensorVelocity();
+    }
+
+    public double getLeftClimberVel() {
+        return left.getSelectedSensorVelocity();
     }
 
     public static Climber getInstance() {

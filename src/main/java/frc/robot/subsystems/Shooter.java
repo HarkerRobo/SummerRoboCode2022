@@ -63,7 +63,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterSpeed() {
-        return master.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / SHOOTER_GEAR_RATIO * Units.wheelRotsToMeter(4);
+        return master.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / SHOOTER_GEAR_RATIO * Units.wheelRotsToMeter(4.0);
     }
 
     public void update() {

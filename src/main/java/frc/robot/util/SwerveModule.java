@@ -86,7 +86,7 @@ public class SwerveModule implements Sendable{
 
     public void setAngleAndDrive(double rotationAngle, double driveOutput, boolean drivePercentOutput) {
         rotation.set(ControlMode.Position, (rotationAngle * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO));
-        rotation.setVoltage(rotationLoop.updateAndPredict(rotationAngle, getCurrentAngle()));
+        // rotation.setVoltage(rotationLoop.updateAndPredict(rotationAngle, getCurrentAngle(), getCurrentAngleVelocity()));
         if(drivePercentOutput) {
             drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
         }
@@ -103,12 +103,16 @@ public class SwerveModule implements Sendable{
         return rotation.getSelectedSensorPosition() * Units.ENCODER_TICKS_TO_DEGREES / ROTATION_GEAR_RATIO;
     }
 
+    public double getCurrentAngleVelocity() {
+        return rotation.getSelectedSensorVelocity() * Units.ENCODER_TICKS_TO_DEGREES / ROTATION_GEAR_RATIO;
+    }
+
     public Rotation2d getCurrentRotation() {
         return Rotation2d.fromDegrees(getCurrentAngle());
     }
 
     public double getCurrentSpeed() {
-        return drive.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND * Units.wheelRotsToMeter(4) / DRIVE_GEAR_RATIO;
+        return drive.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND * Units.wheelRotsToMeter(4.0) / DRIVE_GEAR_RATIO;
     }
 
     public SwerveModuleState getState() {

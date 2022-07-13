@@ -60,6 +60,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(Intake.getInstance());
     SmartDashboard.putData(Indexer.getInstance());
     SmartDashboard.putData(Shooter.getInstance());
+    Drivetrain.getInstance().updatePoseEstimator();
     FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
   }
 

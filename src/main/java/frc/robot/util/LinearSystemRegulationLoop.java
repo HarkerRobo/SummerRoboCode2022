@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.LinearQuadraticRegulator;
@@ -38,15 +39,23 @@ public class LinearSystemRegulationLoop {
         this(plant, modelStdDevs, measurementStdDevs, error, controlEffortTolerance, kS, 0.0, false);
     }
 
-    public double updateAndPredict(double setpoint, double systemOutput) {
+    public double updateAndPredict(double setpoint, Matrix systemOutput) {
         loop.setNextR(setpoint);
-        loop.correct(VecBuilder.fill(systemOutput));
+        loop.correct(systemOutput);
         loop.predict(RobotMap.ROBOT_LOOP);
         double output = loop.getU(0);
         output += Math.signum(output) * kS;
-        if(arm) output += kG * Math.cos(Math.toRadians(loop.getXHat(0)));
+        if (arm) output += kG * Math.cos(Math.toRadians(loop.getXHat(0)));
         else output += kG;
         return output;
+    }
+
+    public double updateAndPredict(double setpoint,  double systemOutputP, double systemOutputV) {
+        return updateAndPredict(setpoint, VecBuilder.fill(systemOutputP, systemOutputV));
+    }
+
+    public double updateAndPredict(double setpoint,  double systemOutputV) {
+        return updateAndPredict(setpoint, VecBuilder.fill(systemOutputV));
     }
 
     public double getSetpoint() {

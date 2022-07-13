@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 
@@ -10,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.util.ColorSensor;
+import frc.robot.util.HSFalconConfigurator;
 import frc.robot.util.LinearSystemRegulationLoop;
 import frc.robot.util.Units;
 import harkerrobolib.wrappers.HSFalcon;
@@ -63,22 +65,16 @@ public class Indexer extends SubsystemBase{
     }
 
     private void initMotors() {
-        
-        top.configFactoryDefault();
-        top.setInverted(TOP_INVERT);
-        top.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, INDEXER_CURRENT_CONTINUOUS, INDEXER_CURRENT_PEAK, INDEXER_CURRENT_PEAK_DUR));
-
-        bottom.configFactoryDefault();
-        bottom.setInverted(BOTTOM_INVERT);
-        bottom.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, INDEXER_CURRENT_CONTINUOUS, INDEXER_CURRENT_PEAK, INDEXER_CURRENT_PEAK_DUR));
+        HSFalconConfigurator.configure(top, TOP_INVERT, new double[]{1, INDEXER_CURRENT_CONTINUOUS, INDEXER_CURRENT_PEAK, INDEXER_CURRENT_PEAK_DUR}, false);
+        HSFalconConfigurator.configure(bottom, BOTTOM_INVERT, new double[]{1, INDEXER_CURRENT_CONTINUOUS, INDEXER_CURRENT_PEAK, INDEXER_CURRENT_PEAK_DUR}, false);
     }
 
     public void setTopOutput(double topOutput) {
-        top.setVoltage(topVelocityLoop.updateAndPredict(topOutput, Units.wheelRotsToMeter(4.0) * getTopRPS()) + TOP_kS * Math.signum(topOutput));
+        top.setVoltage(topVelocityLoop.updateAndPredict(topOutput, getTopMPS()));
     }
 
     public void setBottomOutput(double bottomOutput) {
-        bottom.setVoltage(bottomVelocityLoop.updateAndPredict(bottomOutput, Units.wheelRotsToMeter(3.0) * getBottomRPS()) + BOTTOM_kS * Math.signum(bottomOutput));
+        bottom.setVoltage(bottomVelocityLoop.updateAndPredict(bottomOutput, getBottomMPS()));
 
     }
 
@@ -95,12 +91,12 @@ public class Indexer extends SubsystemBase{
         return !bottomProximity.get();
     }
 
-    public double getTopRPS() {
-        return top.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / INDEXER_TOP_GEAR_RATIO;
+    public double getTopMPS() {
+        return Units.wheelRotsToMeter(4.0) * top.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / INDEXER_TOP_GEAR_RATIO; // change
     }
 
-    public double getBottomRPS() {
-        return bottom.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / INDEXER_BOTTOM_GEAR_RATIO;
+    public double getBottomMPS() {
+        return Units.wheelRotsToMeter(3.0) * bottom.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / INDEXER_BOTTOM_GEAR_RATIO; // change
     }
 
     public static Indexer getInstance() {
@@ -112,11 +108,9 @@ public class Indexer extends SubsystemBase{
 
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Indexer");
-        builder.addDoubleProperty("Top Indexer Velocity",  () -> getTopRPS(), null);
-        builder.addDoubleProperty("Bottom Indexer Velocity", () -> getBottomRPS(), null);
+        builder.addDoubleProperty("Top Indexer Velocity",  () -> getTopMPS(), null);
+        builder.addDoubleProperty("Bottom Indexer Velocity", () -> getBottomMPS(), null);
         builder.addBooleanProperty("Color is red", () -> colorSensor.isRed(), null);
         builder.addBooleanProperty("Color sensor is functioning", () -> colorSensor.isFunctioning(), null);
-        // builder.addDoubleProperty("Top Indexer Sensor Velocity", () -> top.getSelectedSensorVelocity(), null);
-        // builder.addDoubleProperty("Bottom Indexer Sensor Velocity", () -> bottom.getSelectedSensorVelocity(), null);        
     }
 }
