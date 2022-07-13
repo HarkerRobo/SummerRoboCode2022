@@ -49,6 +49,8 @@ public class Drivetrain extends SubsystemBase {
 
         pigeon = new Pigeon2(RobotMap.PIGEON_ID, RobotMap.CANBUS);
 
+        pigeon.setYaw(0);
+
         poseEstimator = new SwerveDrivePoseEstimator(Rotation2d.fromDegrees(getRobotHeading()), new Pose2d(0, 0, Rotation2d.fromDegrees(getRobotHeading())), 
             kinematics, ODOMETRY_STATE_STDDEV, ODOMETRY_ENCODER_STDDEV, ODOMETRY_VISION_STDDEV);
     }
@@ -96,6 +98,12 @@ public class Drivetrain extends SubsystemBase {
         return swerveModules[id];
     }
 
+    public void update() {
+        for(int i = 0; i < 4; i++) {
+            swerveModules[i].update();
+        }
+    }
+
     public static Drivetrain getInstance() {
         if(instance == null) instance = new Drivetrain();
         return instance;
@@ -103,5 +111,6 @@ public class Drivetrain extends SubsystemBase {
 
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Drivetrain");
+        builder.addDoubleProperty("Robot Heading", () -> getRobotHeading(), null);
     }
 }

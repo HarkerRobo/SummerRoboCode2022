@@ -24,6 +24,10 @@ public final class RobotMap {
 
     public static final int TOP_PROXIMITY = 7;
     public static final int BOTTOM_PROXIMITY = 6;
+    
+    public static final int COLOR_PROXIMITY = 0;
+    public static final int COLOR_A = 0;
+    public static final int COLOR_B = 0;
 
     public static final int SHOOTER_MASTER = 11;
     public static final int SHOOTER_FOLLOWER = 12;

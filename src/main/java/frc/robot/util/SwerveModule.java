@@ -7,7 +7,6 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -26,6 +25,7 @@ public class SwerveModule implements Sendable{
     private int swerveID;
 
     private LinearSystemRegulationLoop translationLoop;
+    private LinearSystemRegulationLoop rotationLoop;
 
     private static final double ROTATION_MOTOR_CURRENT_CONTINUOUS = 25;
     private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
@@ -44,9 +44,17 @@ public class SwerveModule implements Sendable{
 	private static final double DRIVE_KV = 2.2819;
 	private static final double DRIVE_KA = 0.3621;
 
-    private static final double MAX_ERROR = 1;  
-    private static final double MODEL_STANDARD_DEVIATION = 0.5;
-    private static final double ENCODER_STANDARD_DEVIATION = 0.035;
+    private static final double ROTATION_KS = 0.3;
+	private static final double ROTATION_KV = 2.2819;
+	private static final double ROTATION_KA = 0.3621;
+
+    private static final double DRIVE_MAX_ERROR = 1;  
+    private static final double DRIVE_MODEL_STDDEV = 0.5;
+    private static final double DRIVE_ENCODER_STDDEV = 0.035;
+
+    private static final double ROTATION_MAX_ERROR = 1;  
+    private static final double ROTATION_MODEL_STDDEV = 0.5;
+    private static final double ROTATION_ENCODER_STDDEV = 0.035;
 
     public static final double ROTATION_GEAR_RATIO = 12.8;
     public static final double DRIVE_GEAR_RATIO = 6.75;
@@ -56,37 +64,16 @@ public class SwerveModule implements Sendable{
         rotation = new HSFalcon(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
         drive = new HSFalcon(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
         canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
-        translationLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(DRIVE_KV, DRIVE_KA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
+        translationLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(DRIVE_KV, DRIVE_KA), DRIVE_MODEL_STDDEV, DRIVE_ENCODER_STDDEV, DRIVE_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, DRIVE_KS);
+        rotationLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(ROTATION_KV, ROTATION_KA), ROTATION_MODEL_STDDEV, ROTATION_ENCODER_STDDEV, ROTATION_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, ROTATION_KS);
         initMotors();
     }
 
     private void initMotors() {
-        initDriveMotor();
-        initRotationMotor();
-    }
-
-    private void initDriveMotor() {
-        drive.configFactoryDefault();
-        drive.setNeutralMode(NeutralMode.Brake);
-        drive.setInverted(Drivetrain.DRIVE_INVERTS[swerveID]);
-        drive.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, DRIVE_MOTOR_CURRENT_CONTINUOUS, DRIVE_MOTOR_CURRENT_PEAK, DRIVE_MOTOR_CURRENT_PEAK_DUR));
-        drive.configClosedloopRamp(0.3);
-        drive.configOpenloopRamp(0.3);
-        drive.configForwardSoftLimitEnable(false);
-        drive.configReverseSoftLimitEnable(false);
-        drive.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms);
-        drive.configVoltageMeasurementFilter(16);
-    }
-
-    private void initRotationMotor() {
-        rotation.configFactoryDefault();
-        rotation.setNeutralMode(NeutralMode.Brake);
-        rotation.setInverted(Drivetrain.ROTATION_INVERTS[swerveID]);
-        rotation.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, ROTATION_MOTOR_CURRENT_CONTINUOUS, ROTATION_MOTOR_CURRENT_PEAK, ROTATION_MOTOR_CURRENT_PEAK_DUR));
+        HSFalconConfigurator.configure(drive, Drivetrain.DRIVE_INVERTS[swerveID], new double[]{1, DRIVE_MOTOR_CURRENT_CONTINUOUS, DRIVE_MOTOR_CURRENT_PEAK, DRIVE_MOTOR_CURRENT_PEAK_DUR}, false);
+        HSFalconConfigurator.configure(rotation, Drivetrain.ROTATION_INVERTS[swerveID], new double[]{1, ROTATION_MOTOR_CURRENT_CONTINUOUS, ROTATION_MOTOR_CURRENT_PEAK, ROTATION_MOTOR_CURRENT_PEAK_DUR}, false);
         rotation.configClosedloopRamp(0.1);
         rotation.configOpenloopRamp(0.1);
-        rotation.configForwardSoftLimitEnable(false);
-        rotation.configReverseSoftLimitEnable(false);
         rotation.config_kP(RobotMap.DEFAULT_SLOT_ID, ROTATION_KP);
         rotation.config_kI(RobotMap.DEFAULT_SLOT_ID, ROTATION_KI);
         rotation.config_kD(RobotMap.DEFAULT_SLOT_ID, ROTATION_KD);
@@ -94,18 +81,17 @@ public class SwerveModule implements Sendable{
         rotation.config_IntegralZone(RobotMap.DEFAULT_SLOT_ID, ROTATION_IZONE);
         rotation.selectProfileSlot(RobotMap.DEFAULT_SLOT_ID, RobotMap.DEFAULT_LOOP_ID);
         rotation.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_5Ms);
-        rotation.configVoltageMeasurementFilter(16);
         rotation.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.DEFAULT_LOOP_ID);
     }
 
     public void setAngleAndDrive(double rotationAngle, double driveOutput, boolean drivePercentOutput) {
         rotation.set(ControlMode.Position, (rotationAngle * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO));
+        rotation.setVoltage(rotationLoop.updateAndPredict(rotationAngle, getCurrentAngle()));
         if(drivePercentOutput) {
             drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
         }
         else {
-            drive.setVoltage(MathUtil.clamp(translationLoop.updateAndPredict(driveOutput, getCurrentSpeed())
-                    + Math.signum(driveOutput) * DRIVE_KS, -RobotMap.MAX_MOTOR_VOLTAGE, RobotMap.MAX_MOTOR_VOLTAGE));
+            drive.setVoltage(translationLoop.updateAndPredict(driveOutput, getCurrentSpeed()));
         }
     }
 
@@ -132,6 +118,10 @@ public class SwerveModule implements Sendable{
     public void setRotationOffset() {
         double position = canCoder.getAbsolutePosition() - Drivetrain.CANCODER_OFFSETS[swerveID];
         rotation.setSelectedSensorPosition(position * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO);
+    }
+
+    public void update() {
+        setAngleAndDrive(rotationLoop.getSetpoint(), translationLoop.getSetpoint());
     }
 
     public LinearSystemRegulationLoop getTranslationLoop() {

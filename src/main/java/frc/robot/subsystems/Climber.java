@@ -1,9 +1,6 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -11,6 +8,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
+import frc.robot.util.HSFalconConfigurator;
 import frc.robot.util.LinearSystemRegulationLoop;
 import harkerrobolib.wrappers.HSFalcon;
 
@@ -52,29 +50,16 @@ public class Climber extends SubsystemBase{
         climber = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.CLIMBER_FORWARD, RobotMap.CLIMBER_BACKWARD);
         rightLimitSwitch = new DigitalInput(RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
         leftLimitSwitch = new DigitalInput(RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);
-        leftPositionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(LEFT_kV, LEFT_kA), LEFT_MODEL_STANDARD_DEVIATION, LEFT_ENCODER_STANDARD_DEVIATION, LEFT_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
-        rightPositionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(RIGHT_kV, RIGHT_kA), RIGHT_MODEL_STANDARD_DEVIATION, RIGHT_ENCODER_STANDARD_DEVIATION, RIGHT_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
-        initRightMotor();
-        initLeftMotor();
+        leftPositionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(LEFT_kV, LEFT_kA), LEFT_MODEL_STANDARD_DEVIATION, LEFT_ENCODER_STANDARD_DEVIATION, LEFT_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, LEFT_kS);
+        rightPositionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(RIGHT_kV, RIGHT_kA), RIGHT_MODEL_STANDARD_DEVIATION, RIGHT_ENCODER_STANDARD_DEVIATION, RIGHT_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, RIGHT_kS);
+        initMotors();
     }
 
-    public void initRightMotor() {
-        right.configFactoryDefault();
-        right.setInverted(RIGHT_INVERT);
-        right.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CURRENT_CONTINUOUS, CURRENT_PEAK, CURRENT_PEAK_DUR));
-        right.setNeutralMode(NeutralMode.Brake);
-        right.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms);
-        right.configVoltageMeasurementFilter(16);
-
-    }
-
-    public void initLeftMotor() {
-        left.configFactoryDefault();
-        left.setInverted(LEFT_INVERT);
-        left.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CURRENT_CONTINUOUS, CURRENT_PEAK, CURRENT_PEAK_DUR));
-        left.setNeutralMode(NeutralMode.Brake);
-        left.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms);
-        left.configVoltageMeasurementFilter(16);
+    public void initMotors() {
+        HSFalconConfigurator.configure(right, RIGHT_INVERT, new double[]{1.0, CURRENT_CONTINUOUS, CURRENT_PEAK, CURRENT_PEAK_DUR}, true);
+        HSFalconConfigurator.configure(left, LEFT_INVERT, new double[]{1.0, CURRENT_CONTINUOUS, CURRENT_PEAK, CURRENT_PEAK_DUR}, true);
+        right.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
+        left.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);
     }
 
     public void setRightClimberPos(double pos) {

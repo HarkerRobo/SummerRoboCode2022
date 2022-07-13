@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
@@ -9,9 +8,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.util.LinearSystemRegulationLoop;
 import frc.robot.util.Units;
@@ -52,7 +49,7 @@ public class Intake extends SubsystemBase {
     private Intake() {
         intake = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD ,RobotMap.INTAKE_BACKWARD);
         roller = new HSFalcon(RobotMap.INTAKE_MOTOR);
-        velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
+        velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, kS);
         state = State.NEUTRAL;
         initMotor();
     }
@@ -60,7 +57,6 @@ public class Intake extends SubsystemBase {
     public void initMotor() {
         roller.configFactoryDefault();
         roller.setInverted(INVERT);
-        roller.selectProfileSlot(RobotMap.DEFAULT_SLOT_ID, RobotMap.DEFAULT_LOOP_ID);
         roller.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.DEFAULT_LOOP_ID);
         roller.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, CONTINUOUS_CURRENT_LIMIT, PEAK_CURRENT, PEAK_DUR));
     }
@@ -74,7 +70,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setRollerOutput(double rollerOutput) {
-        roller.setVoltage(velocityLoop.updateAndPredict(rollerOutput, getIntakeSpeed()) + Math.signum(rollerOutput) * kS);
+        roller.setVoltage(velocityLoop.updateAndPredict(rollerOutput, getIntakeSpeed()));
     }
 
     public State getState() {

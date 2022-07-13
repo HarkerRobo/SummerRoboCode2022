@@ -7,6 +7,7 @@ import harkerrobolib.commands.IndefiniteCommand;
 
 public class ShooterManual extends IndefiniteCommand{
     private InterpolatingTreeMap shooterVals;
+    
     public ShooterManual() {
         addRequirements(Shooter.getInstance());
         shooterVals = new InterpolatingTreeMap();

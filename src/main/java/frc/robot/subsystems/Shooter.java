@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
@@ -40,7 +39,7 @@ public class Shooter extends SubsystemBase {
     private Shooter() {
         master = new HSFalcon(RobotMap.SHOOTER_MASTER, RobotMap.CANBUS);
         follower = new HSFalcon(RobotMap.SHOOTER_FOLLOWER, RobotMap.CANBUS);
-        velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE);
+        velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, kS);
         initMotors();
     }
 
@@ -60,11 +59,15 @@ public class Shooter extends SubsystemBase {
     }
 
     public void set(double speed) {
-        master.set(ControlMode.PercentOutput, (velocityLoop.updateAndPredict(speed, getShooterSpeed()) + kS * Math.signum(speed)) / RobotMap.MAX_MOTOR_VOLTAGE);
+        master.setVoltage(velocityLoop.updateAndPredict(speed, getShooterSpeed()));
     }
 
     public double getShooterSpeed() {
         return master.getSelectedSensorVelocity() * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND / SHOOTER_GEAR_RATIO * Units.wheelRotsToMeter(4);
+    }
+
+    public void update() {
+        set(velocityLoop.getSetpoint());
     }
 
     public static Shooter getInstance() {
