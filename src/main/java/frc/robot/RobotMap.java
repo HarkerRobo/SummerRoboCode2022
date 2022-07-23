@@ -41,6 +41,4 @@ public final class RobotMap {
 
     public static final int OPERATOR_ID = 1;
     public static final int DRIVER_ID = 0;
-
-
 }
