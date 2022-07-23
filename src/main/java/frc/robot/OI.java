@@ -1,5 +1,6 @@
 package frc.robot;
 
+import frc.robot.commands.climber.ClimberStages;
 import harkerrobolib.wrappers.XboxGamepad;
 
 public class OI {
@@ -17,6 +18,7 @@ public class OI {
     }
 
     public void initBindings() {
+        driver.getButtonA().whenPressed(ClimberStages.ALL_STAGES);
     }
 
     public XboxGamepad getDriverGamepad() {

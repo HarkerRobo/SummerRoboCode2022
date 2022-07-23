@@ -52,6 +52,10 @@ public class PositionControlLoop extends LinearSystemControlLoop<N2, N1, N1> {
         return super.getXHat().get(1,0);
     }
 
+    public double getPositionError() {
+        return super.getError().get(0, 0);
+    }
+
     public static class PositionControlLoopBuilder extends VelocityControlLoop.VelocityControlLoopBuilder{
         private Matrix<N2, N2> A;
         private Matrix<N2, N1> B;

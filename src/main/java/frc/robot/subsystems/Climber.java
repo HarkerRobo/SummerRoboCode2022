@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -44,6 +46,10 @@ public class Climber extends SubsystemBase{
     private static final double LEFT_POS_MAX_ERROR = 1;
     private static final double LEFT_VEL_MAX_ERROR = 1;
     private static final boolean LEFT_INVERT = true;
+
+    public static final double UP_HEIGHT = 119000; //TODO
+    public static final double MID_HEIGHT = 60000; //TODO
+    public static final double DOWN_HEIGHT = 0; //TODO
 
     private PositionControlLoop leftPositionLoop;
     private PositionControlLoop rightPositionLoop;
@@ -97,6 +103,11 @@ public class Climber extends SubsystemBase{
         climber.set(DoubleSolenoid.Value.kForward);
     }
 
+    public void turnOffMotors() {
+        right.set(ControlMode.PercentOutput, 0);
+        left.set(ControlMode.PercentOutput, 0);
+    }
+
     public double getRightClimberPos() {
         return right.getSelectedSensorPosition();
     }
@@ -111,6 +122,14 @@ public class Climber extends SubsystemBase{
 
     public double getLeftClimberVel() {
         return left.getSelectedSensorVelocity();
+    }
+
+    public PositionControlLoop getLeftControlLoop() {
+        return leftPositionLoop;
+    }
+
+    public PositionControlLoop getRightControlLoop() {
+        return rightPositionLoop;
     }
 
     public static Climber getInstance() {
