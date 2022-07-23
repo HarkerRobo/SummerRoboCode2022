@@ -28,6 +28,9 @@ import frc.robot.subsystems.Shooter;
 public class Robot extends TimedRobot {
   private static final Field2d FIELD = new Field2d();
 
+  public Robot() {super();}
+
+  public Robot(double period) {super(period);}
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
