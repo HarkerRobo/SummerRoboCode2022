@@ -1,12 +1,13 @@
 package frc.robot.subsystems;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
-import frc.robot.util.HSFalconConfigurator;
-import frc.robot.util.LinearSystemRegulationLoop;
+import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.Units;
+import frc.robot.util.loop.PositionControlLoop;
+import frc.robot.util.loop.PositionControlLoop.PositionControlLoopBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 
@@ -29,30 +30,40 @@ public class Hood extends SubsystemBase{
 
     private static final double GEAR_RATIO = 180; // needs to be updated
 
-    private static final double MAX_ERROR = 5;  
-    private static final double MODEL_STANDARD_DEVIATION = 0.5;
-    private static final double ENCODER_STANDARD_DEVIATION = 0.035;
+    private static final double MAX_POS_ERROR = 5;
+    private static final double MAX_VEL_ERROR = 5;  
+    private static final double MODEL_POS_STDEV = 0.5;
+    private static final double MODEL_VEL_STDEV = 0.5;
+    private static final double ENCODER_STDEV = 0.035;
+    private static final double MAX_VOLTAGE = 3;
 
     private static final double STALLING_CURRENT = 10;
     
     private boolean isHoodZeroed;
 
-    private LinearSystemRegulationLoop positionLoop;
+    private PositionControlLoop positionLoop;
 
     private Hood() {
-        hood = new HSFalcon(RobotMap.HOOD_ID, RobotMap.CANBUS);
-        positionLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, kS, kG, true);
+        hood = new HSFalconBuilder()
+                .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+                .invert(INVERT)
+                .build(RobotMap.HOOD_ID, RobotMap.CANBUS);
+        positionLoop = new PositionControlLoopBuilder()
+                        .motorConstants(kS, kA, kV, kG)
+                        .standardDeviations(MODEL_POS_STDEV, MODEL_VEL_STDEV, ENCODER_STDEV)
+                        .maxError(MAX_POS_ERROR, MAX_VEL_ERROR)
+                        .maxControlEffort(MAX_VOLTAGE)
+                        .buildPositionControlLoop();
         isHoodZeroed = false;
     }
 
     public void initMotors() {
-        HSFalconConfigurator.configure(hood, INVERT, new double[]{1.0, CURRENT_CONTINUOUS, CURRENT_PEAK, CURRENT_PEAK_DUR}, true);
         hood.configForwardSoftLimitEnable(true);
         hood.configForwardSoftLimitThreshold(RANGE * GEAR_RATIO * Units.DEGREES_TO_ENCODER_TICKS);
     }
 
     public void setHoodPosition(double position) {
-        hood.setVoltage(positionLoop.updateAndPredict(position, getHoodVelocity(), getHoodPosition()));
+        hood.setVoltage(positionLoop.setReferenceAndPredict(position, getHoodVelocity(), getHoodPosition()));
     }
 
     public void setHoodPercentOutput(double percentOutput) {

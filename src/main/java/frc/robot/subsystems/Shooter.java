@@ -4,12 +4,12 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
-import frc.robot.util.LinearSystemRegulationLoop;
 import frc.robot.util.Units;
+import frc.robot.util.loop.VelocityControlLoop;
+import frc.robot.util.loop.VelocityControlLoop.VelocityControlLoopBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Shooter extends SubsystemBase {
@@ -18,7 +18,7 @@ public class Shooter extends SubsystemBase {
     private HSFalcon master;
     private HSFalcon follower;
 
-    private LinearSystemRegulationLoop velocityLoop;
+    private VelocityControlLoop velocityLoop;
 
     private static final boolean MASTER_INVERT = true; 
     private static final boolean FOLLOWER_INVERT = false;
@@ -30,8 +30,8 @@ public class Shooter extends SubsystemBase {
     private static final double kS = 0.1432;
     private static final double kV = 0.51368;
     private static final double kA = 0.038625;
-    private static final double MODEL_STANDARD_DEVIATION = 0.5;
-    private static final double ENCODER_STANDARD_DEVIATION = 0.015;
+    private static final double MODEL_STDEV = 0.5;
+    private static final double ENCODER_STDEV = 0.015;
     private static final double MAX_ERROR = 1.0;
 
     private static final double SHOOTER_GEAR_RATIO = 1.5;
@@ -39,7 +39,11 @@ public class Shooter extends SubsystemBase {
     private Shooter() {
         master = new HSFalcon(RobotMap.SHOOTER_MASTER, RobotMap.CANBUS);
         follower = new HSFalcon(RobotMap.SHOOTER_FOLLOWER, RobotMap.CANBUS);
-        velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, kS);
+        velocityLoop = new VelocityControlLoopBuilder()
+                        .motorConstants(kS, kA, kV)
+                        .standardDeviations(MODEL_STDEV, ENCODER_STDEV)
+                        .maxError(MAX_ERROR)
+                        .buildVelocityControlLoop();
         initMotors();
     }
 
@@ -59,7 +63,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void set(double speed) {
-        master.setVoltage(velocityLoop.updateAndPredict(speed, getShooterSpeed()));
+        master.setVoltage(velocityLoop.resetReferenceAndPredict(speed, getShooterSpeed()));
     }
 
     public double getShooterSpeed() {

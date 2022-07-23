@@ -32,9 +32,9 @@ public class Drivetrain extends SubsystemBase {
     public static final double MAX_TRANSLATION_VEL =  3.0; // in m/s
     public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
 
-    private static final Matrix<N3, N1> ODOMETRY_STATE_STDDEV = VecBuilder.fill(1.0, 1.0, 1.0);
-    private static final Matrix<N1, N1> ODOMETRY_ENCODER_STDDEV = VecBuilder.fill(1.0);
-    private static final Matrix<N3, N1> ODOMETRY_VISION_STDDEV = VecBuilder.fill(1.0, 1.0, 1.0);
+    private static final Matrix<N3, N1> ODOMETRY_STATE_STDEV = VecBuilder.fill(1.0, 1.0, 1.0);
+    private static final Matrix<N1, N1> ODOMETRY_ENCODER_STDEV = VecBuilder.fill(1.0);
+    private static final Matrix<N3, N1> ODOMETRY_VISION_STDEV = VecBuilder.fill(1.0, 1.0, 1.0);
 
     private SwerveModule[] swerveModules;
     private SwerveDriveKinematics kinematics;
@@ -52,7 +52,7 @@ public class Drivetrain extends SubsystemBase {
         pigeon.setYaw(0);
 
         poseEstimator = new SwerveDrivePoseEstimator(Rotation2d.fromDegrees(getRobotHeading()), new Pose2d(0, 0, Rotation2d.fromDegrees(getRobotHeading())), 
-            kinematics, ODOMETRY_STATE_STDDEV, ODOMETRY_ENCODER_STDDEV, ODOMETRY_VISION_STDDEV);
+            kinematics, ODOMETRY_STATE_STDEV, ODOMETRY_ENCODER_STDEV, ODOMETRY_VISION_STDEV);
     }
 
     public void updatePoseEstimator() {
@@ -92,6 +92,14 @@ public class Drivetrain extends SubsystemBase {
 
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
+    }
+
+    public SwerveDriveKinematics getKinematics() {
+        return kinematics;
+    }
+
+    public ChassisSpeeds getChassisSpeeds() {
+        return kinematics.toChassisSpeeds(swerveModules[0].getState(), swerveModules[1].getState(), swerveModules[2].getState(), swerveModules[3].getState());
     }
 
     public SwerveModule getSwerveModule(int id) {

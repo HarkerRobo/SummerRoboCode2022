@@ -1,19 +1,17 @@
 package frc.robot.util;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.util.loop.PositionControlLoop;
+import frc.robot.util.loop.VelocityControlLoop;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class SwerveModule implements Sendable{
@@ -24,8 +22,8 @@ public class SwerveModule implements Sendable{
 
     private int swerveID;
 
-    private LinearSystemRegulationLoop translationLoop;
-    private LinearSystemRegulationLoop rotationLoop;
+    private VelocityControlLoop translationLoop;
+    private PositionControlLoop rotationLoop;
 
     private static final double ROTATION_MOTOR_CURRENT_CONTINUOUS = 25;
     private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
@@ -40,58 +38,59 @@ public class SwerveModule implements Sendable{
     public static final double ROTATION_KD = 0.0;
     public static final double ROTATION_IZONE = 0.0;
 
-    private static final double DRIVE_KS = 0.3;
-	private static final double DRIVE_KV = 2.2819;
-	private static final double DRIVE_KA = 0.3621;
+    private static final double DRIVE_kS = 0.3;
+	private static final double DRIVE_kV = 2.2819;
+	private static final double DRIVE_kA = 0.3621;
 
-    private static final double ROTATION_KS = 0.3;
-	private static final double ROTATION_KV = 2.2819;
-	private static final double ROTATION_KA = 0.3621;
+    private static final double ROTATION_kS = 0.3;
+	private static final double ROTATION_kV = 2.2819;
+	private static final double ROTATION_kA = 0.3621;
 
     private static final double DRIVE_MAX_ERROR = 1;  
-    private static final double DRIVE_MODEL_STDDEV = 0.5;
-    private static final double DRIVE_ENCODER_STDDEV = 0.035;
+    private static final double DRIVE_MODEL_STDEV = 0.5;
+    private static final double DRIVE_ENCODER_STDEV = 0.035;
 
-    private static final double ROTATION_MAX_ERROR = 1;  
-    private static final double ROTATION_MODEL_STDDEV = 0.5;
-    private static final double ROTATION_ENCODER_STDDEV = 0.035;
+    private static final double ROTATION_MAX_VEL_ERROR = 1;  
+    private static final double ROTATION_MAX_POS_ERROR = 1;  
+    private static final double ROTATION_POS_MODEL_STDEV = 0.5;
+    private static final double ROTATION_VEL_MODEL_STDEV = 0.5;
+    private static final double ROTATION_ENCODER_STDEV = 0.035;
 
     public static final double ROTATION_GEAR_RATIO = 12.8;
     public static final double DRIVE_GEAR_RATIO = 6.75;
     
     public SwerveModule(int swerveID) {
         this.swerveID = swerveID;
-        rotation = new HSFalcon(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
-        drive = new HSFalcon(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
+        rotation = new HSFalconBuilder()
+                    .invert(Drivetrain.ROTATION_INVERTS[swerveID])
+                    .supplyLimit(ROTATION_MOTOR_CURRENT_PEAK, ROTATION_MOTOR_CURRENT_CONTINUOUS, ROTATION_MOTOR_CURRENT_PEAK_DUR)
+                    .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_5Ms)
+                    .build(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
+        drive = new HSFalconBuilder()
+                    .invert(Drivetrain.DRIVE_INVERTS[swerveID])
+                    .supplyLimit(DRIVE_MOTOR_CURRENT_PEAK, DRIVE_MOTOR_CURRENT_CONTINUOUS, DRIVE_MOTOR_CURRENT_PEAK_DUR)
+                    .build(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
         canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
-        translationLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(DRIVE_KV, DRIVE_KA), DRIVE_MODEL_STDDEV, DRIVE_ENCODER_STDDEV, DRIVE_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, DRIVE_KS);
-        rotationLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyPositionSystem(ROTATION_KV, ROTATION_KA), ROTATION_MODEL_STDDEV, ROTATION_ENCODER_STDDEV, ROTATION_MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, ROTATION_KS);
-        initMotors();
-    }
-
-    private void initMotors() {
-        HSFalconConfigurator.configure(drive, Drivetrain.DRIVE_INVERTS[swerveID], new double[]{1, DRIVE_MOTOR_CURRENT_CONTINUOUS, DRIVE_MOTOR_CURRENT_PEAK, DRIVE_MOTOR_CURRENT_PEAK_DUR}, false);
-        HSFalconConfigurator.configure(rotation, Drivetrain.ROTATION_INVERTS[swerveID], new double[]{1, ROTATION_MOTOR_CURRENT_CONTINUOUS, ROTATION_MOTOR_CURRENT_PEAK, ROTATION_MOTOR_CURRENT_PEAK_DUR}, false);
-        rotation.configClosedloopRamp(0.1);
-        rotation.configOpenloopRamp(0.1);
-        rotation.config_kP(RobotMap.DEFAULT_SLOT_ID, ROTATION_KP);
-        rotation.config_kI(RobotMap.DEFAULT_SLOT_ID, ROTATION_KI);
-        rotation.config_kD(RobotMap.DEFAULT_SLOT_ID, ROTATION_KD);
-        
-        rotation.config_IntegralZone(RobotMap.DEFAULT_SLOT_ID, ROTATION_IZONE);
-        rotation.selectProfileSlot(RobotMap.DEFAULT_SLOT_ID, RobotMap.DEFAULT_LOOP_ID);
-        rotation.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_5Ms);
-        rotation.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, RobotMap.DEFAULT_LOOP_ID);
+        translationLoop = new VelocityControlLoop.VelocityControlLoopBuilder()
+                            .motorConstants(DRIVE_kS, DRIVE_kA, DRIVE_kV)
+                            .standardDeviations(DRIVE_MODEL_STDEV, DRIVE_ENCODER_STDEV)
+                            .maxError(DRIVE_MAX_ERROR)
+                            .buildVelocityControlLoop();
+        rotationLoop = new PositionControlLoop.PositionControlLoopBuilder()
+                            .motorConstants(ROTATION_kS, ROTATION_kA, ROTATION_kV)
+                            .standardDeviations(ROTATION_POS_MODEL_STDEV, ROTATION_VEL_MODEL_STDEV, ROTATION_ENCODER_STDEV)
+                            .maxError(ROTATION_MAX_POS_ERROR, ROTATION_MAX_VEL_ERROR)
+                            .buildPositionControlLoop();
     }
 
     public void setAngleAndDrive(double rotationAngle, double driveOutput, boolean drivePercentOutput) {
-        rotation.set(ControlMode.Position, (rotationAngle * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO));
-        // rotation.setVoltage(rotationLoop.updateAndPredict(rotationAngle, getCurrentAngle(), getCurrentAngleVelocity()));
+        // rotation.set(ControlMode.Position, (rotationAngle * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO));
+        rotation.setVoltage(rotationLoop.setReferenceAndPredict(rotationAngle, 0.0, getCurrentAngle()));
         if(drivePercentOutput) {
             drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
         }
         else {
-            drive.setVoltage(translationLoop.updateAndPredict(driveOutput, getCurrentSpeed()));
+            drive.setVoltage(translationLoop.resetReferenceAndPredict(driveOutput, getCurrentSpeed()));
         }
     }
 
@@ -125,10 +124,10 @@ public class SwerveModule implements Sendable{
     }
 
     public void update() {
-        setAngleAndDrive(rotationLoop.getSetpoint(), translationLoop.getSetpoint());
+        setAngleAndDrive(rotationLoop.getFilteredPosition(), translationLoop.getSetpoint());
     }
 
-    public LinearSystemRegulationLoop getTranslationLoop() {
+    public VelocityControlLoop getTranslationLoop() {
         return translationLoop;
     }
 
@@ -146,7 +145,7 @@ public class SwerveModule implements Sendable{
         builder.addDoubleProperty("Current Rotation",  () -> getCurrentAngle(), null);
         builder.addDoubleProperty("Drive Voltage",  () -> drive.getMotorOutputVoltage(), null);
         builder.addDoubleProperty("Rotation Voltage", () -> rotation.getMotorOutputVoltage(), null);
-        builder.addDoubleProperty("Drive Error", () -> translationLoop.getError(), null);
+        builder.addDoubleProperty("Drive Error", () -> translationLoop.getFilteredVelocity() - translationLoop.getSetpoint(), null);
         builder.addDoubleProperty("Rotation Error", () -> rotation.getClosedLoopError(), null);
     }
 }

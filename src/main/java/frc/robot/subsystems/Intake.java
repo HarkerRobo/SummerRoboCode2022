@@ -4,14 +4,14 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
-import frc.robot.util.LinearSystemRegulationLoop;
 import frc.robot.util.Units;
+import frc.robot.util.loop.VelocityControlLoop;
+import frc.robot.util.loop.VelocityControlLoop.VelocityControlLoopBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 
@@ -33,10 +33,10 @@ public class Intake extends SubsystemBase {
     private static final double kA = 0.147;
 
     private static final double MAX_ERROR = 0.1;  
-    private static final double MODEL_STANDARD_DEVIATION = 0.5;
-    private static final double ENCODER_STANDARD_DEVIATION = 0.015;
+    private static final double MODEL_STDEV = 0.5;
+    private static final double ENCODER_STDEV = 0.015;
 
-    private LinearSystemRegulationLoop velocityLoop;
+    private VelocityControlLoop loop;
 
     private State state;
 
@@ -49,7 +49,11 @@ public class Intake extends SubsystemBase {
     private Intake() {
         intake = new DoubleSolenoid(PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD ,RobotMap.INTAKE_BACKWARD);
         roller = new HSFalcon(RobotMap.INTAKE_MOTOR);
-        velocityLoop = new LinearSystemRegulationLoop(LinearSystemId.identifyVelocitySystem(kV, kA), MODEL_STANDARD_DEVIATION, ENCODER_STANDARD_DEVIATION, MAX_ERROR, RobotMap.MAX_MOTOR_VOLTAGE, kS);
+        loop = new VelocityControlLoopBuilder()
+                .motorConstants(kS, kA, kV)
+                .standardDeviations(MODEL_STDEV, ENCODER_STDEV)
+                .maxError(MAX_ERROR)
+                .buildVelocityControlLoop();
         state = State.NEUTRAL;
         initMotor();
     }
@@ -70,7 +74,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setRollerOutput(double rollerOutput) {
-        roller.setVoltage(velocityLoop.updateAndPredict(rollerOutput, getIntakeSpeed()));
+        roller.setVoltage(loop.resetReferenceAndPredict(rollerOutput, getIntakeSpeed()));
     }
 
     public State getState() {
