@@ -73,11 +73,11 @@ public class Climber extends SubsystemBase{
     }
 
     public void setRightClimberPos(double pos) {
-        right.setVoltage(rightPositionLoop.setReferenceAndPredict(pos, getRightClimberPos(), getRightClimberVel()));
+        right.setVoltage(rightPositionLoop.setReferenceAndPredict(pos, 0.0, getRightClimberVel()));
     }
 
     public void setLeftClimberPos(double pos) {
-        left.setVoltage(leftPositionLoop.setReferenceAndPredict(pos, getLeftClimberPos(), getLeftClimberVel()));
+        left.setVoltage(leftPositionLoop.setReferenceAndPredict(pos, 0.0, getLeftClimberVel()));
     }
 
     public boolean limitSwitchHit() {

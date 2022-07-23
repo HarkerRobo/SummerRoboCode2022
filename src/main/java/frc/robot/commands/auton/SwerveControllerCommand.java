@@ -5,7 +5,6 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -60,11 +59,11 @@ public class SwerveControllerCommand extends CommandBase {
                                                         .maxControlEffort(THETA_MAX_VEL)
                                                         .buildPositionControlLoop();
 
-    public SwerveControllerCommand(Pose2d endpoint, Transform2d endVelocities) {
+    public SwerveControllerCommand(Pose2d endpoint) {
         addRequirements(Drivetrain.getInstance());
-        X_LOOP.setNextSetpoint(endpoint.getTranslation().getX(), endVelocities.getTranslation().getX());
-        Y_LOOP.setNextSetpoint(endpoint.getTranslation().getY(), endVelocities.getTranslation().getY());
-        THETA_LOOP.setNextSetpoint(endpoint.getRotation().getRadians(), endVelocities.getRotation().getRadians());
+        X_LOOP.setNextSetpoint(endpoint.getTranslation().getX(), 0.0);
+        Y_LOOP.setNextSetpoint(endpoint.getTranslation().getY(), 0.0);
+        THETA_LOOP.setNextSetpoint(endpoint.getRotation().getRadians(), 0.0);
     }
 
     public void initialize() {

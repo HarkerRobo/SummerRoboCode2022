@@ -21,12 +21,12 @@ public class VelocityControlLoop extends LinearSystemControlLoop<N1, N1, N1> {
               latencyCompensation, (u) -> {
                 double input = u.get(0,0);
                 if (Math.abs(input) > 0.005) input += kS;
-                input = MathUtil.clamp(kS, -maxControlEffort, maxControlEffort);
+                input = MathUtil.clamp(input, -maxControlEffort, maxControlEffort);
                 return VecBuilder.fill(input);
               }, dtSeconds);
     }
 
-    public double resetReferenceAndPredict(double setpoint, double systemOutput) {
+    public double setReferenceAndPredict(double setpoint, double systemOutput) {
         return setReferenceAndPredict(VecBuilder.fill(setpoint), VecBuilder.fill(systemOutput)).get(0,0);
     }
 

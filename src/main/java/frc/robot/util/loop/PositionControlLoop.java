@@ -115,7 +115,7 @@ public class PositionControlLoop extends LinearSystemControlLoop<N2, N1, N1> {
                 clampFunction = (u) -> {
                     double input = u.get(0,0);
                     if (Math.abs(input) > 0.005) input += kS;
-                    input = MathUtil.clamp(kS, -maxControlEffort, maxControlEffort);
+                    input = MathUtil.clamp(input, -maxControlEffort, maxControlEffort);
                     return VecBuilder.fill(input);
                   };
             else 
@@ -128,7 +128,7 @@ public class PositionControlLoop extends LinearSystemControlLoop<N2, N1, N1> {
                 double input = u.get(0,0);
                 if (Math.abs(input) > 0.005) input += kS;
                 input += kG;
-                input = MathUtil.clamp(kS, -maxControlEffort, maxControlEffort);
+                input = MathUtil.clamp(input, -maxControlEffort, maxControlEffort);
                 return VecBuilder.fill(input);
               }, dtSeconds);
         }
@@ -139,9 +139,9 @@ public class PositionControlLoop extends LinearSystemControlLoop<N2, N1, N1> {
                 double input = u.get(0,0);
                 if (Math.abs(input) > 0.005) input += kS;
                 input += kG * Math.cos(Math.toRadians(loop.getFilteredPosition()));
-                input = MathUtil.clamp(kS, -maxControlEffort, maxControlEffort);
+                input = MathUtil.clamp(input, -maxControlEffort, maxControlEffort);
                 return VecBuilder.fill(input);
-              });
+            });
             return loop;
         }
     }

@@ -63,7 +63,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void set(double speed) {
-        master.setVoltage(velocityLoop.resetReferenceAndPredict(speed, getShooterSpeed()));
+        master.setVoltage(velocityLoop.setReferenceAndPredict(speed, getShooterSpeed()));
     }
 
     public double getShooterSpeed() {

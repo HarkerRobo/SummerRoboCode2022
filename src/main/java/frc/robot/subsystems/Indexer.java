@@ -70,11 +70,11 @@ public class Indexer extends SubsystemBase{
     }
 
     public void setTopOutput(double topOutput) {
-        top.setVoltage(topVelocityLoop.resetReferenceAndPredict(topOutput, getTopMPS()));
+        top.setVoltage(topVelocityLoop.setReferenceAndPredict(topOutput, getTopMPS()));
     }
 
     public void setBottomOutput(double bottomOutput) {
-        bottom.setVoltage(bottomVelocityLoop.resetReferenceAndPredict(bottomOutput, getBottomMPS()));
+        bottom.setVoltage(bottomVelocityLoop.setReferenceAndPredict(bottomOutput, getBottomMPS()));
 
     }
 

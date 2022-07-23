@@ -30,6 +30,7 @@ public class Drivetrain extends SubsystemBase {
     private static final double DT_LENGTH = 0.5969; // 0.88265
 
     public static final double MAX_TRANSLATION_VEL =  3.0; // in m/s
+    public static final double MAX_ACCELERATION = 6.0; // m/s^2
     public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
 
     private static final Matrix<N3, N1> ODOMETRY_STATE_STDEV = VecBuilder.fill(1.0, 1.0, 1.0);

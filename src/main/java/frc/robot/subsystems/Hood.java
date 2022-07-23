@@ -53,8 +53,9 @@ public class Hood extends SubsystemBase{
                         .standardDeviations(MODEL_POS_STDEV, MODEL_VEL_STDEV, ENCODER_STDEV)
                         .maxError(MAX_POS_ERROR, MAX_VEL_ERROR)
                         .maxControlEffort(MAX_VOLTAGE)
-                        .buildPositionControlLoop();
+                        .buildArmControlLoop();
         isHoodZeroed = false;
+        initMotors();
     }
 
     public void initMotors() {
@@ -63,7 +64,7 @@ public class Hood extends SubsystemBase{
     }
 
     public void setHoodPosition(double position) {
-        hood.setVoltage(positionLoop.setReferenceAndPredict(position, getHoodVelocity(), getHoodPosition()));
+        hood.setVoltage(positionLoop.setReferenceAndPredict(position, 0.0, getHoodPosition()));
     }
 
     public void setHoodPercentOutput(double percentOutput) {

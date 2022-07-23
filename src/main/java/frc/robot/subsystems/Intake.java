@@ -74,7 +74,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setRollerOutput(double rollerOutput) {
-        roller.setVoltage(loop.resetReferenceAndPredict(rollerOutput, getIntakeSpeed()));
+        roller.setVoltage(loop.setReferenceAndPredict(rollerOutput, getIntakeSpeed()));
     }
 
     public State getState() {

@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -52,6 +53,7 @@ public class HSFalconBuilder {
         falcon.configFactoryDefault();
         falcon.setNeutralMode(neutralMode);
         falcon.setInverted(invert);
+        falcon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         falcon.configVelocityMeasurementPeriod(velocityMeasPeriod);
         falcon.configVoltageMeasurementFilter(voltageFilter);
         if(stator != null) falcon.configStatorCurrentLimit(stator);

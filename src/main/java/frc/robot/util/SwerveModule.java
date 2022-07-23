@@ -90,7 +90,7 @@ public class SwerveModule implements Sendable{
             drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
         }
         else {
-            drive.setVoltage(translationLoop.resetReferenceAndPredict(driveOutput, getCurrentSpeed()));
+            drive.setVoltage(translationLoop.setReferenceAndPredict(driveOutput, getCurrentSpeed()));
         }
     }
 
