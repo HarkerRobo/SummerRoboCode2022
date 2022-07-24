@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.util.loop.PositionControlLoop;
 import frc.robot.util.loop.PositionControlLoop.PositionControlLoopBuilder;;
@@ -35,10 +36,10 @@ public class SwerveControllerCommand extends CommandBase {
     private static final double THETA_MODEL_VEL_STDEV = 0.5; //TODO
     private static final double THETA_MEAS_STDEV = 0.035; //TODO
 
-    private static final Matrix<N2, N2> A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, 0.0);
-    private static final Matrix<N2, N1> B = VecBuilder.fill(0.0, 1.0);
-    private static final Matrix<N1, N2> C = Matrix.mat(Nat.N1(), Nat.N2()).fill(1.0, 0.0);
-    private static final Matrix<N1, N1> D = VecBuilder.fill(0.0); 
+    public static final Matrix<N2, N2> A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -1/RobotMap.ROBOT_LOOP);
+    public static final Matrix<N2, N1> B = VecBuilder.fill(0.0, 1.0/RobotMap.ROBOT_LOOP);
+    public static final Matrix<N1, N2> C = Matrix.mat(Nat.N1(), Nat.N2()).fill(1.0, 0.0);
+    public static final Matrix<N1, N1> D = VecBuilder.fill(0.0); 
 
     private static final PositionControlLoop X_LOOP = new PositionControlLoopBuilder()
                                                         .stateMatrices(A, B, C, D)

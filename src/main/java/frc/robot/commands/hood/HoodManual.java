@@ -1,6 +1,8 @@
 package frc.robot.commands.hood;
 
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Hood;
+import frc.robot.util.FieldConstants;
 import frc.robot.util.InterpolatingTreeMap;
 import harkerrobolib.commands.IndefiniteCommand;
 
@@ -17,7 +19,8 @@ public class HoodManual extends IndefiniteCommand{
     }
 
     public double calculateHoodPosition() {
-        return 5;
+        return hoodVals.get(Drivetrain.getInstance().getPoseEstimator()
+            .getEstimatedPosition().getTranslation().getDistance(FieldConstants.HUB_LOCATION));
     }
 
     public void end(boolean interrupted) {

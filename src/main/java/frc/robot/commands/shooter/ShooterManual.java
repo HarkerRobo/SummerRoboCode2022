@@ -1,7 +1,10 @@
 package frc.robot.commands.shooter;
 
 import frc.robot.OI;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.State;
+import frc.robot.util.FieldConstants;
 import frc.robot.util.InterpolatingTreeMap;
 import harkerrobolib.commands.IndefiniteCommand;
 
@@ -14,13 +17,35 @@ public class ShooterManual extends IndefiniteCommand{
     }
 
     public void execute() {
-        Shooter.getInstance().set(calculateShooterSpeed());
+        double possibleShooterSpeed = calculateShooterSpeed();
+        updateShooterState(possibleShooterSpeed);
+        if(Shooter.getInstance().getState() != State.IDLE)
+            Shooter.getInstance().set(possibleShooterSpeed);
+        else
+            Shooter.getInstance().set(0.0);
     }
 
-    public double calculateShooterSpeed() {
-        if(OI.getInstance().getDriverGamepad().getButtonYState())
-            return 5;
-        return 0;
+    private void updateShooterState(double nextSpeed) {
+        if(OI.getInstance().getDriverGamepad().getButtonYState()) {
+            switch(Shooter.getInstance().getState()) {
+                case IDLE:
+                Shooter.getInstance().setState(State.REVVING);
+                break;
+                case REVVING:
+                if(Shooter.getInstance().atTargetSpeed(nextSpeed) && Shooter.getInstance().isAligned())
+                Shooter.getInstance().setState(State.SHOOTING);
+                break;
+                case SHOOTING:
+                if(!(Shooter.getInstance().atTargetSpeed(nextSpeed) && Shooter.getInstance().isAligned()))
+                Shooter.getInstance().setState(State.REVVING);
+            }
+        }
+        else Shooter.getInstance().setState(State.IDLE);
+    }
+
+    private double calculateShooterSpeed() {
+        return shooterVals.get(Drivetrain.getInstance().getPoseEstimator()
+                .getEstimatedPosition().getTranslation().getDistance(FieldConstants.HUB_LOCATION));
     }
 
     public void end(boolean interrupted) {

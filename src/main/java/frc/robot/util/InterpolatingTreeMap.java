@@ -4,22 +4,17 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 public class InterpolatingTreeMap extends TreeMap<Double, Double>{
-    public Double get(Double key) {
-        Entry<Double, Double> targetEntry = new SimpleEntry<Double, Double>(key, super.get(key));
-        if (targetEntry.getValue() != null) return targetEntry.getValue();
+    public double get(double key) {
         Entry<Double, Double> upperEntry = super.ceilingEntry(key);
         Entry<Double, Double> lowerEntry = super.floorEntry(key);
-        if (upperEntry == null && lowerEntry == null) return null;
+        if (upperEntry == null && lowerEntry == null) return Double.NaN;
         else if (upperEntry == null) return lowerEntry.getValue();
         else if (lowerEntry == null) return upperEntry.getValue();
-        else return interpolate(targetEntry, upperEntry, lowerEntry);
-
+        else return lerp(key, lowerEntry.getKey(), lowerEntry.getValue(), upperEntry.getKey(), upperEntry.getValue());
     }
 
-    public double interpolate(Entry<Double, Double> targetEntry, Entry<Double, Double> upperEntry, Entry<Double, Double> lowerEntry) {
-        return (targetEntry.getKey() - lowerEntry.getKey())/(upperEntry.getKey()-lowerEntry.getKey()) *
-               (upperEntry.getValue() - lowerEntry.getValue()) + lowerEntry.getValue();
-
+    public double lerp(double x, double x0, double y0, double x1, double y1) {
+        if(x0 == x1) return y0;
+        return (x - x0)/(x1 - x0) * (y1 - y0) + y1;
     }
-    
 }

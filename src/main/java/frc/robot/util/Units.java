@@ -10,4 +10,8 @@ public class Units {
     public static double wheelRotsToMeter(double diameter) {
         return diameter * 0.0254 * Math.PI;
     }
+
+    public static double inchesToMeters(double inches) {
+        return inches * 0.0254;
+    }
 }

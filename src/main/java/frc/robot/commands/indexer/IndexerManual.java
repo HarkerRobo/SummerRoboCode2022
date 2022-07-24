@@ -2,6 +2,7 @@ package frc.robot.commands.indexer;
 
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 import harkerrobolib.commands.IndefiniteCommand;
 
 public class IndexerManual extends IndefiniteCommand {
@@ -13,6 +14,10 @@ public class IndexerManual extends IndefiniteCommand {
     }
 
     public void execute() {
+        if(Shooter.getInstance().getState() == Shooter.State.SHOOTING) {
+            Indexer.getInstance().setBothOutput(INDEXER_SPEED);
+            return;
+        }
         switch (Intake.getInstance().getState()) {
             case INTAKE:
                 if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(0);
