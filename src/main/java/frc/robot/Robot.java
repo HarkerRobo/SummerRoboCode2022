@@ -29,9 +29,13 @@ import frc.robot.subsystems.Shooter;
 public class Robot extends TimedRobot {
   private static final Field2d FIELD = new Field2d();
 
-  public Robot() {super();}
+  public Robot() {
+    super();
+  }
 
-  public Robot(double period) {super(period);}
+  public Robot(double period) {
+    super(period);
+  }
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -55,7 +59,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    
+
     SmartDashboard.putData(Drivetrain.getInstance());
     SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(0));
     SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(1));
@@ -80,14 +84,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    Drivetrain.getInstance().getPoseEstimator().resetPosition(new Pose2d(), Drivetrain.getInstance().getRobotRotation());
+    Drivetrain.getInstance()
+        .getPoseEstimator()
+        .resetPosition(new Pose2d(), Drivetrain.getInstance().getRobotRotation());
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-
-  }
+  public void autonomousPeriodic() {}
 
   /** This function is called once when teleop is enabled. */
   @Override

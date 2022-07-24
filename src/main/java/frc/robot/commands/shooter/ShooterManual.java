@@ -8,47 +8,49 @@ import frc.robot.util.FieldConstants;
 import frc.robot.util.InterpolatingTreeMap;
 import harkerrobolib.commands.IndefiniteCommand;
 
-public class ShooterManual extends IndefiniteCommand{
-    private InterpolatingTreeMap shooterVals;
-    
-    public ShooterManual() {
-        addRequirements(Shooter.getInstance());
-        shooterVals = new InterpolatingTreeMap();
-    }
+public class ShooterManual extends IndefiniteCommand {
+  private InterpolatingTreeMap shooterVals;
 
-    public void execute() {
-        double possibleShooterSpeed = calculateShooterSpeed();
-        updateShooterState(possibleShooterSpeed);
-        if(Shooter.getInstance().getState() != State.IDLE)
-            Shooter.getInstance().set(possibleShooterSpeed);
-        else
-            Shooter.getInstance().set(0.0);
-    }
+  public ShooterManual() {
+    addRequirements(Shooter.getInstance());
+    shooterVals = new InterpolatingTreeMap();
+  }
 
-    private void updateShooterState(double nextSpeed) {
-        if(OI.getInstance().getDriverGamepad().getButtonYState()) {
-            switch(Shooter.getInstance().getState()) {
-                case IDLE:
-                Shooter.getInstance().setState(State.REVVING);
-                break;
-                case REVVING:
-                if(Shooter.getInstance().atTargetSpeed(nextSpeed) && Shooter.getInstance().isAligned())
-                Shooter.getInstance().setState(State.SHOOTING);
-                break;
-                case SHOOTING:
-                if(!(Shooter.getInstance().atTargetSpeed(nextSpeed) && Shooter.getInstance().isAligned()))
-                Shooter.getInstance().setState(State.REVVING);
-            }
-        }
-        else Shooter.getInstance().setState(State.IDLE);
-    }
+  public void execute() {
+    double possibleShooterSpeed = calculateShooterSpeed();
+    updateShooterState(possibleShooterSpeed);
+    if (Shooter.getInstance().getState() != State.IDLE)
+      Shooter.getInstance().set(possibleShooterSpeed);
+    else Shooter.getInstance().set(0.0);
+  }
 
-    private double calculateShooterSpeed() {
-        return shooterVals.get(Drivetrain.getInstance().getPoseEstimator()
-                .getEstimatedPosition().getTranslation().getDistance(FieldConstants.HUB_LOCATION));
-    }
+  private void updateShooterState(double nextSpeed) {
+    if (OI.getInstance().getDriverGamepad().getButtonYState()) {
+      switch (Shooter.getInstance().getState()) {
+        case IDLE:
+          Shooter.getInstance().setState(State.REVVING);
+          break;
+        case REVVING:
+          if (Shooter.getInstance().atTargetSpeed(nextSpeed) && Shooter.getInstance().isAligned())
+            Shooter.getInstance().setState(State.SHOOTING);
+          break;
+        case SHOOTING:
+          if (!(Shooter.getInstance().atTargetSpeed(nextSpeed)
+              && Shooter.getInstance().isAligned())) Shooter.getInstance().setState(State.REVVING);
+      }
+    } else Shooter.getInstance().setState(State.IDLE);
+  }
 
-    public void end(boolean interrupted) {
-        Shooter.getInstance().set(0);
-    }
+  private double calculateShooterSpeed() {
+    return shooterVals.get(
+        Drivetrain.getInstance()
+            .getPoseEstimator()
+            .getEstimatedPosition()
+            .getTranslation()
+            .getDistance(FieldConstants.HUB_LOCATION));
+  }
+
+  public void end(boolean interrupted) {
+    Shooter.getInstance().set(0);
+  }
 }

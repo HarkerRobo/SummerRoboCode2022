@@ -4,26 +4,25 @@ import frc.robot.OI;
 import frc.robot.subsystems.Intake;
 import harkerrobolib.commands.IndefiniteCommand;
 
-public class IntakeManual extends IndefiniteCommand{
+public class IntakeManual extends IndefiniteCommand {
 
-    private static final double INTAKE_SPEED = 5.75; // meters per second
+  private static final double INTAKE_SPEED = 5.75; // meters per second
 
-    public IntakeManual() {
-        addRequirements(Intake.getInstance());
-    }
+  public IntakeManual() {
+    addRequirements(Intake.getInstance());
+  }
 
-    public void execute() {
-        if(OI.getInstance().getDriverGamepad().getButtonTriggerLeft().get())
-            Intake.getInstance().setState(Intake.State.OUTTAKE);
-        else if(OI.getInstance().getDriverGamepad().getButtonTriggerLeft().get())
-            Intake.getInstance().setState(Intake.State.INTAKE);
-        else
-            Intake.getInstance().setState(Intake.State.NEUTRAL);
-        Intake.getInstance().actOnState(INTAKE_SPEED);
-    }
+  public void execute() {
+    if (OI.getInstance().getDriverGamepad().getButtonTriggerLeft().get())
+      Intake.getInstance().setState(Intake.State.OUTTAKE);
+    else if (OI.getInstance().getDriverGamepad().getButtonTriggerLeft().get())
+      Intake.getInstance().setState(Intake.State.INTAKE);
+    else Intake.getInstance().setState(Intake.State.NEUTRAL);
+    Intake.getInstance().actOnState(INTAKE_SPEED);
+  }
 
-    public void end(boolean interrupted) {
-        Intake.getInstance().setState(Intake.State.NEUTRAL);
-        Intake.getInstance().actOnState(INTAKE_SPEED);
-    }
+  public void end(boolean interrupted) {
+    Intake.getInstance().setState(Intake.State.NEUTRAL);
+    Intake.getInstance().actOnState(INTAKE_SPEED);
+  }
 }

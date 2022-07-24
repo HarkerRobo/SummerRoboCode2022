@@ -6,37 +6,37 @@ import frc.robot.subsystems.Shooter;
 import harkerrobolib.commands.IndefiniteCommand;
 
 public class IndexerManual extends IndefiniteCommand {
-    public static final double INDEXER_SPEED = 11.5; // meters per second
-    public static final double INDEXER_OUTTAKE_SPEED = -16; // meters per second
+  public static final double INDEXER_SPEED = 11.5; // meters per second
+  public static final double INDEXER_OUTTAKE_SPEED = -16; // meters per second
 
-    public IndexerManual() {
-        addRequirements(Indexer.getInstance());
+  public IndexerManual() {
+    addRequirements(Indexer.getInstance());
+  }
+
+  public void execute() {
+    if (Shooter.getInstance().getState() == Shooter.State.SHOOTING) {
+      Indexer.getInstance().setBothOutput(INDEXER_SPEED);
+      return;
     }
-
-    public void execute() {
-        if(Shooter.getInstance().getState() == Shooter.State.SHOOTING) {
-            Indexer.getInstance().setBothOutput(INDEXER_SPEED);
-            return;
-        }
-        switch (Intake.getInstance().getState()) {
-            case INTAKE:
-                if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(0);
-                else Indexer.getInstance().setTopOutput(INDEXER_SPEED);
-                if (Indexer.getInstance().isBallInBottom())
-                    if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setBottomOutput(0);
-                    else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
-                else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
-                break;
-            case OUTTAKE:
-                Indexer.getInstance().setBothOutput(INDEXER_OUTTAKE_SPEED);
-                break;
-            case NEUTRAL:
-                Indexer.getInstance().setBothOutput(0);
-                break;
-        }
-    }
-
-    public void end(boolean interrupted) {
+    switch (Intake.getInstance().getState()) {
+      case INTAKE:
+        if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(0);
+        else Indexer.getInstance().setTopOutput(INDEXER_SPEED);
+        if (Indexer.getInstance().isBallInBottom())
+          if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setBottomOutput(0);
+          else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
+        else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
+        break;
+      case OUTTAKE:
+        Indexer.getInstance().setBothOutput(INDEXER_OUTTAKE_SPEED);
+        break;
+      case NEUTRAL:
         Indexer.getInstance().setBothOutput(0);
+        break;
     }
+  }
+
+  public void end(boolean interrupted) {
+    Indexer.getInstance().setBothOutput(0);
+  }
 }
