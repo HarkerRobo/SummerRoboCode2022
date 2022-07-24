@@ -51,6 +51,6 @@ public class ShooterManual extends IndefiniteCommand {
   }
 
   public void end(boolean interrupted) {
-    Shooter.getInstance().set(0);
+    Shooter.getInstance().turnOffMotors();
   }
 }

@@ -37,7 +37,6 @@ public class SwerveManual extends IndefiniteCommand {
               SwerveControllerCommand.D)
           .standardDeviations(THETA_MODEL_POS_STDEV, THETA_MODEL_VEL_STDEV, THETA_MEAS_STDEV)
           .maxError(THETA_MAX_POS_ERROR, THETA_MAX_VEL_ERROR)
-          .maxControlEffort(SPEED_MULTIPLIER * Drivetrain.MAX_ROTATION_VEL)
           .buildPositionControlLoop();
 
   public SwerveManual() {

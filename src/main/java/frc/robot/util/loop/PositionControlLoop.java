@@ -10,8 +10,6 @@ import edu.wpi.first.math.numbers.N2;
 import java.util.function.Function;
 
 public class PositionControlLoop extends LinearSystemControlLoop<N2, N1, N1> {
-  protected double maxControlEffort;
-
   protected PositionControlLoop(
       Matrix<N2, N2> A,
       Matrix<N2, N1> B,

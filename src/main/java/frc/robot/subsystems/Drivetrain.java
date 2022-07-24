@@ -43,6 +43,8 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator;
   private Pigeon2 pigeon;
 
+  private static final boolean PIGEON_UP = false;
+
   private Drivetrain() {
     swerveModules =
         new SwerveModule[] {
@@ -100,10 +102,6 @@ public class Drivetrain extends SubsystemBase {
     for (int i = 0; i < 4; i++) swerveModules[i].setRotationOffset();
   }
 
-  public double getRobotHeading() {
-    return pigeon.getYaw();
-  }
-
   public Rotation2d getRobotRotation() {
     return Rotation2d.fromDegrees(getRobotHeading());
   }
@@ -132,6 +130,10 @@ public class Drivetrain extends SubsystemBase {
     for (int i = 0; i < 4; i++) {
       swerveModules[i].update();
     }
+  }
+
+  public double getRobotHeading() {
+    return (PIGEON_UP) ? -pigeon.getYaw() : pigeon.getYaw();
   }
 
   public static Drivetrain getInstance() {

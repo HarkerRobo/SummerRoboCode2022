@@ -80,6 +80,10 @@ public class Intake extends SubsystemBase {
     roller.setVoltage(loop.setReferenceAndPredict(rollerOutput, getIntakeSpeed()));
   }
 
+  public void turnOffMotor() {
+    roller.set(ControlMode.PercentOutput, 0);
+  }
+
   public State getState() {
     return state;
   }

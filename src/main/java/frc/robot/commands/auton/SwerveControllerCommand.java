@@ -16,8 +16,8 @@ import frc.robot.util.loop.PositionControlLoop.PositionControlLoopBuilder;
 
 public class SwerveControllerCommand extends CommandBase {
 
-  private static final double TRANSLATION_MAX_VEL = 1; // TODO
-  private static final double THETA_MAX_VEL = 1; // TODO
+  private static final double TRANSLATION_MAX_VOLTAGE = 1; // TODO
+  private static final double THETA_MAX_VOLTAGE = 1; // TODO
 
   private static final double TRANSLATION_POS_TOLERANCE = 0.01; // TODO
   private static final double ROTATION_POS_TOLERANCE = 0.01; // TODO
@@ -47,21 +47,21 @@ public class SwerveControllerCommand extends CommandBase {
           .stateMatrices(A, B, C, D)
           .standardDeviations(TRANS_MODEL_POS_STDEV, TRANS_MODEL_VEL_STDEV, TRANS_MEAS_STDEV)
           .maxError(TRANS_MAX_POS_ERROR, TRANS_MAX_VEL_ERROR)
-          .maxControlEffort(TRANSLATION_MAX_VEL)
+          .maxControlEffort(TRANSLATION_MAX_VOLTAGE)
           .buildPositionControlLoop();
   private static final PositionControlLoop Y_LOOP =
       new PositionControlLoopBuilder()
           .stateMatrices(A, B, C, D)
           .standardDeviations(TRANS_MODEL_POS_STDEV, TRANS_MODEL_VEL_STDEV, TRANS_MEAS_STDEV)
           .maxError(TRANS_MAX_POS_ERROR, TRANS_MAX_VEL_ERROR)
-          .maxControlEffort(TRANSLATION_MAX_VEL)
+          .maxControlEffort(TRANSLATION_MAX_VOLTAGE)
           .buildPositionControlLoop();
   private static final PositionControlLoop THETA_LOOP =
       new PositionControlLoopBuilder()
           .stateMatrices(A, B, C, D)
           .standardDeviations(THETA_MODEL_POS_STDEV, THETA_MODEL_VEL_STDEV, THETA_MEAS_STDEV)
           .maxError(THETA_MAX_POS_ERROR, THETA_MAX_VEL_ERROR)
-          .maxControlEffort(THETA_MAX_VEL)
+          .maxControlEffort(THETA_MAX_VOLTAGE)
           .buildPositionControlLoop();
 
   public SwerveControllerCommand(Pose2d endpoint) {
