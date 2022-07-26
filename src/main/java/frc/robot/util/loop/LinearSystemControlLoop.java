@@ -1,5 +1,6 @@
 package frc.robot.util.loop;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -15,6 +16,7 @@ import java.util.function.Function;
 public class LinearSystemControlLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
 
   private LinearSystemLoop<States, Inputs, Outputs> loop;
+  private Function<Matrix<Inputs,N1>, Matrix<Inputs,N1>> clampFunction;
   private double dtSeconds;
 
   public LinearSystemControlLoop(
@@ -38,7 +40,7 @@ public class LinearSystemControlLoop<States extends Num, Inputs extends Num, Out
             plant,
             new LinearQuadraticRegulator<>(plant, qelms, relms, dtSeconds),
             new KalmanFilter<>(states, outputs, plant, stateStdDevs, measurementStdDevs, dtSeconds),
-            clampFunction,
+            (u) -> {var uClamp = u.copy(); for(int i = 0; i < u.getNumRows(); i++) uClamp.set(i, 0, MathUtil.clamp(u.get(i,0), -relms.get(i,0), relms.get(i,0))); return uClamp;},
             dtSeconds);
     loop.getController().latencyCompensate(plant, dtSeconds, latencyCompensation);
     this.dtSeconds = dtSeconds;
@@ -53,7 +55,11 @@ public class LinearSystemControlLoop<States extends Num, Inputs extends Num, Out
   protected Matrix<Inputs, N1> correctAndPredict(Matrix<Outputs, N1> systemOutput) {
     loop.correct(systemOutput);
     loop.predict(dtSeconds);
-    return loop.getU();
+    return getPlantInput();
+  }
+
+  protected Matrix<Inputs, N1> getPlantInput() {
+    return clampFunction.apply(loop.getU());
   }
 
   protected void reset(Matrix<States, N1> initState) {
