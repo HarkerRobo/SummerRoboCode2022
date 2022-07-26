@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -59,6 +61,8 @@ public class Drivetrain extends SubsystemBase {
             new Translation2d(-DT_LENGTH / 2, -DT_WIDTH / 2));
 
     pigeon = new Pigeon2(RobotMap.PIGEON_ID, RobotMap.CANBUS);
+    for(PigeonIMU_StatusFrame frame: PigeonIMU_StatusFrame.values()) pigeon.setStatusFramePeriod(frame, RobotMap.MAX_CAN_FRAME_PERIOD);
+    pigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, (int)(1000 * RobotMap.ROBOT_LOOP));
 
     pigeon.setYaw(0);
 

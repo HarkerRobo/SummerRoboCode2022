@@ -3,8 +3,12 @@ package frc.robot.util;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+
+import frc.robot.RobotMap;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class HSFalconBuilder {
@@ -12,6 +16,8 @@ public class HSFalconBuilder {
   boolean invert = false;
   SensorVelocityMeasPeriod velocityMeasPeriod = SensorVelocityMeasPeriod.Period_10Ms;
   int voltageFilter = 16;
+  int fastCANFrame = (int)(1000 * RobotMap.ROBOT_LOOP);
+  int slowCANFrame = 2 * fastCANFrame;
   StatorCurrentLimitConfiguration stator;
   SupplyCurrentLimitConfiguration supply;
 
@@ -47,6 +53,12 @@ public class HSFalconBuilder {
     return this;
   }
 
+  public HSFalconBuilder canFramePeriods(int fast, int slow) {
+    fastCANFrame = fast;
+    slowCANFrame = slow;
+    return this;
+  }
+
   public HSFalcon build(int deviceID, String canbus) {
     HSFalcon falcon = new HSFalcon(deviceID, canbus);
     falcon.configFactoryDefault();
@@ -57,6 +69,9 @@ public class HSFalconBuilder {
     falcon.configVoltageMeasurementFilter(voltageFilter);
     if (stator != null) falcon.configStatorCurrentLimit(stator);
     if (supply != null) falcon.configSupplyCurrentLimit(supply);
+    for(StatusFrame frame: StatusFrame.values()) falcon.setStatusFramePeriod(frame, RobotMap.MAX_CAN_FRAME_PERIOD);
+    falcon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, fastCANFrame);
+    falcon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, slowCANFrame);
     return falcon;
   }
 }

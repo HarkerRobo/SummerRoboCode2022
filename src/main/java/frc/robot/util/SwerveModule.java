@@ -2,6 +2,7 @@ package frc.robot.util;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -140,6 +141,7 @@ public class SwerveModule implements Sendable {
     double position = canCoder.getAbsolutePosition() - Drivetrain.CANCODER_OFFSETS[swerveID];
     rotation.setSelectedSensorPosition(
         position * Units.DEGREES_TO_ENCODER_TICKS * ROTATION_GEAR_RATIO);
+    canCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, RobotMap.MAX_CAN_FRAME_PERIOD);
   }
 
   public void update() {

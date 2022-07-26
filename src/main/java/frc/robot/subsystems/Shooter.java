@@ -32,9 +32,9 @@ public class Shooter extends SubsystemBase {
   private static final double kS = 0.1432;
   private static final double kV = 0.51368;
   private static final double kA = 0.038625;
-  private static final double MODEL_STDEV = 0.5;
-  private static final double ENCODER_STDEV = 0.015;
-  private static final double MAX_ERROR = 1.0;
+  private static final double MODEL_STDEV = 0.5; // TODO: Tune
+  private static final double ENCODER_STDEV = 0.015; // TODO: Tune
+  private static final double MAX_ERROR = 1.0; // TODO: Tune
 
   private static final double VELOCITY_TOLERANCE = 0.1;
 
@@ -61,6 +61,7 @@ public class Shooter extends SubsystemBase {
         new HSFalconBuilder()
             .invert(FOLLOWER_INVERT)
             .neutralMode(NeutralMode.Coast)
+            .canFramePeriods(RobotMap.MAX_CAN_FRAME_PERIOD, RobotMap.MAX_CAN_FRAME_PERIOD)
             .build(RobotMap.SHOOTER_FOLLOWER, RobotMap.CANBUS);
     follower.follow(master);
     velocityLoop =
