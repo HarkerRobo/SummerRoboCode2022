@@ -4,25 +4,17 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.drivetrain.SwerveManual;
-import frc.robot.commands.hood.HoodManual;
-import frc.robot.commands.indexer.IndexerManual;
 import frc.robot.commands.intake.IntakeManual;
-import frc.robot.commands.shooter.ShooterManual;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Hood;
-import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -32,6 +24,7 @@ import frc.robot.subsystems.Shooter;
  */
 public class Robot extends TimedRobot {
   private static final Field2d FIELD = new Field2d();
+  private Notifier coastDrivetrainNotifier = new Notifier(()-> {if(isDisabled())Drivetrain.getInstance().setNeutralMode(NeutralMode.Coast);});;
 
   public Robot() {
     super();
@@ -46,9 +39,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    //CommandScheduler.getInstance().setDefaultCommand(Drivetrain.getInstance(), new SwerveManual());
+    // CommandScheduler.getInstance().setDefaultCommand(Drivetrain.getInstance(), new
+    // SwerveManual());
     CommandScheduler.getInstance().setDefaultCommand(Intake.getInstance(), new IntakeManual());
-    //CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
+    // CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
     // CommandScheduler.getInstance().setDefaultCommand(Indexer.getInstance(), new IndexerManual());
     // CommandScheduler.getInstance().setDefaultCommand(Hood.getInstance(), new HoodManual());
     NetworkTableInstance.getDefault().setUpdateRate(RobotMap.ROBOT_LOOP);
@@ -88,9 +82,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-  //   Drivetrain.getInstance()
-  //       .getPoseEstimator()
-  //       .resetPosition(new Pose2d(), Drivetrain.getInstance().getRobotRotation());
+    Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
+    //   Drivetrain.getInstance()
+    //       .getPoseEstimator()
+    //       .resetPosition(new Pose2d(), Drivetrain.getInstance().getRobotRotation());
   }
 
   /** This function is called periodically during autonomous. */
@@ -99,7 +94,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
+  }
 
   /** This function is called periodically during operator control. */
   @Override
@@ -107,7 +104,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    coastDrivetrainNotifier.startSingle(3.0);
+  }
 
   /** This function is called periodically when disabled. */
   @Override
