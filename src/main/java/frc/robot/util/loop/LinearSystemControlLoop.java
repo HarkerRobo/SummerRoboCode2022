@@ -11,6 +11,10 @@ import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
+import frc.robot.RobotMap;
+
 import java.util.function.Function;
 
 public class LinearSystemControlLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
@@ -40,9 +44,10 @@ public class LinearSystemControlLoop<States extends Num, Inputs extends Num, Out
             plant,
             new LinearQuadraticRegulator<>(plant, qelms, relms, dtSeconds),
             new KalmanFilter<>(states, outputs, plant, stateStdDevs, measurementStdDevs, dtSeconds),
-            (u) -> {var uClamp = u.copy(); for(int i = 0; i < u.getNumRows(); i++) uClamp.set(i, 0, MathUtil.clamp(u.get(i,0), -relms.get(i,0), relms.get(i,0))); return uClamp;},
+            RobotMap.MAX_MOTOR_VOLTAGE,
             dtSeconds);
     loop.getController().latencyCompensate(plant, dtSeconds, latencyCompensation);
+    this.clampFunction = clampFunction;
     this.dtSeconds = dtSeconds;
   }
 

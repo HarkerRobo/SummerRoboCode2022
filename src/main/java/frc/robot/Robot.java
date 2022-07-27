@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,11 +46,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    CommandScheduler.getInstance().setDefaultCommand(Drivetrain.getInstance(), new SwerveManual());
+    //CommandScheduler.getInstance().setDefaultCommand(Drivetrain.getInstance(), new SwerveManual());
     CommandScheduler.getInstance().setDefaultCommand(Intake.getInstance(), new IntakeManual());
-    CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
-    CommandScheduler.getInstance().setDefaultCommand(Indexer.getInstance(), new IndexerManual());
-    CommandScheduler.getInstance().setDefaultCommand(Hood.getInstance(), new HoodManual());
+    //CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
+    // CommandScheduler.getInstance().setDefaultCommand(Indexer.getInstance(), new IndexerManual());
+    // CommandScheduler.getInstance().setDefaultCommand(Hood.getInstance(), new HoodManual());
+    NetworkTableInstance.getDefault().setUpdateRate(RobotMap.ROBOT_LOOP);
   }
 
   /**
@@ -59,17 +64,16 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-
-    SmartDashboard.putData(Drivetrain.getInstance());
-    SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(0));
-    SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(1));
-    SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(2));
-    SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(3));
+    // SmartDashboard.putData(Drivetrain.getInstance());
+    // SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(0));
+    // SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(1));
+    // SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(2));
+    // SmartDashboard.putData(Drivetrain.getInstance().getSwerveModule(3));
     SmartDashboard.putData(Intake.getInstance());
-    SmartDashboard.putData(Indexer.getInstance());
-    SmartDashboard.putData(Shooter.getInstance());
-    Drivetrain.getInstance().updatePoseEstimator();
-    FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
+    // SmartDashboard.putData(Indexer.getInstance());
+    // SmartDashboard.putData(Shooter.getInstance());
+    // Drivetrain.getInstance().updatePoseEstimator();
+    // FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
   }
 
   /**
@@ -84,9 +88,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    Drivetrain.getInstance()
-        .getPoseEstimator()
-        .resetPosition(new Pose2d(), Drivetrain.getInstance().getRobotRotation());
+  //   Drivetrain.getInstance()
+  //       .getPoseEstimator()
+  //       .resetPosition(new Pose2d(), Drivetrain.getInstance().getRobotRotation());
   }
 
   /** This function is called periodically during autonomous. */

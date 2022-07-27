@@ -21,6 +21,7 @@ public class InterpolatingTreeMap extends TreeMap<Double, Double> {
 
   public double lerp(double x, double x0, double y0, double x1, double y1) {
     if (x0 == x1) return y0;
-    return (x - x0) / (x1 - x0) * (y1 - y0) + y1;
+    return (x - x0) / (x1 - x0) * (y1 - y0) + y0;
   }
 }
+

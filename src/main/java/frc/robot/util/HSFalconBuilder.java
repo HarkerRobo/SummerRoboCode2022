@@ -14,7 +14,8 @@ import harkerrobolib.wrappers.HSFalcon;
 public class HSFalconBuilder {
   NeutralMode neutralMode = NeutralMode.Brake;
   boolean invert = false;
-  SensorVelocityMeasPeriod velocityMeasPeriod = SensorVelocityMeasPeriod.Period_10Ms;
+  SensorVelocityMeasPeriod velocityMeasPeriod = SensorVelocityMeasPeriod.Period_1Ms;
+  int velocityWindow = 1;
   int voltageFilter = 16;
   int fastCANFrame = (int)(1000 * RobotMap.ROBOT_LOOP);
   int slowCANFrame = 2 * fastCANFrame;
@@ -59,6 +60,11 @@ public class HSFalconBuilder {
     return this;
   }
 
+  public HSFalconBuilder velocityWindow(int window) {
+    velocityWindow = window;
+    return this;
+  }
+
   public HSFalcon build(int deviceID, String canbus) {
     HSFalcon falcon = new HSFalcon(deviceID, canbus);
     falcon.configFactoryDefault();
@@ -66,6 +72,7 @@ public class HSFalconBuilder {
     falcon.setInverted(invert);
     falcon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     falcon.configVelocityMeasurementPeriod(velocityMeasPeriod);
+    falcon.configVelocityMeasurementWindow(velocityWindow);
     falcon.configVoltageMeasurementFilter(voltageFilter);
     if (stator != null) falcon.configStatorCurrentLimit(stator);
     if (supply != null) falcon.configSupplyCurrentLimit(supply);

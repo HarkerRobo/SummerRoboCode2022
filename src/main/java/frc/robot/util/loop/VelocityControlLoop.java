@@ -32,7 +32,7 @@ public class VelocityControlLoop extends LinearSystemControlLoop<N1, N1, N1> {
         latencyCompensation,
         (u) -> {
           double input = u.get(0, 0);
-          if (Math.abs(input) > 0.005) input += kS;
+          if (Math.abs(kS) > 0.005) input += kS;
           input = MathUtil.clamp(input, -maxControlEffort, maxControlEffort);
           return VecBuilder.fill(input);
         },
@@ -62,6 +62,10 @@ public class VelocityControlLoop extends LinearSystemControlLoop<N1, N1, N1> {
 
   public double getVelocityError() {
     return super.getError().get(0, 0);
+  }
+
+  public double getVoltage() {
+    return super.getPlantInput().get(0,0);
   }
 
   public static class VelocityControlLoopBuilder {

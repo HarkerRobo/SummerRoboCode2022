@@ -3,7 +3,7 @@ package frc.robot;
 public final class RobotMap {
   public static final String CANBUS = "BINGCHILLING";
   public static final double ROBOT_LOOP = 0.02;
-  public static final double MAX_MOTOR_VOLTAGE = 12.0;
+  public static final double MAX_MOTOR_VOLTAGE = 10.0;
   public static final int MAX_CAN_FRAME_PERIOD = 255;
 
   public static final String LIMELIGHT_NAME = "gloworm";
