@@ -31,12 +31,14 @@ public class ShooterManual extends IndefiniteCommand {
           Shooter.getInstance().setState(State.REVVING);
           break;
         case REVVING:
-          if (Shooter.getInstance().atTargetSpeed(nextSpeed) && Shooter.getInstance().isAligned())
+          if (Shooter.getInstance().atTargetSpeed(nextSpeed)
+              && Drivetrain.getInstance().isAligned())
             Shooter.getInstance().setState(State.SHOOTING);
           break;
         case SHOOTING:
           if (!(Shooter.getInstance().atTargetSpeed(nextSpeed)
-              && Shooter.getInstance().isAligned())) Shooter.getInstance().setState(State.REVVING);
+              && Drivetrain.getInstance().isAligned()))
+            Shooter.getInstance().setState(State.REVVING);
       }
     } else Shooter.getInstance().setState(State.IDLE);
   }

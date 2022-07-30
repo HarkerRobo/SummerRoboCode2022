@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -24,7 +23,7 @@ import frc.robot.subsystems.Intake;
  */
 public class Robot extends TimedRobot {
   private static final Field2d FIELD = new Field2d();
-  private Notifier coastDrivetrainNotifier = new Notifier(()-> {if(isDisabled())Drivetrain.getInstance().setNeutralMode(NeutralMode.Coast);});;
+  private Notifier coastDrivetrainNotifier;
 
   public Robot() {
     super();
@@ -32,6 +31,12 @@ public class Robot extends TimedRobot {
 
   public Robot(double period) {
     super(period);
+    coastDrivetrainNotifier =
+        new Notifier(
+            () -> {
+              if (isDisabled())
+                Drivetrain.getInstance().setNeutralMode(NeutralMode.Coast);
+            });
   }
   /**
    * This function is run when the robot is first started up and should be used for any

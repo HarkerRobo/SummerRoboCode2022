@@ -1,10 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
-
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -50,11 +47,12 @@ public class Intake extends SubsystemBase {
     intake =
         new DoubleSolenoid(
             PneumaticsModuleType.REVPH, RobotMap.INTAKE_FORWARD, RobotMap.INTAKE_BACKWARD);
-    roller = new HSFalconBuilder()
-              .invert(INVERT)
-              .supplyLimit(PEAK_CURRENT, CONTINUOUS_CURRENT_LIMIT, PEAK_DUR)
-              .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_100Ms)
-              .build(RobotMap.INTAKE_MOTOR, "rio");
+    roller =
+        new HSFalconBuilder()
+            .invert(INVERT)
+            .supplyLimit(PEAK_CURRENT, CONTINUOUS_CURRENT_LIMIT, PEAK_DUR)
+            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_100Ms)
+            .build(RobotMap.INTAKE_MOTOR, "rio");
     loop =
         new VelocityControlLoopBuilder()
             .motorConstants(kS, kA, kV)
@@ -124,16 +122,16 @@ public class Intake extends SubsystemBase {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Intake");
-    builder.addDoubleProperty(
-        "Raw Roller Velocity", () -> getIntakeSpeed(), null);
+    builder.addDoubleProperty("Raw Roller Velocity", () -> getIntakeSpeed(), null);
     builder.addDoubleProperty("Roller Speed", () -> loop.getFilteredVelocity(), null);
-    builder.addDoubleProperty("Voltage", () -> roller.getBusVoltage() , null);
+    builder.addDoubleProperty("Voltage", () -> roller.getBusVoltage(), null);
     builder.addDoubleProperty("Roller Loop Reference", () -> loop.getSetpoint(), null);
     builder.addDoubleProperty("Roller Loop Error", () -> loop.getVelocityError(), null);
-    builder.addDoubleProperty("Roller Loop Feedforward output", () -> loop.getFeedforward().getUff(0), null);
-    builder.addDoubleProperty("Roller Loop Output", () -> loop.getController().getU().get(0,0), null);
-    builder.addDoubleProperty("Roller Stator Current", ()->roller.getStatorCurrent(), null);
-    builder.addDoubleProperty("Roller Supply Current", ()->roller.getSupplyCurrent(), null);
-
+    builder.addDoubleProperty(
+        "Roller Loop Feedforward output", () -> loop.getFeedforward().getUff(0), null);
+    builder.addDoubleProperty(
+        "Roller Loop Output", () -> loop.getController().getU().get(0, 0), null);
+    builder.addDoubleProperty("Roller Stator Current", () -> roller.getStatorCurrent(), null);
+    builder.addDoubleProperty("Roller Supply Current", () -> roller.getSupplyCurrent(), null);
   }
 }

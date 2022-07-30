@@ -27,7 +27,7 @@ public class SwerveManual extends IndefiniteCommand {
   private static final double THETA_MODEL_POS_STDEV = 0.5; // TODO
   private static final double THETA_MODEL_VEL_STDEV = 0.5; // TODO
   private static final double THETA_MEAS_STDEV = 0.035; // TODO
-  
+
   private static final double THETA_MAX_VEL = 1;
 
   private static PositionControlLoop HUB_LOOP =
@@ -39,7 +39,7 @@ public class SwerveManual extends IndefiniteCommand {
               SwerveControllerCommand.D)
           .standardDeviations(THETA_MODEL_POS_STDEV, THETA_MODEL_VEL_STDEV, THETA_MEAS_STDEV)
           .maxError(THETA_MAX_POS_ERROR, THETA_MAX_VEL_ERROR)
-          .maxControlEffort(SPEED_MULTIPLIER*THETA_MAX_VEL)
+          .maxControlEffort(SPEED_MULTIPLIER * THETA_MAX_VEL)
           .buildPositionControlLoop();
 
   public SwerveManual() {

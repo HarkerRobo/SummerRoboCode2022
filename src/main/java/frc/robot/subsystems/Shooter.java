@@ -2,12 +2,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
-import frc.robot.util.FieldConstants;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.Units;
 import frc.robot.util.loop.VelocityControlLoop;
@@ -40,7 +37,7 @@ public class Shooter extends SubsystemBase {
 
   private static final double SHOOTER_GEAR_RATIO = 1.5;
 
-  private static final double CUSTOM_RADIUS = 1.0;
+  public static final double CUSTOM_RADIUS = 1.0;
 
   private State state;
 
@@ -103,16 +100,6 @@ public class Shooter extends SubsystemBase {
 
   public boolean atTargetSpeed() {
     return Math.abs(getError()) < VELOCITY_TOLERANCE;
-  }
-
-  public boolean isAligned() {
-    Pose2d currentPose = Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition();
-    double dist = currentPose.getTranslation().getDistance(FieldConstants.HUB_LOCATION);
-    double threshold =
-        Math.toDegrees(Math.atan(CUSTOM_RADIUS / (dist + FieldConstants.HUB_RADIUS)));
-    Translation2d diff = FieldConstants.HUB_LOCATION.minus(currentPose.getTranslation());
-    double angleToHub = Math.toDegrees(Math.atan2(diff.getY(), diff.getX()));
-    return Math.abs(Drivetrain.getInstance().getRobotHeading() - angleToHub) <= threshold;
   }
 
   public double getFilteredVelocity() {

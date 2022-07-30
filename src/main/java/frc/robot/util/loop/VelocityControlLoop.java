@@ -65,7 +65,7 @@ public class VelocityControlLoop extends LinearSystemControlLoop<N1, N1, N1> {
   }
 
   public double getVoltage() {
-    return super.getPlantInput().get(0,0);
+    return super.getPlantInput().get(0, 0);
   }
 
   public static class VelocityControlLoopBuilder {

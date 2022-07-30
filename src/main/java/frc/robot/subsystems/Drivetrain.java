@@ -17,6 +17,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
+import frc.robot.util.FieldConstants;
 import frc.robot.util.SwerveModule;
 
 public class Drivetrain extends SubsystemBase {
@@ -102,6 +103,16 @@ public class Drivetrain extends SubsystemBase {
       }
       swerveModules[i].setAngleAndDrive(diff + swerveModules[i].getCurrentAngle(), driveOutput);
     }
+  }
+
+  public boolean isAligned() {
+    Pose2d currentPose = poseEstimator.getEstimatedPosition();
+    double dist = currentPose.getTranslation().getDistance(FieldConstants.HUB_LOCATION);
+    double threshold =
+        Math.toDegrees(Math.atan(Shooter.CUSTOM_RADIUS / (dist + FieldConstants.HUB_RADIUS)));
+    Translation2d diff = FieldConstants.HUB_LOCATION.minus(currentPose.getTranslation());
+    double angleToHub = Math.toDegrees(Math.atan2(diff.getY(), diff.getX()));
+    return Math.abs(getRobotHeading() - angleToHub) <= threshold;
   }
 
   public void setDrivetrainOffset() {

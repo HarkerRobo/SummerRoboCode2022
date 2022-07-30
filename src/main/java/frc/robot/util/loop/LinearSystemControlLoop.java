@@ -1,6 +1,5 @@
 package frc.robot.util.loop;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -11,16 +10,13 @@ import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Robot;
 import frc.robot.RobotMap;
-
 import java.util.function.Function;
 
 public class LinearSystemControlLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
 
   private LinearSystemLoop<States, Inputs, Outputs> loop;
-  private Function<Matrix<Inputs,N1>, Matrix<Inputs,N1>> clampFunction;
+  private Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction;
   private double dtSeconds;
 
   public LinearSystemControlLoop(
