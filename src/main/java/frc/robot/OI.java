@@ -1,5 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.Drivetrain;
 // import frc.robot.commands.climber.ClimberStages;
 import harkerrobolib.wrappers.XboxGamepad;
 
@@ -18,6 +21,14 @@ public class OI {
 
   public void initBindings() {
     // driver.getButtonA().whenPressed(ClimberStages.ALL_STAGES);
+    driver
+        .getButtonStart()
+        .whenPressed(
+            new InstantCommand(
+                () -> {
+                  Drivetrain.getInstance().setPose(new Pose2d());
+                  Drivetrain.getInstance().zeroPigeon();
+                }));
   }
 
   public XboxGamepad getDriverGamepad() {

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.loop.PositionControlLoop;
-import frc.robot.util.loop.PositionControlLoop.PositionControlLoopBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Climber extends SubsystemBase {
@@ -69,18 +68,19 @@ public class Climber extends SubsystemBase {
             PneumaticsModuleType.REVPH, RobotMap.CLIMBER_FORWARD, RobotMap.CLIMBER_BACKWARD);
     rightLimitSwitch = new DigitalInput(RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
     leftLimitSwitch = new DigitalInput(RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);
-    leftPositionLoop =
-        new PositionControlLoopBuilder()
-            .motorConstants(LEFT_kS, LEFT_kA, LEFT_kV, LEFT_kG)
-            .standardDeviations(LEFT_MODEL_POS_STDEV, LEFT_MODEL_VEL_STDEV, LEFT_ENCODER_STDEV)
-            .maxError(LEFT_POS_MAX_ERROR, LEFT_VEL_MAX_ERROR)
-            .buildElevatorControlLoop();
-    rightPositionLoop =
-        new PositionControlLoopBuilder()
-            .motorConstants(RIGHT_kS, RIGHT_kA, RIGHT_kV, RIGHT_kG)
-            .standardDeviations(RIGHT_MODEL_POS_STDEV, RIGHT_MODEL_VEL_STDEV, RIGHT_ENCODER_STDEV)
-            .maxError(RIGHT_POS_MAX_ERROR, RIGHT_VEL_MAX_ERROR)
-            .buildElevatorControlLoop();
+    // leftPositionLoop =
+    //     new PositionControlLoopBuilder()
+    //         .motorConstants(LEFT_kS, LEFT_kA, LEFT_kV, LEFT_kG)
+    //         .standardDeviations(LEFT_MODEL_POS_STDEV, LEFT_MODEL_VEL_STDEV, LEFT_ENCODER_STDEV)
+    //         .maxError(LEFT_POS_MAX_ERROR, LEFT_VEL_MAX_ERROR)
+    //         .buildElevatorControlLoop();
+    // rightPositionLoop =
+    //     new PositionControlLoopBuilder()
+    //         .motorConstants(RIGHT_kS, RIGHT_kA, RIGHT_kV, RIGHT_kG)
+    //         .standardDeviations(RIGHT_MODEL_POS_STDEV, RIGHT_MODEL_VEL_STDEV,
+    // RIGHT_ENCODER_STDEV)
+    //         .maxError(RIGHT_POS_MAX_ERROR, RIGHT_VEL_MAX_ERROR)
+    //         .buildElevatorControlLoop();
   }
 
   public void setRightClimberPos(double pos) {

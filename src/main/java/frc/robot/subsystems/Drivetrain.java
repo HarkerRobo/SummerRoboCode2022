@@ -34,8 +34,9 @@ public class Drivetrain extends SubsystemBase {
   private static final double DT_LENGTH = 0.5969; // 0.88265
 
   public static final double MAX_TRANSLATION_VEL = 3.0; // in m/s
-  public static final double MAX_ACCELERATION = 6.0; // m/s^2
+  public static final double MAX_ACCELERATION = 2.0; // m/s^2
   public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
+  public static final double MAX_ROTATION_ACCELERATION = 1.0 * Math.PI;
 
   private static final Matrix<N3, N1> ODOMETRY_STATE_STDEV = VecBuilder.fill(1.0, 1.0, 1.0);
   private static final Matrix<N1, N1> ODOMETRY_ENCODER_STDEV = VecBuilder.fill(1.0);
@@ -67,12 +68,10 @@ public class Drivetrain extends SubsystemBase {
     pigeon.setStatusFramePeriod(
         PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, (int) (1000 * RobotMap.ROBOT_LOOP));
 
-    pigeon.setYaw(0);
-
     poseEstimator =
         new SwerveDrivePoseEstimator(
-            Rotation2d.fromDegrees(getRobotHeading()),
-            new Pose2d(0, 0, Rotation2d.fromDegrees(getRobotHeading())),
+            getRobotRotation(),
+            new Pose2d(0, 0, getRobotRotation()),
             kinematics,
             ODOMETRY_STATE_STDEV,
             ODOMETRY_ENCODER_STDEV,
@@ -158,6 +157,18 @@ public class Drivetrain extends SubsystemBase {
 
   public double getRobotHeading() {
     return (PIGEON_UP) ? -pigeon.getYaw() : pigeon.getYaw();
+  }
+
+  public void setPose(Pose2d pose) {
+    for (int i = 0; i < 4; i++) {
+      swerveModules[i].zeroDriveEncoders();
+    }
+    poseEstimator.resetPosition(pose, getRobotRotation());
+  }
+
+  public void zeroPigeon() {
+    pigeon.setYaw(0);
+    pigeon.setAccumZAngle(0);
   }
 
   public static Drivetrain getInstance() {

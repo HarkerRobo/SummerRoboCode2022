@@ -106,6 +106,10 @@ public class SwerveModule implements Sendable {
     }
   }
 
+  public void zeroDriveEncoders() {
+    drive.setSelectedSensorPosition(0);
+  }
+
   public void setAngleAndDrive(double rotationAngle, double driveOutput) {
     setAngleAndDrive(rotationAngle, driveOutput, false);
   }

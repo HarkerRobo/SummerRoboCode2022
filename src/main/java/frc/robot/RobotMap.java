@@ -24,6 +24,7 @@ public final class RobotMap {
   public static final int INDEXER_BOTTOM = 9;
 
   public static final int HOOD_ID = 14;
+  public static final int HOOD_LIMIT_SWTICH = 0; // TODO
 
   public static final int TOP_PROXIMITY = 7;
   public static final int BOTTOM_PROXIMITY = 6;

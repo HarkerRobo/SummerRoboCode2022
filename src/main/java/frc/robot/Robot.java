@@ -34,8 +34,7 @@ public class Robot extends TimedRobot {
     coastDrivetrainNotifier =
         new Notifier(
             () -> {
-              if (isDisabled())
-                Drivetrain.getInstance().setNeutralMode(NeutralMode.Coast);
+              if (isDisabled()) Drivetrain.getInstance().setNeutralMode(NeutralMode.Coast);
             });
   }
   /**
@@ -88,9 +87,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
-    //   Drivetrain.getInstance()
-    //       .getPoseEstimator()
-    //       .resetPosition(new Pose2d(), Drivetrain.getInstance().getRobotRotation());
   }
 
   /** This function is called periodically during autonomous. */
