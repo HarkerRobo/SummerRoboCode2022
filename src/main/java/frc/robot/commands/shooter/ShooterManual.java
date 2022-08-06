@@ -31,12 +31,12 @@ public class ShooterManual extends IndefiniteCommand {
           Shooter.getInstance().setState(State.REVVING);
           break;
         case REVVING:
-          if (Shooter.getInstance().atTargetSpeed(nextSpeed)
+          if (Shooter.getInstance().atSpeed(nextSpeed)
               && Drivetrain.getInstance().isAligned())
             Shooter.getInstance().setState(State.SHOOTING);
           break;
         case SHOOTING:
-          if (!(Shooter.getInstance().atTargetSpeed(nextSpeed)
+          if (!(Shooter.getInstance().atSpeed(nextSpeed)
               && Drivetrain.getInstance().isAligned()))
             Shooter.getInstance().setState(State.REVVING);
       }
@@ -44,12 +44,13 @@ public class ShooterManual extends IndefiniteCommand {
   }
 
   private double calculateShooterSpeed() {
-    return shooterVals.get(
-        Drivetrain.getInstance()
-            .getPoseEstimator()
-            .getEstimatedPosition()
-            .getTranslation()
-            .getDistance(FieldConstants.HUB_LOCATION));
+    return 15;
+    // return shooterVals.get(
+    //     Drivetrain.getInstance()
+    //         .getPoseEstimator()
+    //         .getEstimatedPosition()
+    //         .getTranslation()
+    //         .getDistance(FieldConstants.HUB_LOCATION));
   }
 
   public void end(boolean interrupted) {
