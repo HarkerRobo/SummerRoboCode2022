@@ -4,7 +4,6 @@ import frc.robot.OI;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.State;
-import frc.robot.util.FieldConstants;
 import frc.robot.util.InterpolatingTreeMap;
 import harkerrobolib.commands.IndefiniteCommand;
 
@@ -31,13 +30,11 @@ public class ShooterManual extends IndefiniteCommand {
           Shooter.getInstance().setState(State.REVVING);
           break;
         case REVVING:
-          if (Shooter.getInstance().atSpeed(nextSpeed)
-              && Drivetrain.getInstance().isAligned())
+          if (Shooter.getInstance().atSpeed(nextSpeed) && Drivetrain.getInstance().isAligned())
             Shooter.getInstance().setState(State.SHOOTING);
           break;
         case SHOOTING:
-          if (!(Shooter.getInstance().atSpeed(nextSpeed)
-              && Drivetrain.getInstance().isAligned()))
+          if (!(Shooter.getInstance().atSpeed(nextSpeed) && Drivetrain.getInstance().isAligned()))
             Shooter.getInstance().setState(State.REVVING);
       }
     } else Shooter.getInstance().setState(State.IDLE);

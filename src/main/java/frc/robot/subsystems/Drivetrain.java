@@ -149,12 +149,6 @@ public class Drivetrain extends SubsystemBase {
     return swerveModules[id];
   }
 
-  public void update() {
-    for (int i = 0; i < 4; i++) {
-      swerveModules[i].update();
-    }
-  }
-
   public double getRobotHeading() {
     return (PIGEON_UP) ? -pigeon.getYaw() : pigeon.getYaw();
   }

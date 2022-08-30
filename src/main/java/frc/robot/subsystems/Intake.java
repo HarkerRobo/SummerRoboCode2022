@@ -1,6 +1,10 @@
 package frc.robot.subsystems;
 
+import static harkerrobolib.util.Conversions.AngleUnit.*;
+import static harkerrobolib.util.Conversions.LinearUnit.*;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -8,9 +12,9 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.HSFalconBuilder;
-import frc.robot.util.Units;
-import frc.robot.util.loop.VelocityControlLoop;
-import frc.robot.util.loop.VelocityControlLoop.VelocityControlLoopBuilder;
+import frc.robot.util.MotorVelocitySystem;
+import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
+import harkerrobolib.util.Conversions.VelUnit;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Intake extends SubsystemBase {
@@ -18,7 +22,10 @@ public class Intake extends SubsystemBase {
   private DoubleSolenoid intake;
   private HSFalcon roller;
 
-  public static final double INTAKE_GEAR_RATIO = 5.0 / 3.0;
+  private static final double WHEEL_DIAMETER = 2.0;
+  public static final double GEAR_RATIO = 5.0 / 3.0;
+  public static final double FALCON_VEL_TO_CARGO_SPEED =
+      new VelUnit(TALONFX).to(new VelUnit(METER), 0.5 / GEAR_RATIO, INCH, WHEEL_DIAMETER);
 
   private static final double CONTINUOUS_CURRENT_LIMIT = 60;
   private static final double PEAK_CURRENT = 60;
@@ -30,10 +37,8 @@ public class Intake extends SubsystemBase {
   private static final double kA = 0.147;
 
   private static final double MAX_ERROR = 0.01;
-  private static final double MODEL_STDEV = 0.5;
-  private static final double ENCODER_STDEV = 0.015;
 
-  private VelocityControlLoop loop;
+  private MotorVelocitySystem velocitySystem;
 
   private State state;
 
@@ -52,14 +57,16 @@ public class Intake extends SubsystemBase {
             .invert(INVERT)
             .supplyLimit(PEAK_CURRENT, CONTINUOUS_CURRENT_LIMIT, PEAK_DUR)
             .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_100Ms)
-            .build(RobotMap.INTAKE_MOTOR, "rio");
-    loop =
-        new VelocityControlLoopBuilder()
-            .motorConstants(kS, kA, kV)
-            .standardDeviations(MODEL_STDEV, ENCODER_STDEV)
+            .build(RobotMap.INTAKE_MOTOR);
+    velocitySystem =
+        new MotorVelocitySystemBuilder()
+            .constants(kV, kA, kS)
             .maxError(MAX_ERROR)
-            .buildVelocityControlLoop();
+            .unitConversionFactor(FALCON_VEL_TO_CARGO_SPEED)
+            .build(roller);
     state = State.NEUTRAL;
+    addChild("Motor", roller);
+    addChild("Motor System", velocitySystem);
   }
 
   public void setForward() {
@@ -71,7 +78,11 @@ public class Intake extends SubsystemBase {
   }
 
   public void setRollerOutput(double rollerOutput) {
-    roller.setVoltage(loop.setReferenceAndPredict(rollerOutput, getIntakeSpeed()));
+    roller.set(
+        ControlMode.Velocity,
+        rollerOutput / FALCON_VEL_TO_CARGO_SPEED,
+        DemandType.ArbitraryFeedForward,
+        kS);
   }
 
   public void turnOffMotor() {
@@ -105,10 +116,7 @@ public class Intake extends SubsystemBase {
   }
 
   public double getIntakeSpeed() {
-    return roller.getSelectedSensorVelocity()
-        / INTAKE_GEAR_RATIO
-        * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND
-        * Units.wheelRotsToMeter(2);
+    return velocitySystem.getVelocity();
   }
 
   public HSFalcon getRollerMotor() {
@@ -122,16 +130,6 @@ public class Intake extends SubsystemBase {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Intake");
-    builder.addDoubleProperty("Raw Roller Velocity", () -> getIntakeSpeed(), null);
-    builder.addDoubleProperty("Roller Speed", () -> loop.getFilteredVelocity(), null);
-    builder.addDoubleProperty("Voltage", () -> roller.getBusVoltage(), null);
-    builder.addDoubleProperty("Roller Loop Reference", () -> loop.getSetpoint(), null);
-    builder.addDoubleProperty("Roller Loop Error", () -> loop.getVelocityError(), null);
-    builder.addDoubleProperty(
-        "Roller Loop Feedforward output", () -> loop.getFeedforward().getUff(0), null);
-    builder.addDoubleProperty(
-        "Roller Loop Output", () -> loop.getController().getU().get(0, 0), null);
-    builder.addDoubleProperty("Roller Stator Current", () -> roller.getStatorCurrent(), null);
-    builder.addDoubleProperty("Roller Supply Current", () -> roller.getSupplyCurrent(), null);
+    builder.addStringProperty("State", () -> state.name(), (a) -> state = State.valueOf(a));
   }
 }

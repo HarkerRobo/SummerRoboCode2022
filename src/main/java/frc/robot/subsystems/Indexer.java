@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import static harkerrobolib.util.Conversions.AngleUnit.*;
+import static harkerrobolib.util.Conversions.LinearUnit.*;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -7,9 +10,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.ColorSensor;
 import frc.robot.util.HSFalconBuilder;
-import frc.robot.util.Units;
-import frc.robot.util.loop.VelocityControlLoop;
-import frc.robot.util.loop.VelocityControlLoop.VelocityControlLoopBuilder;
+import frc.robot.util.MotorVelocitySystem;
+import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
+import harkerrobolib.util.Conversions.VelUnit;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Indexer extends SubsystemBase {
@@ -26,8 +29,15 @@ public class Indexer extends SubsystemBase {
   private static final boolean TOP_INVERT = true;
   private static final boolean BOTTOM_INVERT = false;
 
-  private static final double INDEXER_TOP_GEAR_RATIO = 5.0;
-  private static final double INDEXER_BOTTOM_GEAR_RATIO = 1.5;
+  private static final double TOP_GEAR_RATIO = 5.0;
+  private static final double BOTTOM_GEAR_RATIO = 1.5;
+  private static final double TOP_WHEEL_DIAMETER = 4.0;
+  private static final double BOTTOM_WHEEL_DIAMETER = 3.0;
+  private static final double TOP_FALCON_TO_CARGO_SPEED =
+      new VelUnit(TALONFX).to(new VelUnit(METER), 1.0 / TOP_GEAR_RATIO, INCH, TOP_WHEEL_DIAMETER);
+  private static final double BOTTOM_FALCON_TO_CARGO_SPEED =
+      new VelUnit(TALONFX)
+          .to(new VelUnit(METER), 1.0 / BOTTOM_GEAR_RATIO, INCH, BOTTOM_WHEEL_DIAMETER);
 
   private static final double TOP_kS = 0.14855; // TODO: Tune
   private static final double TOP_kV = 2.5874; // TODO: Tune
@@ -37,14 +47,9 @@ public class Indexer extends SubsystemBase {
   private static final double BOTTOM_kA = 0.026034; // TODO: Tune
 
   private static final double MAX_ERROR = 0.5; // TODO: Tune
-  private static final double TOP_MODEL_STDEV = 0.5; // TODO: Tune
-  private static final double TOP_ENCODER_STDEV = 0.035; // TODO: Tune
 
-  private static final double BOTTOM_MODEL_STDEV = 0.5; // TODO: Tune
-  private static final double BOTTOM_ENCODER_STDEV = 0.035; // TODO: Tune
-
-  private VelocityControlLoop bottomVelocityLoop;
-  private VelocityControlLoop topVelocityLoop;
+  private static MotorVelocitySystem topSystem;
+  private static MotorVelocitySystem bottomSystem;
 
   private Indexer() {
     top =
@@ -52,34 +57,38 @@ public class Indexer extends SubsystemBase {
             .invert(TOP_INVERT)
             .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.INDEXER_TOP, RobotMap.CANBUS);
+    addChild("Top Motor", top);
     bottom =
         new HSFalconBuilder()
             .invert(BOTTOM_INVERT)
             .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.INDEXER_BOTTOM, RobotMap.CANBUS);
+    addChild("Bottom Motor", bottom);
+    topSystem =
+        new MotorVelocitySystemBuilder()
+            .constants(TOP_kV, TOP_kA, TOP_kS)
+            .maxError(MAX_ERROR)
+            .unitConversionFactor(TOP_FALCON_TO_CARGO_SPEED)
+            .build(top);
+    bottomSystem =
+        new MotorVelocitySystemBuilder()
+            .constants(BOTTOM_kV, BOTTOM_kA, BOTTOM_kS)
+            .maxError(MAX_ERROR)
+            .unitConversionFactor(BOTTOM_FALCON_TO_CARGO_SPEED)
+            .build(bottom);
+    addChild("Top System", topSystem);
+    addChild("Bottom System", bottomSystem);
     topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);
     bottomProximity = new DigitalInput(RobotMap.BOTTOM_PROXIMITY);
-    topVelocityLoop =
-        new VelocityControlLoopBuilder()
-            .motorConstants(TOP_kS, TOP_kA, TOP_kV)
-            .standardDeviations(TOP_MODEL_STDEV, TOP_ENCODER_STDEV)
-            .maxError(MAX_ERROR)
-            .buildVelocityControlLoop();
-    bottomVelocityLoop =
-        new VelocityControlLoopBuilder()
-            .motorConstants(BOTTOM_kS, BOTTOM_kA, BOTTOM_kV)
-            .standardDeviations(BOTTOM_MODEL_STDEV, BOTTOM_ENCODER_STDEV)
-            .maxError(MAX_ERROR)
-            .buildVelocityControlLoop();
     colorSensor = new ColorSensor(RobotMap.COLOR_A, RobotMap.COLOR_B, RobotMap.COLOR_PROXIMITY);
   }
 
   public void setTopOutput(double topOutput) {
-    top.setVoltage(topVelocityLoop.setReferenceAndPredict(topOutput, getTopMPS()));
+    topSystem.set(topOutput);
   }
 
   public void setBottomOutput(double bottomOutput) {
-    bottom.setVoltage(bottomVelocityLoop.setReferenceAndPredict(bottomOutput, getBottomMPS()));
+    bottomSystem.set(bottomOutput);
   }
 
   public void setBothOutput(double output) {
@@ -101,17 +110,11 @@ public class Indexer extends SubsystemBase {
   }
 
   public double getTopMPS() {
-    return Units.wheelRotsToMeter(4.0)
-        * top.getSelectedSensorVelocity()
-        * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND
-        / INDEXER_TOP_GEAR_RATIO; // change
+    return top.getSelectedSensorVelocity() * TOP_FALCON_TO_CARGO_SPEED; // change
   }
 
   public double getBottomMPS() {
-    return Units.wheelRotsToMeter(3.0)
-        * bottom.getSelectedSensorVelocity()
-        * Units.FALCON_VELOCITY_TO_ROT_PER_SECOND
-        / INDEXER_BOTTOM_GEAR_RATIO; // change
+    return bottom.getSelectedSensorVelocity() * BOTTOM_FALCON_TO_CARGO_SPEED; // change
   }
 
   public static Indexer getInstance() {
@@ -123,8 +126,6 @@ public class Indexer extends SubsystemBase {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Indexer");
-    builder.addDoubleProperty("Top Indexer Velocity", () -> getTopMPS(), null);
-    builder.addDoubleProperty("Bottom Indexer Velocity", () -> getBottomMPS(), null);
     builder.addBooleanProperty("Color is red", () -> colorSensor.isRed(), null);
     builder.addBooleanProperty(
         "Color sensor is functioning", () -> colorSensor.isFunctioning(), null);

@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import frc.robot.RobotMap;
@@ -20,6 +19,7 @@ public class HSFalconBuilder {
   private int slowCANFrame = 2 * fastCANFrame;
   private StatorCurrentLimitConfiguration stator;
   private SupplyCurrentLimitConfiguration supply;
+  private double voltageComp = RobotMap.MAX_MOTOR_VOLTAGE;
 
   public HSFalconBuilder neutralMode(NeutralMode neutralMode) {
     this.neutralMode = neutralMode;
@@ -64,6 +64,11 @@ public class HSFalconBuilder {
     return this;
   }
 
+  public HSFalconBuilder voltageComp(double voltageComp) {
+    this.voltageComp = voltageComp;
+    return this;
+  }
+
   public HSFalcon build(int deviceID, String canbus) {
     HSFalcon falcon = new HSFalcon(deviceID, canbus);
     falcon.configFactoryDefault();
@@ -78,7 +83,14 @@ public class HSFalconBuilder {
     for (StatusFrame frame : StatusFrame.values())
       falcon.setStatusFramePeriod(frame, RobotMap.MAX_CAN_FRAME_PERIOD);
     falcon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, fastCANFrame);
-    falcon.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current, slowCANFrame);
+    // falcon.setStatusFramePeriod(StatusFrame.status, slowCANFrame);
+    falcon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, slowCANFrame);
+    falcon.configVoltageCompSaturation(voltageComp);
+    falcon.enableVoltageCompensation(true);
     return falcon;
+  }
+
+  public HSFalcon build(int deviceID) {
+    return build(deviceID, "rio");
   }
 }
