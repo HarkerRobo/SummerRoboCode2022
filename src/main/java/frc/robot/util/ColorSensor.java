@@ -7,13 +7,11 @@ public class ColorSensor {
   private DigitalInput B;
   private DigitalInput proximity;
   private boolean isRed;
-  private boolean isFunctioning;
 
   public ColorSensor(int A, int B, int proximity) {
     this.A = new DigitalInput(A);
     this.B = new DigitalInput(B);
     this.proximity = new DigitalInput(proximity);
-    isFunctioning = true;
   }
 
   public boolean inProximity() {
@@ -21,7 +19,12 @@ public class ColorSensor {
   }
 
   public boolean isFunctioning() {
-    return isFunctioning;
+    return !(getA() && getB() || !getA() && !getB());
+  }
+
+  public boolean isRightColor() {
+    if (isRed) return getA() && !getB();
+    return !getA() && getB();
   }
 
   public boolean isRed() {
@@ -36,8 +39,7 @@ public class ColorSensor {
     return B.get();
   }
 
-  public void set(boolean functioning, boolean red) {
-    isFunctioning = functioning;
+  public void setColor(boolean red) {
     isRed = red;
   }
 }

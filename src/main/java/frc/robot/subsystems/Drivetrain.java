@@ -15,9 +15,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.FieldConstants;
+import frc.robot.util.InterpolatingTreeMap;
+import frc.robot.util.PhotonVisionLimelight;
 import frc.robot.util.SwerveModule;
 
 public class Drivetrain extends SubsystemBase {
@@ -46,6 +49,9 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDriveKinematics kinematics;
   private SwerveDrivePoseEstimator poseEstimator;
   private Pigeon2 pigeon;
+
+  private InterpolatingTreeMap headingHistory;
+  private static final int MAX_HISTORY_SIZE = 500;
 
   private static final boolean PIGEON_UP = false;
 
@@ -76,6 +82,7 @@ public class Drivetrain extends SubsystemBase {
             ODOMETRY_STATE_STDEV,
             ODOMETRY_ENCODER_STDEV,
             ODOMETRY_VISION_STDEV);
+    headingHistory = new InterpolatingTreeMap();
   }
 
   public void updatePoseEstimator() {
@@ -85,6 +92,20 @@ public class Drivetrain extends SubsystemBase {
         swerveModules[1].getState(),
         swerveModules[2].getState(),
         swerveModules[3].getState());
+    headingHistory.put(
+        Timer.getFPGATimestamp(), poseEstimator.getEstimatedPosition().getRotation().getRadians());
+    if (headingHistory.size() >= MAX_HISTORY_SIZE) headingHistory.pollFirstEntry();
+    poseEstimator.addVisionMeasurement(
+        new Pose2d(
+            PhotonVisionLimelight.robotToField(),
+            new Rotation2d(
+                headingHistory.get(
+                    Timer.getFPGATimestamp() - PhotonVisionLimelight.lastMeasurementLatency()))),
+        Timer.getFPGATimestamp() - PhotonVisionLimelight.lastMeasurementLatency());
+  }
+
+  public InterpolatingTreeMap getHeadingHistory() {
+    return headingHistory;
   }
 
   public void setAngleAndDrive(ChassisSpeeds chassisSpeeds) {

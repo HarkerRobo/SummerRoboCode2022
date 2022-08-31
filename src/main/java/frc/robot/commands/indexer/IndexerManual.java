@@ -20,12 +20,16 @@ public class IndexerManual extends IndefiniteCommand {
     }
     switch (Intake.getInstance().getState()) {
       case INTAKE:
-        if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(0);
-        else Indexer.getInstance().setTopOutput(INDEXER_SPEED);
-        if (Indexer.getInstance().isBallInBottom())
-          if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setBottomOutput(0);
+        if (!Indexer.getInstance().isRightColor())
+          Indexer.getInstance().setBottomOutput(INDEXER_OUTTAKE_SPEED);
+        else {
+          if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(0);
+          else Indexer.getInstance().setTopOutput(INDEXER_SPEED);
+          if (Indexer.getInstance().isBallInBottom())
+            if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setBottomOutput(0);
+            else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
           else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
-        else Indexer.getInstance().setBottomOutput(INDEXER_SPEED);
+        }
         break;
       case OUTTAKE:
         Indexer.getInstance().setBothOutput(INDEXER_OUTTAKE_SPEED);

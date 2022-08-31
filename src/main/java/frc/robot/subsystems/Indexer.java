@@ -6,6 +6,8 @@ import static harkerrobolib.util.Conversions.LinearUnit.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.ColorSensor;
@@ -81,6 +83,7 @@ public class Indexer extends SubsystemBase {
     topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);
     bottomProximity = new DigitalInput(RobotMap.BOTTOM_PROXIMITY);
     colorSensor = new ColorSensor(RobotMap.COLOR_A, RobotMap.COLOR_B, RobotMap.COLOR_PROXIMITY);
+    colorSensor.setColor(DriverStation.getAlliance().equals(Alliance.Red) ? true : false);
   }
 
   public void setTopOutput(double topOutput) {
@@ -115,6 +118,11 @@ public class Indexer extends SubsystemBase {
 
   public double getBottomMPS() {
     return bottom.getSelectedSensorVelocity() * BOTTOM_FALCON_TO_CARGO_SPEED; // change
+  }
+
+  public boolean isRightColor() {
+    if (!colorSensor.isFunctioning()) return true;
+    return colorSensor.isRightColor();
   }
 
   public static Indexer getInstance() {

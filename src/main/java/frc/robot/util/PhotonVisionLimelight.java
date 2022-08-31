@@ -1,6 +1,8 @@
 package frc.robot.util;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import java.util.ArrayList;
@@ -12,21 +14,27 @@ public class PhotonVisionLimelight {
   private static final PhotonCamera LIMELIGHT = new PhotonCamera(RobotMap.LIMELIGHT_NAME);
   private static final double PRECISION = 0.05;
 
-  public static Translation2d robotToTarget() {
+  private static final Translation2d cameraToVehicle = new Translation2d(0.01, 0); // TODO
+
+  public static Translation2d robotToField() {
     List<Translation2d> points = new ArrayList<>();
     for (PhotonTrackedTarget trackedTarget : LIMELIGHT.getLatestResult().getTargets()) {
-      points.add(
-          Drivetrain.getInstance()
-              .getPoseEstimator()
-              .getEstimatedPosition()
-              .transformBy(trackedTarget.getCameraToTarget())
-              .getTranslation());
+      points.add(trackedTarget.getCameraToTarget().getTranslation());
     }
-    return fit(points, PRECISION);
+    Translation2d cameraToTarget = fit(points, PRECISION);
+    Translation2d targetToVehicle = cameraToTarget.plus(cameraToVehicle);
+    return FieldConstants.HUB_LOCATION.minus(
+        targetToVehicle.rotateBy(
+            new Rotation2d(
+                Drivetrain.getInstance()
+                    .getHeadingHistory()
+                    .get(
+                        Timer.getFPGATimestamp()
+                            - PhotonVisionLimelight.lastMeasurementLatency()))));
   }
 
   public static double lastMeasurementLatency() {
-    return LIMELIGHT.getLatestResult().getLatencyMillis();
+    return LIMELIGHT.getLatestResult().getLatencyMillis() / 1000.0;
   }
 
   public static Translation2d fit(List<Translation2d> points, double precision) {
@@ -43,7 +51,7 @@ public class PhotonVisionLimelight {
 
     // Iterate to find optimal center
     double shiftDist = FieldConstants.HUB_RADIUS / 2.0;
-    double minResidual = calcResidual(FieldConstants.HUB_RADIUS, points, center);
+    double minResidual = calcResidual(points, center);
     while (true) {
       List<Translation2d> translations =
           List.of(
@@ -56,7 +64,7 @@ public class PhotonVisionLimelight {
 
       // Check all adjacent positions
       for (Translation2d translation : translations) {
-        double residual = calcResidual(FieldConstants.HUB_RADIUS, points, center.plus(translation));
+        double residual = calcResidual(points, center.plus(translation));
         if (residual < minResidual) {
           bestPoint = center.plus(translation);
           minResidual = residual;
@@ -77,11 +85,10 @@ public class PhotonVisionLimelight {
     }
   }
 
-  private static double calcResidual(
-      double radius, List<Translation2d> points, Translation2d center) {
+  private static double calcResidual(List<Translation2d> points, Translation2d center) {
     double residual = 0.0;
     for (Translation2d point : points) {
-      double diff = point.getDistance(center) - radius;
+      double diff = point.getDistance(center) - FieldConstants.HUB_RADIUS;
       residual += diff * diff;
     }
     return residual;

@@ -16,7 +16,7 @@ public class SwerveControllerLoop {
   static {
     Matrix<N2, N2> A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -1 / RobotMap.ROBOT_LOOP);
     Matrix<N2, N1> B = VecBuilder.fill(0.0, 1.0 / RobotMap.ROBOT_LOOP);
-    final double MAX_TRANSLATION_POS_ERROR = 0.1;  // TODO: Tune
+    final double MAX_TRANSLATION_POS_ERROR = 0.1; // TODO: Tune
     final double MAX_ROTATION_POS_ERROR = 0.1; // TODO: Tune
     final double MAX_TRANSLATION_VEL_ERROR = 0.1; // TODO: Tune
     final double MAX_ROTATION_VEL_ERROR = 0.1; // TODO: Tune
@@ -44,12 +44,19 @@ public class SwerveControllerLoop {
     velocityGains[2] = rotationGains[1];
   }
 
-  public static double getRotationOnlyOutput(double curRotVelocity, double headingSetpoint, double headingVelSetpoint) {
-    double curHeading = Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition().getRotation().getDegrees();
-    while(Math.abs(headingSetpoint - curHeading) > 360.0) {
+  public static double getRotationOnlyOutput(
+      double curRotVelocity, double headingSetpoint, double headingVelSetpoint) {
+    double curHeading =
+        Drivetrain.getInstance()
+            .getPoseEstimator()
+            .getEstimatedPosition()
+            .getRotation()
+            .getDegrees();
+    while (Math.abs(headingSetpoint - curHeading) > 360.0) {
       headingSetpoint += Math.signum(headingSetpoint - curHeading) * 360.0;
     }
-    return positionGains[2] * (headingSetpoint - curHeading) + velocityGains[2] * (headingVelSetpoint - curRotVelocity);
+    return positionGains[2] * (headingSetpoint - curHeading)
+        + velocityGains[2] * (headingVelSetpoint - curRotVelocity);
   }
 
   public static double getRotationOnlyOutput(double curRotVelocity, double headingSetpoint) {

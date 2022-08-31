@@ -79,8 +79,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     // Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
     //   Drivetrain.getInstance()
-    //       .getPoseEstimator()
-    //       .resetPosition(new Pose2d(), Drivetrain.getInstance().getRobotRotation());
+    //       .setPose();
   }
 
   /** This function is called periodically during autonomous. */
