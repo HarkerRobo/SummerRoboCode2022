@@ -83,7 +83,6 @@ public class HSFalconBuilder {
     for (StatusFrame frame : StatusFrame.values())
       falcon.setStatusFramePeriod(frame, RobotMap.MAX_CAN_FRAME_PERIOD);
     falcon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, fastCANFrame);
-    // falcon.setStatusFramePeriod(StatusFrame.status, slowCANFrame);
     falcon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, slowCANFrame);
     falcon.configVoltageCompSaturation(voltageComp);
     falcon.enableVoltageCompensation(true);

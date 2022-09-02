@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Drivetrain;
 // import frc.robot.commands.climber.ClimberStages;
-import harkerrobolib.wrappers.XboxGamepad;
+import harkerrobolib.joysticks.XboxGamepad;
 
 public class OI {
   private static OI instance;
