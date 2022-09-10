@@ -134,6 +134,14 @@ public class Climber extends SubsystemBase {
     return leftPositionSys;
   }
 
+  public HSFalcon getRightClimber() {
+    return right;
+  }
+
+  public HSFalcon getLeftClimber() {
+    return left;
+  }
+
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Climber");
     builder.addStringProperty("Solenoid Value", () -> climber.get().name(), null);

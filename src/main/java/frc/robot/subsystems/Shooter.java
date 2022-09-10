@@ -1,17 +1,14 @@
 package frc.robot.subsystems;
 
-import static harkerrobolib.util.Conversions.AngleUnit.*;
-import static harkerrobolib.util.Conversions.LinearUnit.*;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
+import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.MotorVelocitySystem;
 import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
-import harkerrobolib.util.Conversions.VelUnit;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Shooter extends SubsystemBase {
@@ -27,10 +24,10 @@ public class Shooter extends SubsystemBase {
   private static final double CURRENT_PEAK = 45;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double kS = 0.1432;
-  private static final double kV = 0.51368;
-  private static final double kA = 0.038625;
-  private static final double MAX_ERROR = 1.0; // TODO: Tune
+  private static final double kS = 0.26437;
+  private static final double kV = 0.58046;
+  private static final double kA = 1.0667;
+  private static final double MAX_ERROR = 0.1; // TODO: Tune
 
   private static final double WHEEL_DIAMETER = 4.0;
 
@@ -39,7 +36,7 @@ public class Shooter extends SubsystemBase {
   private static final double SHOOTER_GEAR_RATIO = 1.5;
 
   private static final double MOTOR_TO_METERS_PER_SECOND =
-      new VelUnit(TALONFX).to(new VelUnit(METER), 1.0 / SHOOTER_GEAR_RATIO, INCH, WHEEL_DIAMETER);
+      Conversions.ENCODER_TO_WHEEL_SPEED * WHEEL_DIAMETER / SHOOTER_GEAR_RATIO;
 
   public static final double CUSTOM_RADIUS = 1.0;
 
@@ -75,6 +72,7 @@ public class Shooter extends SubsystemBase {
             .unitConversionFactor(MOTOR_TO_METERS_PER_SECOND)
             .maxError(MAX_ERROR)
             .build(master);
+    addChild("Velocity System", velocitySystem);
     state = State.IDLE;
   }
 
@@ -88,7 +86,6 @@ public class Shooter extends SubsystemBase {
 
   public void turnOffMotors() {
     master.set(ControlMode.PercentOutput, 0);
-    follower.set(ControlMode.PercentOutput, 0);
   }
 
   public boolean atSpeed(double speed) {

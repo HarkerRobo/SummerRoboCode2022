@@ -1,12 +1,11 @@
 package frc.robot.subsystems;
 
-import static harkerrobolib.util.Conversions.AngleUnit.*;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
+import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.MotorPositionSystem;
 import frc.robot.util.MotorPositionSystem.MotorPositionSystemBuilder;
@@ -32,7 +31,7 @@ public class Hood extends SubsystemBase {
   private static final double kG = 0.087132;
 
   private static final double GEAR_RATIO = 180; // needs to be updated
-  private static final double FALCON_TO_DEG = TALONFX.to(DEGREE, GEAR_RATIO);
+  private static final double FALCON_TO_DEG = Conversions.ENCODER_TO_DEG / GEAR_RATIO;
 
   private static final double MAX_POS_ERROR = 5;
   private static final double MAX_VEL_ERROR = 5;
@@ -64,7 +63,7 @@ public class Hood extends SubsystemBase {
 
   public void initMotors() {
     hood.configForwardSoftLimitEnable(true);
-    hood.configForwardSoftLimitThreshold(DEGREE.to(TALONFX, RANGE * GEAR_RATIO));
+    hood.configForwardSoftLimitThreshold(5.0);
   }
 
   public void setHoodPosition(double position) {

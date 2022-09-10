@@ -1,8 +1,5 @@
 package frc.robot.subsystems;
 
-import static harkerrobolib.util.Conversions.AngleUnit.*;
-import static harkerrobolib.util.Conversions.LinearUnit.*;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -11,10 +8,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.ColorSensor;
+import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.MotorVelocitySystem;
 import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
-import harkerrobolib.util.Conversions.VelUnit;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Indexer extends SubsystemBase {
@@ -36,10 +33,9 @@ public class Indexer extends SubsystemBase {
   private static final double TOP_WHEEL_DIAMETER = 4.0;
   private static final double BOTTOM_WHEEL_DIAMETER = 3.0;
   private static final double TOP_FALCON_TO_CARGO_SPEED =
-      new VelUnit(TALONFX).to(new VelUnit(METER), 1.0 / TOP_GEAR_RATIO, INCH, TOP_WHEEL_DIAMETER);
+      Conversions.ENCODER_TO_WHEEL_SPEED / TOP_GEAR_RATIO * TOP_WHEEL_DIAMETER;
   private static final double BOTTOM_FALCON_TO_CARGO_SPEED =
-      new VelUnit(TALONFX)
-          .to(new VelUnit(METER), 1.0 / BOTTOM_GEAR_RATIO, INCH, BOTTOM_WHEEL_DIAMETER);
+      Conversions.ENCODER_TO_WHEEL_SPEED / BOTTOM_GEAR_RATIO * BOTTOM_WHEEL_DIAMETER;
 
   private static final double TOP_kS = 0.14855; // TODO: Tune
   private static final double TOP_kV = 2.5874; // TODO: Tune

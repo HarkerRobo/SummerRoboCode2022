@@ -5,9 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.intake.IntakeManual;
 import frc.robot.commands.shooter.ShooterManual;
@@ -21,8 +21,9 @@ import frc.robot.subsystems.Shooter;
  * project.
  */
 public class Robot extends TimedRobot {
+  public static double counter = 0;
   private static final Field2d FIELD = new Field2d();
-  private Notifier coastDrivetrainNotifier;
+  // private Notifier coastDrivetrainNotifier;
 
   public Robot() {
     super();
@@ -60,7 +61,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    counter += 0.02;
     CommandScheduler.getInstance().run();
+    SmartDashboard.putNumber("Robot loop", counter);
     // Drivetrain.getInstance().updatePoseEstimator();
     // FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
   }

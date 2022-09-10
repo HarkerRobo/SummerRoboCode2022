@@ -1,20 +1,18 @@
 package frc.robot.subsystems;
 
-import static harkerrobolib.util.Conversions.AngleUnit.*;
-import static harkerrobolib.util.Conversions.LinearUnit.*;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
+import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.MotorVelocitySystem;
 import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
-import harkerrobolib.util.Conversions.VelUnit;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Intake extends SubsystemBase {
@@ -25,7 +23,7 @@ public class Intake extends SubsystemBase {
   private static final double WHEEL_DIAMETER = 2.0;
   public static final double GEAR_RATIO = 5.0 / 3.0;
   public static final double FALCON_VEL_TO_CARGO_SPEED =
-      new VelUnit(TALONFX).to(new VelUnit(METER), 0.5 / GEAR_RATIO, INCH, WHEEL_DIAMETER);
+      Conversions.ENCODER_TO_WHEEL_SPEED / GEAR_RATIO * (WHEEL_DIAMETER / 2.0);
 
   private static final double CONTINUOUS_CURRENT_LIMIT = 60;
   private static final double PEAK_CURRENT = 60;
@@ -65,6 +63,7 @@ public class Intake extends SubsystemBase {
             .unitConversionFactor(FALCON_VEL_TO_CARGO_SPEED)
             .build(roller);
     state = State.NEUTRAL;
+    SmartDashboard.putNumber("unit conversion intake", FALCON_VEL_TO_CARGO_SPEED);
     addChild("Motor", roller);
     addChild("Motor System", velocitySystem);
   }
@@ -100,8 +99,7 @@ public class Intake extends SubsystemBase {
   public void actOnState(double intakeSpeed) {
     switch (Intake.getInstance().getState()) {
       case NEUTRAL:
-        setRollerOutput(0);
-        roller.set(ControlMode.PercentOutput, 0);
+        turnOffMotor();
         setForward();
         break;
       case INTAKE:

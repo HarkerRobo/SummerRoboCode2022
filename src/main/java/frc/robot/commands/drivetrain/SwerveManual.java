@@ -6,7 +6,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.OI;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
-import frc.robot.util.FieldConstants;
+import frc.robot.util.Constants;
 import frc.robot.util.SwerveControllerLoop;
 import harkerrobolib.commands.IndefiniteCommand;
 import harkerrobolib.util.MathUtil;
@@ -54,7 +54,7 @@ public class SwerveManual extends IndefiniteCommand {
 
   public void alignWithHub() {
     Translation2d diff =
-        FieldConstants.HUB_LOCATION.minus(
+        Constants.HUB_LOCATION.minus(
             Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition().getTranslation());
     double angleToHub = Math.toDegrees(Math.atan2(diff.getY(), diff.getX()));
   }

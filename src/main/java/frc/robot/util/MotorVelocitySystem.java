@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.LinearQuadraticRegulator;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 
 public class MotorVelocitySystem implements Sendable {
@@ -101,8 +102,10 @@ public class MotorVelocitySystem implements Sendable {
                   RobotMap.TALON_FX_LOOP)
               .getK()
               .get(0, 0);
-      kP *= 1023.0 / maxVoltage / unitConversion;
-      kV *= 1023.0 / maxVoltage / unitConversion;
+      kP *= 1023.0 / maxVoltage * unitConversion;
+      SmartDashboard.putNumber("Intake kP", kP);
+      kV *= 1023.0 / maxVoltage * unitConversion;
+      SmartDashboard.putNumber("Intake kV", kV);
       kS /= maxVoltage;
       return new MotorVelocitySystem(motor, kS, kV, unitConversion, kP, maxError);
     }

@@ -23,7 +23,7 @@ public class PhotonVisionLimelight {
     }
     Translation2d cameraToTarget = fit(points, PRECISION);
     Translation2d targetToVehicle = cameraToTarget.plus(cameraToVehicle);
-    return FieldConstants.HUB_LOCATION.minus(
+    return Constants.HUB_LOCATION.minus(
         targetToVehicle.rotateBy(
             new Rotation2d(
                 Drivetrain.getInstance()
@@ -47,10 +47,10 @@ public class PhotonVisionLimelight {
       ySum += point.getY();
     }
     Translation2d center =
-        new Translation2d(xSum / points.size() + FieldConstants.HUB_RADIUS, ySum / points.size());
+        new Translation2d(xSum / points.size() + Constants.HUB_RADIUS, ySum / points.size());
 
     // Iterate to find optimal center
-    double shiftDist = FieldConstants.HUB_RADIUS / 2.0;
+    double shiftDist = Constants.HUB_RADIUS / 2.0;
     double minResidual = calcResidual(points, center);
     while (true) {
       List<Translation2d> translations =
@@ -88,7 +88,7 @@ public class PhotonVisionLimelight {
   private static double calcResidual(List<Translation2d> points, Translation2d center) {
     double residual = 0.0;
     for (Translation2d point : points) {
-      double diff = point.getDistance(center) - FieldConstants.HUB_RADIUS;
+      double diff = point.getDistance(center) - Constants.HUB_RADIUS;
       residual += diff * diff;
     }
     return residual;

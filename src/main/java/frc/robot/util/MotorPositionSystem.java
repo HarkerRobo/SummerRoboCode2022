@@ -1,7 +1,5 @@
 package frc.robot.util;
 
-import static harkerrobolib.util.Conversions.TimeUnit.*;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
@@ -12,6 +10,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 
 public class MotorPositionSystem extends MotorVelocitySystem {
@@ -40,6 +39,7 @@ public class MotorPositionSystem extends MotorVelocitySystem {
   public void set(double position) {
     positionSetpoint = position;
     velocitySetpoint = 0.0;
+    SmartDashboard.putBoolean("functioning", true);
     double ff = Math.signum(getPositionError()) * kS;
     if (arm) ff += kG * Math.cos(Math.toRadians(getPosition()));
     else ff += kG;
@@ -51,7 +51,7 @@ public class MotorPositionSystem extends MotorVelocitySystem {
   }
 
   public double getVelocity() {
-    return SECOND.to(CTRE_VEL, super.getVelocity());
+    return super.getVelocity() * Conversions.SECOND_TO_CTRE_SECOND;
   }
 
   public double getPosition() {
@@ -72,7 +72,7 @@ public class MotorPositionSystem extends MotorVelocitySystem {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MotorPositionSystem");
-    builder.addDoubleProperty("Velocity", () -> getVelocity(), null);
+    builder.addDoubleProperty("Velocity", () -> this.getVelocity(), null);
     builder.addDoubleProperty("Position", () -> getPosition(), (a) -> set(a));
   }
 
@@ -130,7 +130,7 @@ public class MotorPositionSystem extends MotorVelocitySystem {
                   VecBuilder.fill(maxVoltage),
                   RobotMap.TALON_FX_LOOP)
               .getK();
-      gains.times(1023.0 / maxVoltage / unitConversion);
+      gains.times(1023.0 / maxVoltage * unitConversion);
       kS /= maxVoltage;
       return new MotorPositionSystem(
           motor,

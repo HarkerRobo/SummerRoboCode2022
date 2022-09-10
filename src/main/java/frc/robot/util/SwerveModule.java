@@ -1,8 +1,5 @@
 package frc.robot.util;
 
-import static harkerrobolib.util.Conversions.AngleUnit.*;
-import static harkerrobolib.util.Conversions.LinearUnit.*;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
@@ -11,11 +8,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.util.MotorPositionSystem.MotorPositionSystemBuilder;
 import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
-import harkerrobolib.util.Conversions.VelUnit;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class SwerveModule implements Sendable {
@@ -54,8 +51,8 @@ public class SwerveModule implements Sendable {
   private static final double ROTATION_GEAR_RATIO = 12.8;
   private static final double DRIVE_GEAR_RATIO = 6.75;
   private static final double DRIVE_FALCON_TO_MPS =
-      new VelUnit(TALONFX).to(new VelUnit(METER), 1.0 / DRIVE_GEAR_RATIO, INCH, WHEEL_DIAMETER);
-  private static final double ROT_MOTOR_TO_DEG = TALONFX.to(DEGREE, 1.0 / ROTATION_GEAR_RATIO);
+      Conversions.ENCODER_TO_WHEEL_SPEED / DRIVE_GEAR_RATIO * WHEEL_DIAMETER;
+  private static final double ROT_MOTOR_TO_DEG = Conversions.ENCODER_TO_DEG / ROTATION_GEAR_RATIO;
 
   public SwerveModule(int swerveID) {
     this.swerveID = swerveID;
@@ -68,7 +65,10 @@ public class SwerveModule implements Sendable {
                 ROTATION_MOTOR_CURRENT_PEAK_DUR)
             .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_5Ms)
             .build(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
-    Drivetrain.getInstance().addChild(swerveIDToName(swerveID) + " Turn Motor", rotation);
+    SendableRegistry.addLW(
+        rotation,
+        "Drivetrain\\" + swerveIDToName(swerveID) + " Module",
+        swerveIDToName(swerveID) + " Rotation Motor");
     drive =
         new HSFalconBuilder()
             .invert(Drivetrain.DRIVE_INVERTS[swerveID])
@@ -77,7 +77,10 @@ public class SwerveModule implements Sendable {
                 DRIVE_MOTOR_CURRENT_CONTINUOUS,
                 DRIVE_MOTOR_CURRENT_PEAK_DUR)
             .build(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
-    Drivetrain.getInstance().addChild(swerveIDToName(swerveID) + " Drive Motor", drive);
+    SendableRegistry.addLW(
+        drive,
+        "Drivetrain\\" + swerveIDToName(swerveID) + " Module",
+        swerveIDToName(swerveID) + " Drive Motor");
     canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
     driveSystem =
         new MotorVelocitySystemBuilder()
@@ -91,10 +94,17 @@ public class SwerveModule implements Sendable {
             .unitConversionFactor(ROT_MOTOR_TO_DEG)
             .maxError(ROTATION_MAX_POS_ERROR, ROTATION_MAX_VEL_ERROR)
             .build(rotation);
-    Drivetrain.getInstance()
-        .addChild(swerveIDToName(swerveID) + " Rotation System", rotationSystem);
-    Drivetrain.getInstance().addChild(swerveIDToName(swerveID) + " Drive System", driveSystem);
+    SendableRegistry.addLW(
+        rotationSystem,
+        "Drivetrain\\" + swerveIDToName(swerveID) + " Module",
+        swerveIDToName(swerveID) + " Rotation System");
+    SendableRegistry.addLW(
+        driveSystem,
+        "Drivetrain\\" + swerveIDToName(swerveID) + " Module",
+        swerveIDToName(swerveID) + " Drive System");
   }
+
+  public void initLiveWindow() {}
 
   public void setAngleAndDrive(
       double rotationAngle, double driveOutput, boolean drivePercentOutput) {
@@ -136,7 +146,7 @@ public class SwerveModule implements Sendable {
 
   public void setRotationOffset() {
     double position = canCoder.getAbsolutePosition() - Drivetrain.CANCODER_OFFSETS[swerveID];
-    rotation.setSelectedSensorPosition(DEGREE.to(TALONFX, position * ROTATION_GEAR_RATIO));
+    rotation.setSelectedSensorPosition(1.0); // DEGREE.to(TALONFX, position * ROTATION_GEAR_RATIO));
     canCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, RobotMap.MAX_CAN_FRAME_PERIOD);
   }
 
@@ -146,6 +156,10 @@ public class SwerveModule implements Sendable {
 
   public HSFalcon getRotationMotor() {
     return rotation;
+  }
+
+  public CANCoder getCanCoder() {
+    return canCoder;
   }
 
   public static String swerveIDToName(int swerveID) {
