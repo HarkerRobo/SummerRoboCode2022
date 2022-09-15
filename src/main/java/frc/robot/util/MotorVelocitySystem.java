@@ -8,38 +8,66 @@ import edu.wpi.first.math.controller.LinearQuadraticRegulator;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 
 public class MotorVelocitySystem implements Sendable {
   protected BaseMotorController motor;
-  protected double kS;
-  protected double unitConversion;
-  protected double velocitySetpoint;
-  protected double maxError;
+  protected double kS, kP, kV, kA, kF, unitConversion, velocitySetpoint, maxError, maxVoltage;
 
   protected MotorVelocitySystem(
       BaseMotorController motor,
       double kS,
       double kV,
+      double kA,
       double unitConversion,
-      double kP,
-      double maxError) {
+      double maxError, double maxVoltage) {
     this.motor = motor;
     this.kS = kS;
+    this.kV = kV;
+    this.kA = kA;
     this.unitConversion = unitConversion;
     this.maxError = maxError;
-    motor.config_kP(RobotMap.SLOT_INDEX, kP);
-    motor.config_kF(RobotMap.SLOT_INDEX, kV);
+    this.maxVoltage = maxVoltage;
+    this.calculateConstants();
     motor.selectProfileSlot(RobotMap.SLOT_INDEX, 0);
   }
 
+  public MotorVelocitySystem init() {
+    velocitySetpoint = 0;
+    this.calculateConstants();
+    motor.selectProfileSlot(RobotMap.SLOT_INDEX, 0);
+    return this;
+  }
+
+  public void calculateConstants() {
+    System.out.println(kV);
+    System.out.println(kA);
+    System.out.println(maxVoltage);
+    System.out.println(maxError);
+    kP = new LinearQuadraticRegulator<>(
+      LinearSystemId.identifyVelocitySystem(kV, kA),
+      VecBuilder.fill(maxError),
+      VecBuilder.fill(maxVoltage),
+      RobotMap.TALON_FX_LOOP)
+      .getK()
+      .get(0, 0);
+    kP *= 1023.0 / maxVoltage * unitConversion;
+    kF = kV * 1023.0 / maxVoltage * unitConversion;
+    configConstants();
+  }
+
+  public void configConstants() {
+    motor.config_kP(RobotMap.SLOT_INDEX, kP);
+    motor.config_kF(RobotMap.SLOT_INDEX, kF);
+  }
+
   public void set(double output) {
+    velocitySetpoint = output;
     motor.set(
         ControlMode.Velocity,
         output / unitConversion,
         DemandType.ArbitraryFeedForward,
-        kS * Math.signum(output));
+        kS * Math.signum(output) / maxVoltage);
   }
 
   public double getVelocity() {
@@ -60,7 +88,16 @@ public class MotorVelocitySystem implements Sendable {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MotorVelocitySystem");
-    builder.addDoubleProperty("Velocity", () -> getVelocity(), (a) -> set(a));
+    builder.addDoubleProperty("Velocity", () -> getVelocity(), null);
+    builder.addDoubleProperty("Vel Setpoint", () -> getVelocitySetpoint(), (a) -> set(a));
+    builder.addDoubleProperty("Vel Error", () -> getVelocityError(), null);
+    builder.addDoubleProperty("Max Error", () -> maxError, (a) -> maxError = a);
+    builder.addDoubleProperty("Max Voltage", () -> maxVoltage, (a) -> {motor.configVoltageCompSaturation(a);maxVoltage=a;calculateConstants();});
+    builder.addDoubleProperty("kS", () -> kS, (a) -> kS = a);
+    builder.addDoubleProperty("kV", () -> kV, (a) -> {kV = a; calculateConstants();});
+    builder.addDoubleProperty("kA", () -> kA, (a) -> {kA = a; calculateConstants();});
+    builder.addDoubleProperty("kP", () -> kP, (a) -> {kP = a; configConstants();});
+    builder.addDoubleProperty("kF", () -> kF, (a) -> {kF = a; configConstants();});
   }
 
   public static class MotorVelocitySystemBuilder {
@@ -94,20 +131,7 @@ public class MotorVelocitySystem implements Sendable {
     }
 
     public MotorVelocitySystem build(BaseMotorController motor) {
-      double kP =
-          new LinearQuadraticRegulator<>(
-                  LinearSystemId.identifyVelocitySystem(kV, kA),
-                  VecBuilder.fill(maxError),
-                  VecBuilder.fill(maxVoltage),
-                  RobotMap.TALON_FX_LOOP)
-              .getK()
-              .get(0, 0);
-      kP *= 1023.0 / maxVoltage * unitConversion;
-      SmartDashboard.putNumber("Intake kP", kP);
-      kV *= 1023.0 / maxVoltage * unitConversion;
-      SmartDashboard.putNumber("Intake kV", kV);
-      kS /= maxVoltage;
-      return new MotorVelocitySystem(motor, kS, kV, unitConversion, kP, maxError);
+      return new MotorVelocitySystem(motor, kS, kV, kA, unitConversion, maxError, maxVoltage);
     }
   }
 }

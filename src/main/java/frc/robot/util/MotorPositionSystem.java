@@ -10,36 +10,59 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 
-public class MotorPositionSystem extends MotorVelocitySystem {
-  private double kG;
+public class MotorPositionSystem extends MotorVelocitySystem { 
+  private double kG, kD, positionSetpoint, maxPosError;
   public boolean arm;
-  private double positionSetpoint;
-  private double maxPosError;
 
   private MotorPositionSystem(
       BaseMotorController motor,
-      double kD,
-      double kP,
       double kS,
+      double kV,
+      double kA,
       double unitConversion,
       double maxPosError,
       double maxVelError,
+      double maxVoltage,
       double kG,
       boolean arm) {
-    super(motor, kS, 0.0, unitConversion, kP, maxVelError);
-    motor.config_kD(RobotMap.SLOT_INDEX, kD);
+    super(motor, kS, kV, kA, unitConversion, maxVelError, maxVoltage);
     this.kG = kG;
     this.arm = arm;
     this.maxPosError = maxPosError;
   }
 
+  public MotorPositionSystem init() {
+    positionSetpoint = 0.0;
+    super.init();
+    return this;
+  }
+
+  public void configConstants() {
+    super.configConstants();
+    motor.config_kD(RobotMap.SLOT_INDEX, kD);
+  }
+
+  public void calculateConstants() {
+    if(maxPosError < 0.000001) maxPosError = 0.001;
+    Matrix<N1, N2> gains =
+          new LinearQuadraticRegulator<>(
+                  LinearSystemId.identifyPositionSystem(kV, kA),
+                  VecBuilder.fill(maxPosError, maxError),
+                  VecBuilder.fill(maxVoltage),
+                  RobotMap.TALON_FX_LOOP)
+              .getK();
+    gains.times(1023.0 / maxVoltage * unitConversion);
+    kP = gains.get(0, 0);
+    kD = gains.get(0, 1);
+    kF = kV * 1023.0 / maxVoltage * unitConversion;
+    configConstants();
+  }
+
   public void set(double position) {
     positionSetpoint = position;
     velocitySetpoint = 0.0;
-    SmartDashboard.putBoolean("functioning", true);
     double ff = Math.signum(getPositionError()) * kS;
     if (arm) ff += kG * Math.cos(Math.toRadians(getPosition()));
     else ff += kG;
@@ -71,9 +94,15 @@ public class MotorPositionSystem extends MotorVelocitySystem {
   }
 
   public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
     builder.setSmartDashboardType("MotorPositionSystem");
-    builder.addDoubleProperty("Velocity", () -> this.getVelocity(), null);
-    builder.addDoubleProperty("Position", () -> getPosition(), (a) -> set(a));
+    builder.addDoubleProperty("Vel Setpoint", () -> getVelocitySetpoint(), null);
+    builder.addDoubleProperty("Position", () -> getPosition(), null);
+    builder.addDoubleProperty("Pos Setpoint", () -> getPositionSetpoint(), (a) -> set(a));
+    builder.addDoubleProperty("Pos Error", () -> getPositionError(), null);
+    builder.addDoubleProperty("kD", () -> kD, (a) -> {kD = a; calculateConstants();});
+    builder.addDoubleProperty("kG", () -> kG, (a) -> kG = a);
+    builder.addBooleanProperty("isArm", () -> arm, (a) -> arm = a);
   }
 
   public static class MotorPositionSystemBuilder {
@@ -123,23 +152,15 @@ public class MotorPositionSystem extends MotorVelocitySystem {
     }
 
     public MotorPositionSystem build(BaseMotorController motor) {
-      Matrix<N1, N2> gains =
-          new LinearQuadraticRegulator<>(
-                  LinearSystemId.identifyPositionSystem(kV, kA),
-                  VecBuilder.fill(maxPosError, maxVelError),
-                  VecBuilder.fill(maxVoltage),
-                  RobotMap.TALON_FX_LOOP)
-              .getK();
-      gains.times(1023.0 / maxVoltage * unitConversion);
-      kS /= maxVoltage;
       return new MotorPositionSystem(
           motor,
-          gains.get(0, 1),
-          gains.get(0, 0),
           kS,
+          kV,
+          kA,
           unitConversion,
           maxPosError,
           maxVelError,
+          maxVoltage,
           kG,
           arm);
     }

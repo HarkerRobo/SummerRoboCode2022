@@ -6,7 +6,6 @@ import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
@@ -54,16 +53,15 @@ public class Intake extends SubsystemBase {
         new HSFalconBuilder()
             .invert(INVERT)
             .supplyLimit(PEAK_CURRENT, CONTINUOUS_CURRENT_LIMIT, PEAK_DUR)
-            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_100Ms)
+            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms)
             .build(RobotMap.INTAKE_MOTOR);
     velocitySystem =
         new MotorVelocitySystemBuilder()
             .constants(kV, kA, kS)
             .maxError(MAX_ERROR)
             .unitConversionFactor(FALCON_VEL_TO_CARGO_SPEED)
-            .build(roller);
+            .build(roller).init();
     state = State.NEUTRAL;
-    SmartDashboard.putNumber("unit conversion intake", FALCON_VEL_TO_CARGO_SPEED);
     addChild("Motor", roller);
     addChild("Motor System", velocitySystem);
   }
@@ -129,5 +127,6 @@ public class Intake extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Intake");
     builder.addStringProperty("State", () -> state.name(), (a) -> state = State.valueOf(a));
+    builder.addDoubleProperty("Unit Conversion", () -> FALCON_VEL_TO_CARGO_SPEED, null);
   }
 }

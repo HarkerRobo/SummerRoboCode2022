@@ -42,10 +42,10 @@ public class SwerveModule implements Sendable {
   private static final double ROTATION_kV = 2.2819;
   private static final double ROTATION_kA = 0.3621;
 
-  private static final double DRIVE_MAX_ERROR = 1;
+  private static final double DRIVE_MAX_ERROR = 0.1;
 
-  private static final double ROTATION_MAX_VEL_ERROR = 1;
-  private static final double ROTATION_MAX_POS_ERROR = 1;
+  private static final double ROTATION_MAX_VEL_ERROR = 0.1;
+  private static final double ROTATION_MAX_POS_ERROR = 0.1;
 
   private static final double WHEEL_DIAMETER = 4.0;
   private static final double ROTATION_GEAR_RATIO = 12.8;
@@ -67,8 +67,8 @@ public class SwerveModule implements Sendable {
             .build(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
     SendableRegistry.addLW(
         rotation,
-        "Drivetrain\\" + swerveIDToName(swerveID) + " Module",
-        swerveIDToName(swerveID) + " Rotation Motor");
+        "Drivetrain/" + swerveIDToName(swerveID) + " Module",
+        "Rotation Motor");
     drive =
         new HSFalconBuilder()
             .invert(Drivetrain.DRIVE_INVERTS[swerveID])
@@ -79,29 +79,29 @@ public class SwerveModule implements Sendable {
             .build(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
     SendableRegistry.addLW(
         drive,
-        "Drivetrain\\" + swerveIDToName(swerveID) + " Module",
-        swerveIDToName(swerveID) + " Drive Motor");
+        "Drivetrain/" + swerveIDToName(swerveID) + " Module",
+        "Drive Motor");
     canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
     driveSystem =
         new MotorVelocitySystemBuilder()
             .constants(DRIVE_kV, DRIVE_kA, DRIVE_kS)
             .unitConversionFactor(DRIVE_FALCON_TO_MPS)
             .maxError(DRIVE_MAX_ERROR)
-            .build(drive);
+            .build(drive).init();
     rotationSystem =
         new MotorPositionSystemBuilder()
             .constants(ROTATION_kV, ROTATION_kA, ROTATION_kS)
             .unitConversionFactor(ROT_MOTOR_TO_DEG)
             .maxError(ROTATION_MAX_POS_ERROR, ROTATION_MAX_VEL_ERROR)
-            .build(rotation);
+            .build(rotation).init();
     SendableRegistry.addLW(
         rotationSystem,
-        "Drivetrain\\" + swerveIDToName(swerveID) + " Module",
-        swerveIDToName(swerveID) + " Rotation System");
+        "Drivetrain/" + swerveIDToName(swerveID) + " Module",
+        "Rotation System");
     SendableRegistry.addLW(
         driveSystem,
-        "Drivetrain\\" + swerveIDToName(swerveID) + " Module",
-        swerveIDToName(swerveID) + " Drive System");
+        "Drivetrain/" + swerveIDToName(swerveID) + " Module",
+        "Drive System");
   }
 
   public void initLiveWindow() {}
@@ -171,7 +171,6 @@ public class SwerveModule implements Sendable {
     return output;
   }
 
-  @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("SwerveModule");
   }

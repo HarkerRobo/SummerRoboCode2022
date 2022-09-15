@@ -25,9 +25,9 @@ public class Hood extends SubsystemBase {
   private static final double CURRENT_PEAK_DUR = 0.05;
   private static final int RANGE = 23;
 
-  private static final double kS = 0;
-  private static final double kV = 0;
-  private static final double kA = 0;
+  private static final double kS = 0.1;
+  private static final double kV = 0.1;
+  private static final double kA = 0.1;
   private static final double kG = 0.087132;
 
   private static final double GEAR_RATIO = 180; // needs to be updated
@@ -55,7 +55,7 @@ public class Hood extends SubsystemBase {
             .unitConversionFactor(FALCON_TO_DEG)
             .maxVoltage(MAX_VOLTAGE)
             .maxError(MAX_POS_ERROR, MAX_VEL_ERROR)
-            .build(hood);
+            .build(hood).init();
     addChild("Hood Position System", positionSystem);
     isHoodZeroed = false;
     initMotors();

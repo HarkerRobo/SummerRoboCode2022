@@ -67,13 +67,13 @@ public class Indexer extends SubsystemBase {
             .constants(TOP_kV, TOP_kA, TOP_kS)
             .maxError(MAX_ERROR)
             .unitConversionFactor(TOP_FALCON_TO_CARGO_SPEED)
-            .build(top);
+            .build(top).init();
     bottomSystem =
         new MotorVelocitySystemBuilder()
             .constants(BOTTOM_kV, BOTTOM_kA, BOTTOM_kS)
             .maxError(MAX_ERROR)
             .unitConversionFactor(BOTTOM_FALCON_TO_CARGO_SPEED)
-            .build(bottom);
+            .build(bottom).init();
     addChild("Top System", topSystem);
     addChild("Bottom System", bottomSystem);
     topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);

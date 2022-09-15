@@ -25,16 +25,16 @@ public class Climber extends SubsystemBase {
   private static final double CURRENT_PEAK = 45;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double RIGHT_kS = 0;
-  private static final double RIGHT_kV = 0;
-  private static final double RIGHT_kA = 0;
-  private static final double RIGHT_kG = 0;
+  private static final double RIGHT_kS = 0.1;
+  private static final double RIGHT_kV = 0.1;
+  private static final double RIGHT_kA = 0.1;
+  private static final double RIGHT_kG = 0.1;
   private static final boolean RIGHT_INVERT = false;
 
-  private static final double LEFT_kS = 0;
-  private static final double LEFT_kV = 0;
-  private static final double LEFT_kA = 0;
-  private static final double LEFT_kG = 0;
+  private static final double LEFT_kS = 0.1;
+  private static final double LEFT_kV = 0.1;
+  private static final double LEFT_kA = 0.1;
+  private static final double LEFT_kG = 0.1;
   private static final double POS_MAX_ERROR = 1;
   private static final double VEL_MAX_ERROR = 1;
   private static final boolean LEFT_INVERT = true;
@@ -69,13 +69,13 @@ public class Climber extends SubsystemBase {
             .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
             .elevatorGravityConstant(RIGHT_kG)
             .constants(RIGHT_kV, RIGHT_kA, RIGHT_kS)
-            .build(right);
+            .build(right).init();
     leftPositionSys =
         new MotorPositionSystemBuilder()
             .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
             .elevatorGravityConstant(LEFT_kG)
             .constants(LEFT_kV, LEFT_kA, LEFT_kS)
-            .build(right);
+            .build(right).init();
     addChild("Right Position System", rightPositionSys);
     addChild("Left Position System", leftPositionSys);
   }

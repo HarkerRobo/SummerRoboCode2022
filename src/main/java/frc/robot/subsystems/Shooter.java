@@ -31,8 +31,6 @@ public class Shooter extends SubsystemBase {
 
   private static final double WHEEL_DIAMETER = 4.0;
 
-  private static final double VELOCITY_TOLERANCE = 0.1;
-
   private static final double SHOOTER_GEAR_RATIO = 1.5;
 
   private static final double MOTOR_TO_METERS_PER_SECOND =
@@ -71,7 +69,7 @@ public class Shooter extends SubsystemBase {
             .constants(kV, kA, kS)
             .unitConversionFactor(MOTOR_TO_METERS_PER_SECOND)
             .maxError(MAX_ERROR)
-            .build(master);
+            .build(master).init();
     addChild("Velocity System", velocitySystem);
     state = State.IDLE;
   }
@@ -90,7 +88,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean atSpeed(double speed) {
     return Math.abs(master.getSelectedSensorVelocity() * MOTOR_TO_METERS_PER_SECOND - speed)
-        < VELOCITY_TOLERANCE;
+        < MAX_ERROR;
   }
 
   public void setState(State nextState) {
@@ -109,5 +107,6 @@ public class Shooter extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Shooter");
     builder.addStringProperty("State", () -> state.name(), (a) -> state = State.valueOf(a));
+    builder.addDoubleProperty("Unit Conversion", () -> MOTOR_TO_METERS_PER_SECOND, null);
   }
 }

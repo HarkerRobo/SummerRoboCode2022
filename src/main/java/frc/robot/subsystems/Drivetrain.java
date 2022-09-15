@@ -111,7 +111,10 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void setAngleAndDrive(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
+    setAngleAndDrive(kinematics.toSwerveModuleStates(chassisSpeeds));
+  }
+
+  public void setAngleAndDrive(SwerveModuleState[] states) {
     for (int i = 0; i < 4; i++) {
       double driveOutput = states[i].speedMetersPerSecond;
       double angle = states[i].angle.getDegrees();
