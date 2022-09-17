@@ -2,6 +2,10 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.climber.ClimberStages;
+import frc.robot.commands.climber.SetClimberPos;
+import frc.robot.commands.climber.ZeroClimber;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 // import frc.robot.commands.climber.ClimberStages;
 import harkerrobolib.joysticks.XboxGamepad;
@@ -20,7 +24,7 @@ public class OI {
   }
 
   public void initBindings() {
-    // driver.getButtonA().whenPressed(ClimberStages.ALL_STAGES);
+    driver.getButtonA().whenPressed(ClimberStages.ALL_STAGES);
     driver
         .getButtonStart()
         .whenPressed(
@@ -29,6 +33,12 @@ public class OI {
                   Drivetrain.getInstance().setPose(new Pose2d());
                   Drivetrain.getInstance().zeroPigeon();
                 }));
+    driver.getButtonStart().whenPressed(new ZeroClimber());
+    driver.getUpDPadButton().whenPressed(new SetClimberPos(1000));
+    driver.getButtonB().whenPressed(new SetClimberPos(Climber.UP_HEIGHT));
+    driver.getButtonX().whenPressed(new SetClimberPos(Climber.MID_HEIGHT));
+    driver.getButtonY().whenPressed(()->Climber.getInstance().setClimberBackward());
+    driver.getDownDPadButton().whenPressed(()-> Climber.getInstance().setClimberForward());
   }
 
   public XboxGamepad getDriverGamepad() {

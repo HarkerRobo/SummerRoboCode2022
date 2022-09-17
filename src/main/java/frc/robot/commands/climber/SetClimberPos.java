@@ -12,12 +12,22 @@ public class SetClimberPos extends CommandBase {
   }
 
   public void execute() {
-    Climber.getInstance().setBothClimberPos(position);
+    if(Math.abs(Climber.getInstance().getRightClimberPos() - position) >= Climber.POS_MAX_ERROR) {
+      Climber.getInstance().setRightPercentOutput(-Math.signum(Climber.getInstance().getRightClimberPos() - position) * 0.25);
+    }
+    else {
+      Climber.getInstance().setRightPercentOutput(0);
+    }
+    if(Math.abs(Climber.getInstance().getLeftClimberPos() - position) >= Climber.POS_MAX_ERROR) {
+      Climber.getInstance().setLeftPercentOutput(-Math.signum(Climber.getInstance().getLeftClimberPos() - position) * 0.25);
+    }
+    else {
+      Climber.getInstance().setLeftPercentOutput(0);
+    }
   }
 
   public boolean isFinished() {
-    return Climber.getInstance().getLeftPositionSystem().atSetpoint()
-        && Climber.getInstance().getRightPositionSystem().atSetpoint();
+    return Math.abs(Climber.getInstance().getRightClimberPos() - position) < Climber.POS_MAX_ERROR && Math.abs(Climber.getInstance().getLeftClimberPos() - position) < Climber.POS_MAX_ERROR;
   }
 
   public void end(boolean interrupted) {

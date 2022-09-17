@@ -53,7 +53,7 @@ public class Intake extends SubsystemBase {
         new HSFalconBuilder()
             .invert(INVERT)
             .supplyLimit(PEAK_CURRENT, CONTINUOUS_CURRENT_LIMIT, PEAK_DUR)
-            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms)
+            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_100Ms)
             .build(RobotMap.INTAKE_MOTOR);
     velocitySystem =
         new MotorVelocitySystemBuilder()
@@ -75,11 +75,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void setRollerOutput(double rollerOutput) {
-    roller.set(
-        ControlMode.Velocity,
-        rollerOutput / FALCON_VEL_TO_CARGO_SPEED,
-        DemandType.ArbitraryFeedForward,
-        kS);
+    velocitySystem.set(rollerOutput);
   }
 
   public void turnOffMotor() {

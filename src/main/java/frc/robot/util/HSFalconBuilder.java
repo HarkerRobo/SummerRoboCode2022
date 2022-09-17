@@ -12,7 +12,7 @@ import harkerrobolib.wrappers.HSFalcon;
 public class HSFalconBuilder {
   private NeutralMode neutralMode = NeutralMode.Brake;
   private boolean invert = false;
-  private SensorVelocityMeasPeriod velocityMeasPeriod = SensorVelocityMeasPeriod.Period_1Ms;
+  private SensorVelocityMeasPeriod velocityMeasPeriod = SensorVelocityMeasPeriod.Period_100Ms;
   private int velocityWindow = 1;
   private int voltageFilter = 16;
   private int fastCANFrame = (int) (1000 * RobotMap.ROBOT_LOOP);
@@ -82,9 +82,11 @@ public class HSFalconBuilder {
     if (supply != null) falcon.configSupplyCurrentLimit(supply);
     for (StatusFrame frame : StatusFrame.values())
       falcon.setStatusFramePeriod(frame, RobotMap.MAX_CAN_FRAME_PERIOD);
-    
+    falcon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, fastCANFrame);
+    falcon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, slowCANFrame);
     falcon.configVoltageCompSaturation(voltageComp);
     falcon.enableVoltageCompensation(true);
+    falcon.configClosedLoopPeriod(RobotMap.SLOT_INDEX, 1);
     return falcon;
   }
 

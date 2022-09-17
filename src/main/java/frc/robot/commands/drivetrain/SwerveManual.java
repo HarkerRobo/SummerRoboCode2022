@@ -49,22 +49,27 @@ public class SwerveManual extends IndefiniteCommand {
             OI.getInstance().getDriverGamepad().getRightX(), OI.DEFAULT_DEADBAND);
     squareInputs();
     scaleToDrivetrainSpeeds();
-    if (Shooter.getInstance().getState() != Shooter.State.IDLE && omega <= MIN_OUTPUT) alignWithHub();
-    if(Math.abs(omega) <= MIN_OUTPUT && Math.sqrt(vx*vx + vy*vy) <= MIN_OUTPUT) {
+    if (Shooter.getInstance().getState() != Shooter.State.IDLE && omega <= MIN_OUTPUT)
+      alignWithHub();
+    if (Math.abs(omega) <= MIN_OUTPUT && Math.sqrt(vx * vx + vy * vy) <= MIN_OUTPUT) {
       omega = MIN_OUTPUT;
       SmartDashboard.putNumber("translation vel x", vx);
       SmartDashboard.putNumber("translation vel y", vy);
-      ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, omega, Rotation2d.fromDegrees(Drivetrain.getInstance().getRobotHeading()));
+      ChassisSpeeds speeds =
+          ChassisSpeeds.fromFieldRelativeSpeeds(
+              vx, vy, omega, Rotation2d.fromDegrees(Drivetrain.getInstance().getRobotHeading()));
       var states = Drivetrain.getInstance().getKinematics().toSwerveModuleStates(speeds);
-      for (SwerveModuleState state: states)
-        state.angle.plus(Rotation2d.fromDegrees(90));
+      for (SwerveModuleState state : states) state.angle.plus(Rotation2d.fromDegrees(90));
       Drivetrain.getInstance().setAngleAndDrive(states);
+    } else {
+      Drivetrain.getInstance()
+          .setAngleAndDrive(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  vx,
+                  vy,
+                  omega,
+                  Rotation2d.fromDegrees(Drivetrain.getInstance().getRobotHeading())));
     }
-    else {
-    Drivetrain.getInstance()
-        .setAngleAndDrive(
-            ChassisSpeeds.fromFieldRelativeSpeeds(
-                vx, vy, omega, Rotation2d.fromDegrees(Drivetrain.getInstance().getRobotHeading())));}
   }
 
   public void alignWithHub() {

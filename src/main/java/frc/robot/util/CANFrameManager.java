@@ -9,7 +9,7 @@
 // public class CANFrameManager {
 
 //     private static void deactivateMotor(HSFalcon falcon) {
-//         for (StatusFrame frame : StatusFrame.values()) 
+//         for (StatusFrame frame : StatusFrame.values())
 //             falcon.setStatusFramePeriod(frame, RobotMap.MAX_CAN_FRAME_PERIOD);
 //     }
 

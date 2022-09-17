@@ -12,7 +12,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.RobotMap;
 
-public class MotorPositionSystem extends MotorVelocitySystem { 
+public class MotorPositionSystem extends MotorVelocitySystem {
   private double kG, kD, positionSetpoint, maxPosError;
   public boolean arm;
 
@@ -46,14 +46,14 @@ public class MotorPositionSystem extends MotorVelocitySystem {
   }
 
   public void calculateConstants() {
-    if(maxPosError < 0.000001) maxPosError = 0.001;
+    if (maxPosError < 0.000001) maxPosError = 0.001;
     Matrix<N1, N2> gains =
-          new LinearQuadraticRegulator<>(
-                  LinearSystemId.identifyPositionSystem(kV, kA),
-                  VecBuilder.fill(maxPosError, maxError),
-                  VecBuilder.fill(maxVoltage),
-                  RobotMap.TALON_FX_LOOP)
-              .getK();
+        new LinearQuadraticRegulator<>(
+                LinearSystemId.identifyPositionSystem(kV, kA),
+                VecBuilder.fill(maxPosError, maxError),
+                VecBuilder.fill(maxVoltage),
+                RobotMap.TALON_FX_LOOP)
+            .getK();
     gains.times(1023.0 / maxVoltage * unitConversion);
     kP = gains.get(0, 0);
     kD = gains.get(0, 1);
@@ -67,7 +67,11 @@ public class MotorPositionSystem extends MotorVelocitySystem {
     double ff = Math.signum(getPositionError()) * kS;
     if (arm) ff += kG * Math.cos(Math.toRadians(getPosition()));
     else ff += kG;
-    motor.set(ControlMode.Position, position / unitConversion, DemandType.ArbitraryFeedForward, ff);
+    motor.set(
+        ControlMode.Position,
+        position / unitConversion,
+        DemandType.ArbitraryFeedForward,
+        ff / maxVoltage);
   }
 
   public double getVelocitySetpoint() {
@@ -101,7 +105,13 @@ public class MotorPositionSystem extends MotorVelocitySystem {
     builder.addDoubleProperty("Position", () -> getPosition(), null);
     builder.addDoubleProperty("Pos Setpoint", () -> getPositionSetpoint(), (a) -> set(a));
     builder.addDoubleProperty("Pos Error", () -> getPositionError(), null);
-    builder.addDoubleProperty("kD", () -> kD, (a) -> {kD = a; calculateConstants();});
+    builder.addDoubleProperty(
+        "kD",
+        () -> kD,
+        (a) -> {
+          kD = a;
+          calculateConstants();
+        });
     builder.addDoubleProperty("kG", () -> kG, (a) -> kG = a);
     builder.addBooleanProperty("isArm", () -> arm, (a) -> arm = a);
   }
@@ -154,16 +164,7 @@ public class MotorPositionSystem extends MotorVelocitySystem {
 
     public MotorPositionSystem build(BaseMotorController motor) {
       return new MotorPositionSystem(
-          motor,
-          kS,
-          kV,
-          kA,
-          unitConversion,
-          maxPosError,
-          maxVelError,
-          maxVoltage,
-          kG,
-          arm);
+          motor, kS, kV, kA, unitConversion, maxPosError, maxVelError, maxVoltage, kG, arm);
     }
   }
 }

@@ -25,76 +25,49 @@ public class Climber extends SubsystemBase {
   private static final double CURRENT_PEAK = 45;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double RIGHT_kS = 0.1;
-  private static final double RIGHT_kV = 0.1;
-  private static final double RIGHT_kA = 0.1;
-  private static final double RIGHT_kG = 0.1;
-  private static final boolean RIGHT_INVERT = false;
+  private static final boolean RIGHT_INVERT = true;
 
-  private static final double LEFT_kS = 0.1;
-  private static final double LEFT_kV = 0.1;
-  private static final double LEFT_kA = 0.1;
-  private static final double LEFT_kG = 0.1;
-  private static final double POS_MAX_ERROR = 1;
-  private static final double VEL_MAX_ERROR = 1;
+  public static final double POS_MAX_ERROR = 500;
   private static final boolean LEFT_INVERT = true;
 
-  public static final double UP_HEIGHT = 119000; // TODO
-  public static final double MID_HEIGHT = 60000; // TODO
+  public static final double UP_HEIGHT = 112500; // TODO
+  public static final double MID_HEIGHT = 75000; // TODO
   public static final double DOWN_HEIGHT = 0; // TODO
-
-  private MotorPositionSystem leftPositionSys;
-  private MotorPositionSystem rightPositionSys;
 
   private Climber() {
     right =
         new HSFalconBuilder()
             .invert(RIGHT_INVERT)
-            .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.RIGHT_CLIMBER, RobotMap.CANBUS);
     addChild("Right Motor", right);
     left =
         new HSFalconBuilder()
             .invert(LEFT_INVERT)
-            .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.LEFT_CLIMBER, RobotMap.CANBUS);
     addChild("Left Motor", left);
+    right.configForwardSoftLimitEnable(false);
+    right.configReverseSoftLimitEnable(false);
+    left.configForwardSoftLimitEnable(false);
+    left.configReverseSoftLimitEnable(false);
     climber =
         new DoubleSolenoid(
             PneumaticsModuleType.REVPH, RobotMap.CLIMBER_FORWARD, RobotMap.CLIMBER_BACKWARD);
     rightLimitSwitch = new DigitalInput(RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
     leftLimitSwitch = new DigitalInput(RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);
-    rightPositionSys =
-        new MotorPositionSystemBuilder()
-            .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
-            .elevatorGravityConstant(RIGHT_kG)
-            .constants(RIGHT_kV, RIGHT_kA, RIGHT_kS)
-            .build(right).init();
-    leftPositionSys =
-        new MotorPositionSystemBuilder()
-            .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
-            .elevatorGravityConstant(LEFT_kG)
-            .constants(LEFT_kV, LEFT_kA, LEFT_kS)
-            .build(right).init();
-    addChild("Right Position System", rightPositionSys);
-    addChild("Left Position System", leftPositionSys);
   }
 
-  public void setRightClimberPos(double pos) {
-    rightPositionSys.set(pos);
+  public boolean leftLimitSwitch() {
+    return !leftLimitSwitch.get();
   }
 
-  public void setLeftClimberPos(double pos) {
-    leftPositionSys.set(pos);
+  public boolean rightLimitSwitch() {
+    return !rightLimitSwitch.get();
   }
 
   public boolean limitSwitchHit() {
     return !rightLimitSwitch.get() && !leftLimitSwitch.get();
-  }
-
-  public void setBothClimberPos(double pos) {
-    setRightClimberPos(pos);
-    setLeftClimberPos(pos);
   }
 
   public void setClimberForward() {
@@ -126,12 +99,12 @@ public class Climber extends SubsystemBase {
     return left.getSelectedSensorVelocity();
   }
 
-  public MotorPositionSystem getRightPositionSystem() {
-    return rightPositionSys;
+  public void setLeftPercentOutput(double output) {
+    left.set(ControlMode.PercentOutput, output);
   }
 
-  public MotorPositionSystem getLeftPositionSystem() {
-    return leftPositionSys;
+  public void setRightPercentOutput(double output) {
+    right.set(ControlMode.PercentOutput, output);
   }
 
   public HSFalcon getRightClimber() {

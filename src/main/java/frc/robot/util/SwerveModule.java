@@ -30,11 +30,11 @@ public class SwerveModule implements Sendable {
   private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
   private static final double ROTATION_MOTOR_CURRENT_PEAK_DUR = 0.1;
 
-  private static final double DRIVE_MOTOR_CURRENT_CONTINUOUS = 35;
+  private static final double DRIVE_MOTOR_CURRENT_CONTINUOUS = 60;
   private static final double DRIVE_MOTOR_CURRENT_PEAK = 60;
-  private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0.1;
+  private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0;
 
-  private static final double DRIVE_kS = 0.3;
+  private static final double DRIVE_kS = 0.1;//0.3;
   private static final double DRIVE_kV = 2.2819;
   private static final double DRIVE_kA = 0.3621;
 
@@ -42,7 +42,7 @@ public class SwerveModule implements Sendable {
   private static final double ROTATION_kV = 0.0057859;
   private static final double ROTATION_kA = 0.00016558;
 
-  private static final double DRIVE_MAX_ERROR = 0.05;
+  private static final double DRIVE_MAX_ERROR = 10;
 
   private static final double ROTATION_MAX_VEL_ERROR = 0.15;
   private static final double ROTATION_MAX_POS_ERROR = 0.1;
@@ -63,12 +63,10 @@ public class SwerveModule implements Sendable {
                 ROTATION_MOTOR_CURRENT_PEAK,
                 ROTATION_MOTOR_CURRENT_CONTINUOUS,
                 ROTATION_MOTOR_CURRENT_PEAK_DUR)
-            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms)
+            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_100Ms)
             .build(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
     SendableRegistry.addLW(
-        rotation,
-        "Drivetrain/" + swerveIDToName(swerveID) + " Module",
-        "Rotation Motor");
+        rotation, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Rotation Motor");
     drive =
         new HSFalconBuilder()
             .invert(Drivetrain.DRIVE_INVERTS[swerveID])
@@ -78,9 +76,7 @@ public class SwerveModule implements Sendable {
                 DRIVE_MOTOR_CURRENT_PEAK_DUR)
             .build(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
     SendableRegistry.addLW(
-        drive,
-        "Drivetrain/" + swerveIDToName(swerveID) + " Module",
-        "Drive Motor");
+        drive, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Drive Motor");
     canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
     driveSystem =
         new MotorVelocitySystemBuilder()
@@ -95,13 +91,9 @@ public class SwerveModule implements Sendable {
             .maxError(ROTATION_MAX_POS_ERROR, ROTATION_MAX_VEL_ERROR)
             .build(rotation).init();
     SendableRegistry.addLW(
-        rotationSystem,
-        "Drivetrain/" + swerveIDToName(swerveID) + " Module",
-        "Rotation System");
+        rotationSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Rotation System");
     SendableRegistry.addLW(
-        driveSystem,
-        "Drivetrain/" + swerveIDToName(swerveID) + " Module",
-        "Drive System");
+        driveSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Drive System");
   }
 
   public void initLiveWindow() {}
@@ -146,7 +138,8 @@ public class SwerveModule implements Sendable {
 
   public void setRotationOffset() {
     double position = canCoder.getAbsolutePosition() - Drivetrain.CANCODER_OFFSETS[swerveID];
-    rotation.setSelectedSensorPosition(position / ROT_MOTOR_TO_DEG); // DEGREE.to(TALONFX, position * ROTATION_GEAR_RATIO));
+    rotation.setSelectedSensorPosition(
+        position / ROT_MOTOR_TO_DEG); // DEGREE.to(TALONFX, position * ROTATION_GEAR_RATIO));
     canCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, RobotMap.MAX_CAN_FRAME_PERIOD);
   }
 

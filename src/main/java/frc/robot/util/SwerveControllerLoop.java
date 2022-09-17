@@ -37,7 +37,8 @@
 //     private double[] set, velSet, maxError = {}, maxVel = {4.0, Math.PI};
 //     private boolean x, y, theta;
 
-//     private static final Matrix<N2, N2> A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -1 / RobotMap.ROBOT_LOOP);
+//     private static final Matrix<N2, N2> A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -1
+// / RobotMap.ROBOT_LOOP);
 //     private static final Matrix<N2, N1> B = VecBuilder.fill(0.0, 1.0 / RobotMap.ROBOT_LOOP);
 
 //     public SwerveControllerLoopBuilder() {
