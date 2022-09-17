@@ -30,6 +30,7 @@ public class MotorVelocitySystem implements Sendable {
     this.maxVoltage = maxVoltage;
     this.calculateConstants();
     motor.selectProfileSlot(RobotMap.SLOT_INDEX, 0);
+    motor.configAllowableClosedloopError(RobotMap.SLOT_INDEX, maxError / unitConversion);
   }
 
   public MotorVelocitySystem init() {
@@ -40,10 +41,6 @@ public class MotorVelocitySystem implements Sendable {
   }
 
   public void calculateConstants() {
-    System.out.println(kV);
-    System.out.println(kA);
-    System.out.println(maxVoltage);
-    System.out.println(maxError);
     kP = new LinearQuadraticRegulator<>(
       LinearSystemId.identifyVelocitySystem(kV, kA),
       VecBuilder.fill(maxError),
@@ -51,6 +48,7 @@ public class MotorVelocitySystem implements Sendable {
       RobotMap.TALON_FX_LOOP)
       .getK()
       .get(0, 0);
+    System.out.println(kP);
     kP *= 1023.0 / maxVoltage * unitConversion;
     kF = kV * 1023.0 / maxVoltage * unitConversion;
     configConstants();
@@ -91,13 +89,13 @@ public class MotorVelocitySystem implements Sendable {
     builder.addDoubleProperty("Velocity", () -> getVelocity(), null);
     builder.addDoubleProperty("Vel Setpoint", () -> getVelocitySetpoint(), (a) -> set(a));
     builder.addDoubleProperty("Vel Error", () -> getVelocityError(), null);
-    builder.addDoubleProperty("Max Error", () -> maxError, (a) -> maxError = a);
+    builder.addDoubleProperty("Max Error", () -> maxError, (a) -> {maxError = a; calculateConstants();});
     builder.addDoubleProperty("Max Voltage", () -> maxVoltage, (a) -> {motor.configVoltageCompSaturation(a);maxVoltage=a;calculateConstants();});
     builder.addDoubleProperty("kS", () -> kS, (a) -> kS = a);
-    builder.addDoubleProperty("kV", () -> kV, (a) -> {kV = a; calculateConstants();});
-    builder.addDoubleProperty("kA", () -> kA, (a) -> {kA = a; calculateConstants();});
-    builder.addDoubleProperty("kP", () -> kP, (a) -> {kP = a; configConstants();});
-    builder.addDoubleProperty("kF", () -> kF, (a) -> {kF = a; configConstants();});
+    builder.addDoubleProperty("kV", () -> kV, (a) -> {this.kV = a; calculateConstants();});
+    builder.addDoubleProperty("kA", () -> kA, (a) -> {this.kA = a; calculateConstants();});
+    builder.addDoubleProperty("kP", () -> kP, (a) -> {this.kP = a; configConstants();});
+    builder.addDoubleProperty("kF", () -> kF, (a) -> {this.kF = a; configConstants();});
   }
 
   public static class MotorVelocitySystemBuilder {

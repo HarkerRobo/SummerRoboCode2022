@@ -31,6 +31,7 @@ public class MotorPositionSystem extends MotorVelocitySystem {
     this.kG = kG;
     this.arm = arm;
     this.maxPosError = maxPosError;
+    motor.configAllowableClosedloopError(RobotMap.SLOT_INDEX, maxPosError / unitConversion);
   }
 
   public MotorPositionSystem init() {

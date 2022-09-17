@@ -4,17 +4,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.OI;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.util.Constants;
-import frc.robot.util.SwerveControllerLoop;
+// import frc.robot.util.SwerveControllerLoop;
 import harkerrobolib.commands.IndefiniteCommand;
 import harkerrobolib.util.MathUtil;
 
 public class SwerveManual extends IndefiniteCommand {
   public static final double SPEED_MULTIPLIER = 0.6;
-  public static final double MIN_OUTPUT = 0.001;
+  public static final double MIN_OUTPUT = 0.0001;
 
   private double vx;
   private double vy;
@@ -24,7 +25,7 @@ public class SwerveManual extends IndefiniteCommand {
   private boolean translationOutput;
   private boolean aligningWithHub;
 
-  private static SwerveControllerLoop HUB_LOOP = new SwerveControllerLoop();
+  // private static SwerveControllerLoop HUB_LOOP = new SwerveControllerLoop();
 
   public SwerveManual() {
     addRequirements(Drivetrain.getInstance());
@@ -49,8 +50,10 @@ public class SwerveManual extends IndefiniteCommand {
     squareInputs();
     scaleToDrivetrainSpeeds();
     if (Shooter.getInstance().getState() != Shooter.State.IDLE && omega <= MIN_OUTPUT) alignWithHub();
-    if(omega <= MIN_OUTPUT && Math.sqrt(vx*vx + vy*vy) <= MIN_OUTPUT) {
+    if(Math.abs(omega) <= MIN_OUTPUT && Math.sqrt(vx*vx + vy*vy) <= MIN_OUTPUT) {
       omega = MIN_OUTPUT;
+      SmartDashboard.putNumber("translation vel x", vx);
+      SmartDashboard.putNumber("translation vel y", vy);
       ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, omega, Rotation2d.fromDegrees(Drivetrain.getInstance().getRobotHeading()));
       var states = Drivetrain.getInstance().getKinematics().toSwerveModuleStates(speeds);
       for (SwerveModuleState state: states)

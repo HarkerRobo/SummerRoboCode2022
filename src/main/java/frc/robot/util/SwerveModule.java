@@ -38,13 +38,13 @@ public class SwerveModule implements Sendable {
   private static final double DRIVE_kV = 2.2819;
   private static final double DRIVE_kA = 0.3621;
 
-  private static final double ROTATION_kS = 0.3;
-  private static final double ROTATION_kV = 2.2819;
-  private static final double ROTATION_kA = 0.3621;
+  private static final double ROTATION_kS = 0.40104;
+  private static final double ROTATION_kV = 0.0057859;
+  private static final double ROTATION_kA = 0.00016558;
 
-  private static final double DRIVE_MAX_ERROR = 0.1;
+  private static final double DRIVE_MAX_ERROR = 0.05;
 
-  private static final double ROTATION_MAX_VEL_ERROR = 0.1;
+  private static final double ROTATION_MAX_VEL_ERROR = 0.15;
   private static final double ROTATION_MAX_POS_ERROR = 0.1;
 
   private static final double WHEEL_DIAMETER = 4.0;
@@ -63,7 +63,7 @@ public class SwerveModule implements Sendable {
                 ROTATION_MOTOR_CURRENT_PEAK,
                 ROTATION_MOTOR_CURRENT_CONTINUOUS,
                 ROTATION_MOTOR_CURRENT_PEAK_DUR)
-            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_5Ms)
+            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_10Ms)
             .build(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
     SendableRegistry.addLW(
         rotation,
@@ -146,7 +146,7 @@ public class SwerveModule implements Sendable {
 
   public void setRotationOffset() {
     double position = canCoder.getAbsolutePosition() - Drivetrain.CANCODER_OFFSETS[swerveID];
-    rotation.setSelectedSensorPosition(1.0); // DEGREE.to(TALONFX, position * ROTATION_GEAR_RATIO));
+    rotation.setSelectedSensorPosition(position / ROT_MOTOR_TO_DEG); // DEGREE.to(TALONFX, position * ROTATION_GEAR_RATIO));
     canCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, RobotMap.MAX_CAN_FRAME_PERIOD);
   }
 
