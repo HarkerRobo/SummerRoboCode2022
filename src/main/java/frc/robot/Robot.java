@@ -9,13 +9,21 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drivetrain.SwerveManual;
+import frc.robot.commands.hood.HoodManual;
+import frc.robot.commands.indexer.IndexerManual;
 import frc.robot.commands.intake.IntakeManual;
+import frc.robot.commands.shooter.ShooterManual;
 // import frc.robot.commands.indexer.IndexerManual;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Hood;
+import frc.robot.subsystems.Indexer;
 // import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.util.PhotonVisionLimelight;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -48,9 +56,10 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     CommandScheduler.getInstance().setDefaultCommand(Drivetrain.getInstance(), new SwerveManual());
     CommandScheduler.getInstance().setDefaultCommand(Intake.getInstance(), new IntakeManual());
-    // CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
+    SmartDashboard.putNumber("angle", 0.0);
+    CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
     // CommandScheduler.getInstance().setDefaultCommand(Indexer.getInstance(), new IndexerManual());
-    // CommandScheduler.getInstance().setDefaultCommand(Hood.getInstance(), new HoodManual());
+    CommandScheduler.getInstance().setDefaultCommand(Hood.getInstance(), new HoodManual());
     NetworkTableInstance.getDefault().setUpdateRate(RobotMap.ROBOT_LOOP);
   }
 
@@ -65,6 +74,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     counter += 0.02;
     CommandScheduler.getInstance().run();
+    SmartDashboard.putNumber("distance", PhotonVisionLimelight.getDistance());
     // SmartDashboard.putNumber("Robot loop", counter);
     // Drivetrain.getInstance().updatePoseEstimator();
     // FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());

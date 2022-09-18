@@ -15,7 +15,7 @@ public class ZeroHood extends CommandBase {
   }
 
   public boolean isFinished() {
-    return Hood.getInstance().isLimitSwitchHit();
+    return Hood.getInstance().isHoodStalling();
   }
 
   public void end(boolean interrupted) {

@@ -24,10 +24,10 @@ public class Shooter extends SubsystemBase {
   private static final double CURRENT_PEAK = 45;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double kS = 0.26437;
-  private static final double kV = 0.58046;
-  private static final double kA = 1.0667;
-  private static final double MAX_ERROR = 0.1; // TODO: Tune
+  private static final double kS = 0.13292;
+  private static final double kV = 0.72649;
+  private static final double kA = 0.044263;
+  private static final double MAX_ERROR = 3; // TODO: Tune
 
   private static final double WHEEL_DIAMETER = 4.0;
 

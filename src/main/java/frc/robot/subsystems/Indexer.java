@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
-import frc.robot.util.ColorSensor;
 import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.MotorVelocitySystem;
@@ -20,7 +19,7 @@ public class Indexer extends SubsystemBase {
   private HSFalcon bottom;
   private DigitalInput topProximity;
   private DigitalInput bottomProximity;
-  private ColorSensor colorSensor;
+  // private ColorSensor colorSensor;
 
   private static final double CURRENT_CONTINUOUS = 30;
   private static final double CURRENT_PEAK = 60;
@@ -37,12 +36,12 @@ public class Indexer extends SubsystemBase {
   private static final double BOTTOM_FALCON_TO_CARGO_SPEED =
       Conversions.ENCODER_TO_WHEEL_SPEED / BOTTOM_GEAR_RATIO * BOTTOM_WHEEL_DIAMETER;
 
-  private static final double TOP_kS = 0.14855; // TODO: Tune
-  private static final double TOP_kV = 2.5874; // TODO: Tune
-  private static final double TOP_kA = 0.049339; // TODO: Tune
-  private static final double BOTTOM_kS = 0.050444; // TODO: Tune
-  private static final double BOTTOM_kV = 1.704; // TODO: Tune
-  private static final double BOTTOM_kA = 0.026034; // TODO: Tune
+  private static final double TOP_kS = 0.062268; // TODO: Tune
+  private static final double TOP_kV = 2.5235; // TODO: Tune
+  private static final double TOP_kA = 0.034295; // TODO: Tune
+  private static final double BOTTOM_kS = 0.017587;
+  private static final double BOTTOM_kV =1.014; // TODO: Tune
+  private static final double BOTTOM_kA = 0.082487; // TODO: Tune
 
   private static final double MAX_ERROR = 0.5; // TODO: Tune
 
@@ -78,8 +77,8 @@ public class Indexer extends SubsystemBase {
     addChild("Bottom System", bottomSystem);
     topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);
     bottomProximity = new DigitalInput(RobotMap.BOTTOM_PROXIMITY);
-    colorSensor = new ColorSensor(RobotMap.COLOR_A, RobotMap.COLOR_B, RobotMap.COLOR_PROXIMITY);
-    colorSensor.setColor(DriverStation.getAlliance().equals(Alliance.Red) ? true : false);
+    // colorSensor = new ColorSensor(RobotMap.COLOR_A, RobotMap.COLOR_B, RobotMap.COLOR_PROXIMITY);
+    // colorSensor.setColor(DriverStation.getAlliance().equals(Alliance.Red) ? true : false);
   }
 
   public void setTopOutput(double topOutput) {
@@ -117,8 +116,9 @@ public class Indexer extends SubsystemBase {
   }
 
   public boolean isRightColor() {
-    if (!colorSensor.isFunctioning()) return true;
-    return colorSensor.isRightColor();
+    // if (!colorSensor.isFunctioning()) return true;
+    // return colorSensor.isRightColor();
+    return true;
   }
 
   public static Indexer getInstance() {
@@ -130,8 +130,8 @@ public class Indexer extends SubsystemBase {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Indexer");
-    builder.addBooleanProperty("Color is red", () -> colorSensor.isRed(), null);
-    builder.addBooleanProperty(
-        "Color sensor is functioning", () -> colorSensor.isFunctioning(), null);
+    // builder.addBooleanProperty("Color is red", () -> colorSensor.isRed(), null);
+    // builder.addBooleanProperty(
+    //     "Color sensor is functioning", () -> colorSensor.isFunctioning(), null);
   }
 }

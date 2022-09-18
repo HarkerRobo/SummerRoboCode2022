@@ -18,23 +18,25 @@ public class Hood extends SubsystemBase {
 
   private DigitalInput limitSwitch;
 
-  private static final boolean INVERT = false;
+  private static final boolean INVERT = true;
 
   private static final double CURRENT_CONTINUOUS = 10;
   private static final double CURRENT_PEAK = 10;
   private static final double CURRENT_PEAK_DUR = 0.05;
-  private static final int RANGE = 23;
 
-  private static final double kS = 0.1;
-  private static final double kV = 0.1;
-  private static final double kA = 0.1;
-  private static final double kG = 0.087132;
+  private static final double STALLING_CURRENT = 10;
+  private static final double RANGE = 32.25;
 
-  private static final double GEAR_RATIO = 180; // needs to be updated
+  private static final double kS = 0.2675;
+  private static final double kV = 0.067675;
+  private static final double kA = 0.0011271;
+  private static final double kG = 0.2377;
+
+  private static final double GEAR_RATIO = 180;
   private static final double FALCON_TO_DEG = Conversions.ENCODER_TO_DEG / GEAR_RATIO;
 
-  private static final double MAX_POS_ERROR = 5;
-  private static final double MAX_VEL_ERROR = 5;
+  private static final double MAX_POS_ERROR = 0.5;
+  private static final double MAX_VEL_ERROR = 0.51;
   private static final double MAX_VOLTAGE = 3;
 
   private boolean isHoodZeroed;
@@ -51,7 +53,7 @@ public class Hood extends SubsystemBase {
     positionSystem =
         new MotorPositionSystemBuilder()
             .constants(kV, kA, kS)
-            .armGravityConstant(kG)
+            .elevatorGravityConstant(kG)
             .unitConversionFactor(FALCON_TO_DEG)
             .maxVoltage(MAX_VOLTAGE)
             .maxError(MAX_POS_ERROR, MAX_VEL_ERROR)
@@ -62,8 +64,8 @@ public class Hood extends SubsystemBase {
   }
 
   public void initMotors() {
-    hood.configForwardSoftLimitEnable(true);
-    hood.configForwardSoftLimitThreshold(5.0);
+    // hood.configForwardSoftLimitEnable(true);
+    // hood.configForwardSoftLimitThreshold(5.0);
   }
 
   public void setHoodPosition(double position) {
@@ -87,8 +89,8 @@ public class Hood extends SubsystemBase {
     return positionSystem.getVelocity();
   }
 
-  public boolean isLimitSwitchHit() {
-    return !limitSwitch.get();
+  public boolean isHoodStalling() {
+    return hood.getStatorCurrent() > STALLING_CURRENT;
   }
 
   public boolean isHoodZeroed() {

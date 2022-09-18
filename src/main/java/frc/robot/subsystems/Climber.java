@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.HSFalconBuilder;
-import frc.robot.util.MotorPositionSystem;
-import frc.robot.util.MotorPositionSystem.MotorPositionSystemBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Climber extends SubsystemBase {
@@ -25,13 +23,13 @@ public class Climber extends SubsystemBase {
   private static final double CURRENT_PEAK = 45;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final boolean RIGHT_INVERT = true;
+  private static final boolean RIGHT_INVERT = false;
 
-  public static final double POS_MAX_ERROR = 500;
+  public static final double POS_MAX_ERROR = 350;
   private static final boolean LEFT_INVERT = true;
 
   public static final double UP_HEIGHT = 112500; // TODO
-  public static final double MID_HEIGHT = 75000; // TODO
+  public static final double MID_HEIGHT = 50000; // TODO
   public static final double DOWN_HEIGHT = 0; // TODO
 
   private Climber() {

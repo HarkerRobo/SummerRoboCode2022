@@ -2,11 +2,14 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.climber.ClimberStages;
 import frc.robot.commands.climber.SetClimberPos;
 import frc.robot.commands.climber.ZeroClimber;
+import frc.robot.commands.hood.ZeroHood;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Indexer;
 // import frc.robot.commands.climber.ClimberStages;
 import harkerrobolib.joysticks.XboxGamepad;
 
@@ -34,11 +37,12 @@ public class OI {
                   Drivetrain.getInstance().zeroPigeon();
                 }));
     driver.getButtonStart().whenPressed(new ZeroClimber());
-    driver.getUpDPadButton().whenPressed(new SetClimberPos(1000));
-    driver.getButtonB().whenPressed(new SetClimberPos(Climber.UP_HEIGHT));
-    driver.getButtonX().whenPressed(new SetClimberPos(Climber.MID_HEIGHT));
-    driver.getButtonY().whenPressed(()->Climber.getInstance().setClimberBackward());
-    driver.getDownDPadButton().whenPressed(()-> Climber.getInstance().setClimberForward());
+    driver.getButtonX().whenPressed(new ZeroHood());
+    driver.getButtonY().whenPressed(()->Indexer.getInstance().setBothOutput(18));
+    // driver.getButtonB().whenPressed(new SetClimberPos(Climber.UP_HEIGHT));
+    // driver.getButtonX().whenPressed(new SetClimberPos(Climber.MID_HEIGHT));
+    driver.getUpDPadButton().whenPressed(()->{Climber.getInstance().setRightPercentOutput(0.1); Climber.getInstance().setLeftPercentOutput(0.1);});
+    driver.getDownDPadButton().whenPressed(()->{Climber.getInstance().setRightPercentOutput(-0.1); Climber.getInstance().setLeftPercentOutput(-0.1);});
   }
 
   public XboxGamepad getDriverGamepad() {

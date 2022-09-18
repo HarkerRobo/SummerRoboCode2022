@@ -39,10 +39,10 @@ public class SwerveManual extends IndefiniteCommand {
 
   public void execute() {
     vx =
-        MathUtil.mapJoystickOutput(
+        -MathUtil.mapJoystickOutput(
             OI.getInstance().getDriverGamepad().getLeftY(), OI.DEFAULT_DEADBAND);
     vy =
-        -MathUtil.mapJoystickOutput(
+        MathUtil.mapJoystickOutput(
             OI.getInstance().getDriverGamepad().getLeftX(), OI.DEFAULT_DEADBAND);
     omega =
         -MathUtil.mapJoystickOutput(

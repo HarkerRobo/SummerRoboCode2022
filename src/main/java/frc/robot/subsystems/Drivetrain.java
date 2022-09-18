@@ -94,16 +94,16 @@ public class Drivetrain extends SubsystemBase {
         swerveModules[1].getState(),
         swerveModules[2].getState(),
         swerveModules[3].getState());
-    headingHistory.put(
-        Timer.getFPGATimestamp(), poseEstimator.getEstimatedPosition().getRotation().getRadians());
-    if (headingHistory.size() >= MAX_HISTORY_SIZE) headingHistory.pollFirstEntry();
-    poseEstimator.addVisionMeasurement(
-        new Pose2d(
-            PhotonVisionLimelight.robotToField(),
-            new Rotation2d(
-                headingHistory.get(
-                    Timer.getFPGATimestamp() - PhotonVisionLimelight.lastMeasurementLatency()))),
-        Timer.getFPGATimestamp() - PhotonVisionLimelight.lastMeasurementLatency());
+    // headingHistory.put(
+    //     Timer.getFPGATimestamp(), poseEstimator.getEstimatedPosition().getRotation().getRadians());
+    // if (headingHistory.size() >= MAX_HISTORY_SIZE) headingHistory.pollFirstEntry();
+    // poseEstimator.addVisionMeasurement(
+    //     new Pose2d(
+    //         PhotonVisionLimelight.robotToField(),
+    //         new Rotation2d(
+    //             headingHistory.get(
+    //                 Timer.getFPGATimestamp() - PhotonVisionLimelight.lastMeasurementLatency()))),
+    //     Timer.getFPGATimestamp() - PhotonVisionLimelight.lastMeasurementLatency());
   }
 
   public InterpolatingTreeMap getHeadingHistory() {

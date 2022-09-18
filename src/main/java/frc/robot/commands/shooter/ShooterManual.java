@@ -7,10 +7,12 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.State;
 import frc.robot.util.InterpolatingTreeMap;
+import frc.robot.util.PhotonVisionLimelight;
 import harkerrobolib.commands.IndefiniteCommand;
 
 public class ShooterManual extends IndefiniteCommand {
   private InterpolatingTreeMap shooterVals;
+  private double smartdashboard;
 
   public ShooterManual() {
     addRequirements(Shooter.getInstance());
@@ -19,11 +21,11 @@ public class ShooterManual extends IndefiniteCommand {
 
   public void execute() {
     double possibleShooterSpeed = calculateShooterSpeed();
+    SmartDashboard.putNumber("speed", smartdashboard);
     updateShooterState(possibleShooterSpeed);
     if (Shooter.getInstance().getState() != State.IDLE) {
       Shooter.getInstance().set(possibleShooterSpeed);
     } else Shooter.getInstance().turnOffMotors();
-    SmartDashboard.putNumber("shooter counter", Robot.counter);
   }
 
   private void updateShooterState(double nextSpeed) {
@@ -48,7 +50,9 @@ public class ShooterManual extends IndefiniteCommand {
   }
 
   private double calculateShooterSpeed() {
-    return 15;
+    smartdashboard =  SmartDashboard.getNumber("speed", 0.0);
+    return smartdashboard;
+    // return shooterVals.get(PhotonVisionLimelight.getDistance());
     // return shooterVals.get(
     //     Drivetrain.getInstance()
     //         .getPoseEstimator()

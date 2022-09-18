@@ -1,5 +1,6 @@
 package frc.robot.commands.hood;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Hood;
 import frc.robot.util.Constants;
@@ -19,15 +20,16 @@ public class HoodManual extends IndefiniteCommand {
   }
 
   public double calculateHoodPosition() {
-    return hoodVals.get(
-        Drivetrain.getInstance()
-            .getPoseEstimator()
-            .getEstimatedPosition()
-            .getTranslation()
-            .getDistance(Constants.HUB_LOCATION));
+    return SmartDashboard.getNumber("angle", 0.0);
+    // return hoodVals.get(
+    //     Drivetrain.getInstance()
+    //         .getPoseEstimator()
+    //         .getEstimatedPosition()
+    //         .getTranslation()
+    //         .getDistance(Constants.HUB_LOCATION));
   }
 
-  public void end(boolean interruptxed) {
+  public void end(boolean interrupted) {
     Hood.getInstance().setHoodPosition(0);
   }
 }
