@@ -10,6 +10,7 @@ public class ClimberStages {
   private static class WaitForDriver extends WaitUntilCommand {
     public WaitForDriver() {
       super(() -> OI.getInstance().getDriverGamepad().getButtonAState());
+      addRequirements(Climber.getInstance());
     }
   }
 
@@ -24,11 +25,11 @@ public class ClimberStages {
     return new SequentialCommandGroup(
         new SetClimberPos(Climber.MID_HEIGHT),
         new WaitForDriver(),
-        new InstantCommand(() -> Climber.getInstance().setClimberBackward()),
+        new InstantCommand(() -> Climber.getInstance().setClimberBackward(), Climber.getInstance()),
         new WaitForDriver(),
         new SetClimberPos(Climber.UP_HEIGHT),
         new WaitForDriver(),
-        new InstantCommand(() -> Climber.getInstance().setClimberForward()),
+        new InstantCommand(() -> Climber.getInstance().setClimberForward(), Climber.getInstance()),
         new WaitForDriver(),
         new SetClimberPos(Climber.DOWN_HEIGHT));
   }
