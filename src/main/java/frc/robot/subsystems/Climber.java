@@ -29,12 +29,12 @@ public class Climber extends SubsystemBase {
 
   private static final boolean LEFT_INVERT = true;
 
-  private static final double kS = 0.1;
-  private static final double kV = 0.1;
-  private static final double kA = 0.1;
-  private static final double kG = 0.1;
-  private static final double POS_MAX_ERROR = 100;
-  private static final double VEL_MAX_ERROR = 75;
+  private static final double kS = 0.126;
+  private static final double kV = 0.165;
+  private static final double kA = 0.019;
+  private static final double kG = -0.1;
+  private static final double POS_MAX_ERROR = 10000/2048.0;
+  private static final double VEL_MAX_ERROR = 14500/2048.0;
   private static final double unitConversion = 1.0/2048.0;
 
   public static final double UP_AND_BACK_HEIGHT = 118000/2048.0;
@@ -68,6 +68,7 @@ public class Climber extends SubsystemBase {
                 .constants(kV, kA, kS)
                 .unitConversionFactor(unitConversion)
                 .build(right).init();
+    addChild("Right Position System", rightPositionSys);
     leftPositionSys =
             new MotorPositionSystemBuilder()
                 .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
@@ -75,6 +76,7 @@ public class Climber extends SubsystemBase {
                 .constants(kV, kA, kS)
                 .unitConversionFactor(unitConversion)
                 .build(right).init();
+    addChild("Left Position System", leftPositionSys);
     rightLimitSwitch = new DigitalInput(RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
     leftLimitSwitch = new DigitalInput(RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);
   }

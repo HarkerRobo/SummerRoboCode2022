@@ -30,10 +30,12 @@ public class PhotonVisionLimelight {
   }
 
   public static double getDistance() {
+    if (robotToHub == null) return 0;
     return robotToHub.getNorm();
   }
 
   public static double getXDistance() {
+    if (robotToHub == null) return 0;
     return robotToHub.getX();
   }
 

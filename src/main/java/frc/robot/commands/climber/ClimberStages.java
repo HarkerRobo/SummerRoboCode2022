@@ -27,7 +27,7 @@ public class ClimberStages {
         new WaitForDriver(),
         new InstantCommand(() -> Climber.getInstance().setClimberBackward(), Climber.getInstance()),
         new WaitForDriver(),
-        new SetClimberPos(Climber.UP_AND_BACK_HEIGHT),
+        new SetClimberPos(Climber.UP_HEIGHT),
         new WaitForDriver(),
         new InstantCommand(() -> Climber.getInstance().setClimberForward(), Climber.getInstance()),
         new WaitForDriver(),

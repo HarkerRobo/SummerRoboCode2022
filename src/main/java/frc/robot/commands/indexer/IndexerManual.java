@@ -23,7 +23,7 @@ public class IndexerManual extends IndefiniteCommand {
         if (!Indexer.getInstance().isRightColor())
           Indexer.getInstance().setBottomOutput(INDEXER_OUTTAKE_SPEED);
         else {
-          if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(-1);
+          if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(0);
           else Indexer.getInstance().setTopOutput(INDEXER_SPEED);
           if (Indexer.getInstance().isBallInBottom())
             if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setBottomOutput(0);
