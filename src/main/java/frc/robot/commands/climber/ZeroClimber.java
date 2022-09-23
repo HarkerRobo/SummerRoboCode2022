@@ -11,12 +11,12 @@ public class ZeroClimber extends CommandBase {
   }
 
   public void execute() {
-    if(!Climber.getInstance().leftLimitSwitch())
+    if (!Climber.getInstance().leftLimitSwitch())
       Climber.getInstance().setLeftPercentOutput(ZERO_SPEED);
     else {
       Climber.getInstance().setLeftPercentOutput(0);
     }
-    if(!Climber.getInstance().rightLimitSwitch())
+    if (!Climber.getInstance().rightLimitSwitch())
       Climber.getInstance().setRightPercentOutput(ZERO_SPEED);
     else {
       Climber.getInstance().setRightPercentOutput(0);

@@ -1,14 +1,10 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import java.util.List;
-
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class PhotonVisionLimelight {
   private static final PhotonCamera LIMELIGHT = new PhotonCamera(RobotMap.LIMELIGHT_NAME);
@@ -40,7 +36,10 @@ public class PhotonVisionLimelight {
   public static double getDistance() {
     return 0.0;
     // if (LIMELIGHT.getLatestResult().getBestTarget() == null) return 0;
-    // else return (Constants.HUB_HEIGHT - LIMELIGHT_HEIGHT) / (Math.tan(Math.toRadians(LIMELIGHT.getLatestResult().getBestTarget().getPitch() + LIMELIGHT_ANGLE) * Math.cos(Math.toRadians(LIMELIGHT.getLatestResult().getBestTarget().getYaw()))));
+    // else return (Constants.HUB_HEIGHT - LIMELIGHT_HEIGHT) /
+    // (Math.tan(Math.toRadians(LIMELIGHT.getLatestResult().getBestTarget().getPitch() +
+    // LIMELIGHT_ANGLE) *
+    // Math.cos(Math.toRadians(LIMELIGHT.getLatestResult().getBestTarget().getYaw()))));
     // return robotToHub().getTranslation().getDistance(new Translation2d(0,0));
   }
 

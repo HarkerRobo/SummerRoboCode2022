@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -60,7 +59,8 @@ public class Intake extends SubsystemBase {
             .constants(kV, kA, kS)
             .maxError(MAX_ERROR)
             .unitConversionFactor(FALCON_VEL_TO_CARGO_SPEED)
-            .build(roller).init();
+            .build(roller)
+            .init();
     state = State.NEUTRAL;
     addChild("Motor", roller);
     addChild("Motor System", velocitySystem);

@@ -57,7 +57,8 @@ public class Hood extends SubsystemBase {
             .unitConversionFactor(FALCON_TO_DEG)
             .maxVoltage(MAX_VOLTAGE)
             .maxError(MAX_POS_ERROR, MAX_VEL_ERROR)
-            .build(hood).init();
+            .build(hood)
+            .init();
     addChild("Hood Position System", positionSystem);
     isHoodZeroed = false;
     initMotors();

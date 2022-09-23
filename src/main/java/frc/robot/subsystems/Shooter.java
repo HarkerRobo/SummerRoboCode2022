@@ -17,8 +17,8 @@ public class Shooter extends SubsystemBase {
   private HSFalcon master;
   private HSFalcon follower;
 
-  private static final boolean MASTER_INVERT = true;
-  private static final boolean FOLLOWER_INVERT = false;
+  private static final boolean MASTER_INVERT = false;
+  private static final boolean FOLLOWER_INVERT = true;
 
   private static final double CURRENT_CONTINUOUS = 40;
   private static final double CURRENT_PEAK = 45;
@@ -69,7 +69,8 @@ public class Shooter extends SubsystemBase {
             .constants(kV, kA, kS)
             .unitConversionFactor(MOTOR_TO_METERS_PER_SECOND)
             .maxError(MAX_ERROR)
-            .build(master).init();
+            .build(master)
+            .init();
     addChild("Velocity System", velocitySystem);
     state = State.IDLE;
   }

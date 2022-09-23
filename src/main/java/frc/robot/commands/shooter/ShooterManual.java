@@ -7,7 +7,6 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.State;
 import frc.robot.util.InterpolatingTreeMap;
-import frc.robot.util.PhotonVisionLimelight;
 import harkerrobolib.commands.IndefiniteCommand;
 
 public class ShooterManual extends IndefiniteCommand {
@@ -36,8 +35,8 @@ public class ShooterManual extends IndefiniteCommand {
           Shooter.getInstance().setState(State.REVVING);
           break;
         case REVVING:
-          // if (Shooter.getInstance().atSpeed(nextSpeed) && Drivetrain.getInstance().isAligned())
-          //   Shooter.getInstance().setState(State.SHOOTING);
+          if (Shooter.getInstance().atSpeed(nextSpeed) && Drivetrain.getInstance().isAligned())
+            Shooter.getInstance().setState(State.SHOOTING);
           break;
         case SHOOTING:
           if (!(Shooter.getInstance().atSpeed(nextSpeed) && Drivetrain.getInstance().isAligned()))
@@ -50,7 +49,7 @@ public class ShooterManual extends IndefiniteCommand {
   }
 
   private double calculateShooterSpeed() {
-    smartdashboard =  SmartDashboard.getNumber("speed", 0.0);
+    smartdashboard = SmartDashboard.getNumber("speed", 0.0);
     return smartdashboard;
     // return shooterVals.get(PhotonVisionLimelight.getDistance());
     // return shooterVals.get(

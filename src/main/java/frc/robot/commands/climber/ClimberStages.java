@@ -21,14 +21,17 @@ public class ClimberStages {
           new SetClimberPos(Climber.DOWN_HEIGHT));
 
   public static SequentialCommandGroup STAGE_2_AND_3() {
-      return new SequentialCommandGroup(
-          new SetClimberPos(Climber.MID_HEIGHT),
-          new InstantCommand(() -> Climber.getInstance().setClimberForward()),
-          new SetClimberPos(Climber.UP_HEIGHT),
-          new WaitForDriver(),
-          new InstantCommand(() -> Climber.getInstance().setClimberBackward()),
-          new WaitForDriver(),
-          new SetClimberPos(Climber.DOWN_HEIGHT));}
+    return new SequentialCommandGroup(
+        new SetClimberPos(Climber.MID_HEIGHT),
+        new WaitForDriver(),
+        new InstantCommand(() -> Climber.getInstance().setClimberBackward()),
+        new WaitForDriver(),
+        new SetClimberPos(Climber.UP_HEIGHT),
+        new WaitForDriver(),
+        new InstantCommand(() -> Climber.getInstance().setClimberForward()),
+        new WaitForDriver(),
+        new SetClimberPos(Climber.DOWN_HEIGHT));
+  }
 
   public static final SequentialCommandGroup ALL_STAGES =
       new SequentialCommandGroup(

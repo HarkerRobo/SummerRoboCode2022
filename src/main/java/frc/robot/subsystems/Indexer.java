@@ -3,8 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
@@ -24,7 +22,7 @@ public class Indexer extends SubsystemBase {
   private static final double CURRENT_CONTINUOUS = 30;
   private static final double CURRENT_PEAK = 60;
   private static final double CURRENT_PEAK_DUR = 0.2;
-  private static final boolean TOP_INVERT = true;
+  private static final boolean TOP_INVERT = false;
   private static final boolean BOTTOM_INVERT = false;
 
   private static final double TOP_GEAR_RATIO = 5.0;
@@ -40,10 +38,10 @@ public class Indexer extends SubsystemBase {
   private static final double TOP_kV = 2.5235; // TODO: Tune
   private static final double TOP_kA = 0.034295; // TODO: Tune
   private static final double BOTTOM_kS = 0.017587;
-  private static final double BOTTOM_kV =1.014; // TODO: Tune
+  private static final double BOTTOM_kV = 1.014; // TODO: Tune
   private static final double BOTTOM_kA = 0.082487; // TODO: Tune
 
-  private static final double MAX_ERROR = 0.5; // TODO: Tune
+  private static final double MAX_ERROR = 5; // TODO: Tune
 
   private static MotorVelocitySystem topSystem;
   private static MotorVelocitySystem bottomSystem;
@@ -66,13 +64,15 @@ public class Indexer extends SubsystemBase {
             .constants(TOP_kV, TOP_kA, TOP_kS)
             .maxError(MAX_ERROR)
             .unitConversionFactor(TOP_FALCON_TO_CARGO_SPEED)
-            .build(top).init();
+            .build(top)
+            .init();
     bottomSystem =
         new MotorVelocitySystemBuilder()
             .constants(BOTTOM_kV, BOTTOM_kA, BOTTOM_kS)
             .maxError(MAX_ERROR)
             .unitConversionFactor(BOTTOM_FALCON_TO_CARGO_SPEED)
-            .build(bottom).init();
+            .build(bottom)
+            .init();
     addChild("Top System", topSystem);
     addChild("Bottom System", bottomSystem);
     topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);
@@ -130,6 +130,8 @@ public class Indexer extends SubsystemBase {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Indexer");
+    builder.addBooleanProperty("top proximity", () -> isBallInTop(), null);
+
     // builder.addBooleanProperty("Color is red", () -> colorSensor.isRed(), null);
     // builder.addBooleanProperty(
     //     "Color sensor is functioning", () -> colorSensor.isFunctioning(), null);

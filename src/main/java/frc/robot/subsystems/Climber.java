@@ -25,11 +25,11 @@ public class Climber extends SubsystemBase {
 
   private static final boolean RIGHT_INVERT = false;
 
-  public static final double POS_MAX_ERROR = 350;
+  public static final double POS_MAX_ERROR = 500;
   private static final boolean LEFT_INVERT = true;
 
   public static final double UP_HEIGHT = 112500; // TODO
-  public static final double MID_HEIGHT = 50000; // TODO
+  public static final double MID_HEIGHT = 58000; // TODO
   public static final double DOWN_HEIGHT = 0; // TODO
 
   private Climber() {

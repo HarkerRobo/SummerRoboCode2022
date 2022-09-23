@@ -34,7 +34,7 @@ public class SwerveModule implements Sendable {
   private static final double DRIVE_MOTOR_CURRENT_PEAK = 60;
   private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0;
 
-  private static final double DRIVE_kS = 0.1;//0.3;
+  private static final double DRIVE_kS = 0.1; // 0.3;
   private static final double DRIVE_kV = 2.2819;
   private static final double DRIVE_kA = 0.3621;
 
@@ -83,13 +83,15 @@ public class SwerveModule implements Sendable {
             .constants(DRIVE_kV, DRIVE_kA, DRIVE_kS)
             .unitConversionFactor(DRIVE_FALCON_TO_MPS)
             .maxError(DRIVE_MAX_ERROR)
-            .build(drive).init();
+            .build(drive)
+            .init();
     rotationSystem =
         new MotorPositionSystemBuilder()
             .constants(ROTATION_kV, ROTATION_kA, ROTATION_kS)
             .unitConversionFactor(ROT_MOTOR_TO_DEG)
             .maxError(ROTATION_MAX_POS_ERROR, ROTATION_MAX_VEL_ERROR)
-            .build(rotation).init();
+            .build(rotation)
+            .init();
     SendableRegistry.addLW(
         rotationSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Rotation System");
     SendableRegistry.addLW(

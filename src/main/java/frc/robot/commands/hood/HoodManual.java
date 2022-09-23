@@ -1,9 +1,7 @@
 package frc.robot.commands.hood;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Hood;
-import frc.robot.util.Constants;
 import frc.robot.util.InterpolatingTreeMap;
 import harkerrobolib.commands.IndefiniteCommand;
 

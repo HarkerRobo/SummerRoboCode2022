@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().setDefaultCommand(Intake.getInstance(), new IntakeManual());
     SmartDashboard.putNumber("angle", 0.0);
     CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
-    // CommandScheduler.getInstance().setDefaultCommand(Indexer.getInstance(), new IndexerManual());
+    CommandScheduler.getInstance().setDefaultCommand(Indexer.getInstance(), new IndexerManual());
     CommandScheduler.getInstance().setDefaultCommand(Hood.getInstance(), new HoodManual());
     NetworkTableInstance.getDefault().setUpdateRate(RobotMap.ROBOT_LOOP);
   }
