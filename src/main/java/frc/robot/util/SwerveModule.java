@@ -30,8 +30,8 @@ public class SwerveModule implements Sendable {
   private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
   private static final double ROTATION_MOTOR_CURRENT_PEAK_DUR = 0.1;
 
-  private static final double DRIVE_MOTOR_CURRENT_CONTINUOUS = 60;
-  private static final double DRIVE_MOTOR_CURRENT_PEAK = 60;
+  private static final double DRIVE_MOTOR_CURRENT_CONTINUOUS = 100;
+  private static final double DRIVE_MOTOR_CURRENT_PEAK = 100;
   private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0;
 
   private static final double DRIVE_kS = 0.1; // 0.3;

@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.HSFalconBuilder;
+import frc.robot.util.MotorPositionSystem;
+import frc.robot.util.MotorPositionSystem.MotorPositionSystemBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Climber extends SubsystemBase {
@@ -25,13 +27,22 @@ public class Climber extends SubsystemBase {
 
   private static final boolean RIGHT_INVERT = false;
 
-  public static final double POS_MAX_ERROR = 500;
   private static final boolean LEFT_INVERT = true;
 
-  public static final double UP_AND_BACK_HEIGHT = 118000;
-  public static final double UP_HEIGHT = 112500;
-  public static final double MID_HEIGHT = 58000;
+  private static final double kS = 0.1;
+  private static final double kV = 0.1;
+  private static final double kA = 0.1;
+  private static final double kG = 0.1;
+  private static final double POS_MAX_ERROR = 100;
+  private static final double VEL_MAX_ERROR = 75;
+
+  public static final double UP_AND_BACK_HEIGHT = 118000/2048.0;
+  public static final double UP_HEIGHT = 112500/2048.0;
+  public static final double MID_HEIGHT = 58000/2048.0;
   public static final double DOWN_HEIGHT = 0;
+
+  private MotorPositionSystem leftPositionSys;
+  private MotorPositionSystem rightPositionSys;
 
   private Climber() {
     right =
@@ -46,13 +57,21 @@ public class Climber extends SubsystemBase {
             .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.LEFT_CLIMBER, RobotMap.CANBUS);
     addChild("Left Motor", left);
-    right.configForwardSoftLimitEnable(false);
-    right.configReverseSoftLimitEnable(false);
-    left.configForwardSoftLimitEnable(false);
-    left.configReverseSoftLimitEnable(false);
     climber =
         new DoubleSolenoid(
             PneumaticsModuleType.REVPH, RobotMap.CLIMBER_FORWARD, RobotMap.CLIMBER_BACKWARD);
+    rightPositionSys =
+            new MotorPositionSystemBuilder()
+                .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
+                .elevatorGravityConstant(kG)
+                .constants(kV, kA, kS)
+                .build(right).init();
+    leftPositionSys =
+            new MotorPositionSystemBuilder()
+                .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
+                .elevatorGravityConstant(kG)
+                .constants(kV, kA, kS)
+                .build(right).init();
     rightLimitSwitch = new DigitalInput(RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
     leftLimitSwitch = new DigitalInput(RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);
   }
@@ -67,6 +86,14 @@ public class Climber extends SubsystemBase {
 
   public boolean limitSwitchHit() {
     return !rightLimitSwitch.get() && !leftLimitSwitch.get();
+  }
+
+  public void setRightClimberPos(double pos) {
+    rightPositionSys.set(pos);
+  }
+
+  public void setLeftClimberPos(double pos) {
+    leftPositionSys.set(pos);
   }
 
   public void setClimberForward() {
@@ -114,6 +141,14 @@ public class Climber extends SubsystemBase {
     return left;
   }
 
+  public MotorPositionSystem getRightPositionSystem() {
+    return rightPositionSys;
+  }
+
+  public MotorPositionSystem getLeftPositionSystem() {
+    return leftPositionSys;
+  }
+
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Climber");
     builder.addStringProperty("Solenoid Value", () -> climber.get().name(), null);
@@ -126,5 +161,10 @@ public class Climber extends SubsystemBase {
       instance = new Climber();
     }
     return instance;
+  }
+
+  public void setBothClimberPos(double position) {
+    setLeftClimberPos(position);
+    setRightClimberPos(position);
   }
 }

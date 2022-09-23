@@ -1,10 +1,12 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.RobotMap;
+
+import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class PhotonVisionLimelight {
   private static final PhotonCamera LIMELIGHT = new PhotonCamera(RobotMap.LIMELIGHT_NAME);
@@ -12,35 +14,27 @@ public class PhotonVisionLimelight {
 
   private static final Translation2d cameraToVehicle = new Translation2d(0.32, 0.0);
   private static final double LIMELIGHT_HEIGHT = 0.603284;
-  private static final double LIMELIGHT_ANGLE = 38;
+  private static final double LIMELIGHT_TO_HUB_HEIGHT = Constants.HUB_HEIGHT - LIMELIGHT_HEIGHT;
+  private static final double LIMELIGHT_ANGLE = Math.toRadians(38);
+  private static Translation2d robotToHub = null;
 
-  public static Transform2d robotToHub() {
-    return LIMELIGHT.getLatestResult().getBestTarget().getCameraToTarget();
-    // List<Translation2d> points = new ArrayList<>();
-    // for (PhotonTrackedTarget trackedTarget : LIMELIGHT.getLatestResult().getTargets()) {
-    //   points.add(trackedTarget.getCameraToTarget().getTranslation());
-    // }
-    // Translation2d cameraToTarget = fit(points, PRECISION);
-    // Translation2d targetToVehicle = cameraToTarget.plus(cameraToVehicle);
-    // return targetToVehicle;
-    // return Constants.HUB_LOCATION.minus(
-    //     targetToVehicle.rotateBy(
-    //         new Rotation2d(
-    //             Drivetrain.getInstance()
-    //                 .getHeadingHistory()
-    //                 .get(
-    //                     Timer.getFPGATimestamp()
-    //                         - PhotonVisionLimelight.lastMeasurementLatency()))));
+  public static void robotToHub() {
+    if(!LIMELIGHT.getLatestResult().hasTargets()) return;
+    List<Translation2d> points = new ArrayList<>();
+    for (PhotonTrackedTarget trackedTarget : LIMELIGHT.getLatestResult().getTargets()) {
+      points.add(getRobotToTarget(trackedTarget));
+    }
+    Translation2d cameraToTarget = fit(points, PRECISION);
+    Translation2d targetToVehicle = cameraToTarget.plus(cameraToVehicle);
+    robotToHub =  targetToVehicle;
   }
 
   public static double getDistance() {
-    return 0.0;
-    // if (LIMELIGHT.getLatestResult().getBestTarget() == null) return 0;
-    // else return (Constants.HUB_HEIGHT - LIMELIGHT_HEIGHT) /
-    // (Math.tan(Math.toRadians(LIMELIGHT.getLatestResult().getBestTarget().getPitch() +
-    // LIMELIGHT_ANGLE) *
-    // Math.cos(Math.toRadians(LIMELIGHT.getLatestResult().getBestTarget().getYaw()))));
-    // return robotToHub().getTranslation().getDistance(new Translation2d(0,0));
+    return robotToHub.getNorm();
+  }
+
+  public static double getXDistance() {
+    return robotToHub.getX();
   }
 
   public static double lastMeasurementLatency() {
@@ -102,5 +96,12 @@ public class PhotonVisionLimelight {
       residual += diff * diff;
     }
     return residual;
+  }
+
+  private static Translation2d getRobotToTarget(PhotonTrackedTarget target) {
+    double dy = Math.toRadians(target.getPitch());
+    double dx = Math.toRadians(target.getYaw());
+    double dist = LIMELIGHT_TO_HUB_HEIGHT / (Math.tan(dy + LIMELIGHT_ANGLE) * Math.cos(dx));
+    return new Translation2d(Math.cos(dx) * dist, Math.sin(dx) * dist);
   }
 }

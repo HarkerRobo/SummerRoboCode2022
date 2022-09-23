@@ -29,9 +29,6 @@ public class MotorVelocitySystem implements Sendable {
     this.unitConversion = unitConversion;
     this.maxError = maxError;
     this.maxVoltage = maxVoltage;
-    this.calculateConstants();
-    motor.selectProfileSlot(RobotMap.SLOT_INDEX, 0);
-    // motor.configAllowableClosedloopError(RobotMap.SLOT_INDEX, maxError / unitConversion);
   }
 
   public MotorVelocitySystem init() {
