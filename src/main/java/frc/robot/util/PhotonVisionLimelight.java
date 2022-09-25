@@ -16,26 +16,24 @@ public class PhotonVisionLimelight {
   private static final double LIMELIGHT_HEIGHT = 0.603284;
   private static final double LIMELIGHT_TO_HUB_HEIGHT = Constants.HUB_HEIGHT - LIMELIGHT_HEIGHT;
   private static final double LIMELIGHT_ANGLE = Math.toRadians(38);
-  private static Translation2d robotToHub = null;
+  private static Translation2d robotToHub = new Translation2d();
 
-  public static void robotToHub() {
+  public static void update() {
     if(!LIMELIGHT.getLatestResult().hasTargets()) return;
     List<Translation2d> points = new ArrayList<>();
     for (PhotonTrackedTarget trackedTarget : LIMELIGHT.getLatestResult().getTargets()) {
       points.add(getRobotToTarget(trackedTarget));
     }
     Translation2d cameraToTarget = fit(points, PRECISION);
-    Translation2d targetToVehicle = cameraToTarget.plus(cameraToVehicle);
-    robotToHub =  targetToVehicle;
+    // Translation2d targetToVehicle = cameraToTarget.plus(cameraToVehicle);
+    robotToHub =  cameraToTarget;
   }
 
   public static double getDistance() {
-    if (robotToHub == null) return 0;
-    return robotToHub.getNorm();
+    return robotToHub.getNorm() - Constants.HUB_RADIUS;
   }
 
   public static double getXDistance() {
-    if (robotToHub == null) return 0;
     return robotToHub.getX();
   }
 
@@ -103,7 +101,7 @@ public class PhotonVisionLimelight {
   private static Translation2d getRobotToTarget(PhotonTrackedTarget target) {
     double dy = Math.toRadians(target.getPitch());
     double dx = Math.toRadians(target.getYaw());
-    double dist = LIMELIGHT_TO_HUB_HEIGHT / (Math.tan(dy + LIMELIGHT_ANGLE) * Math.cos(dx));
-    return new Translation2d(Math.cos(dx) * dist, Math.sin(dx) * dist);
+    double dist = LIMELIGHT_TO_HUB_HEIGHT / Math.tan(dy + LIMELIGHT_ANGLE);
+    return new Translation2d(Math.cos(dx) * dist, Math.sin(dx)*dist);
   }
 }

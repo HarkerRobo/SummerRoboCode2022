@@ -27,17 +27,17 @@ public class Hood extends SubsystemBase {
   private static final double STALLING_CURRENT = 10;
   private static final double RANGE = 32.25;
 
-  private static final double kS = 0.2675;
-  private static final double kV = 0.067675;
-  private static final double kA = 0.0011271;
-  private static final double kG = 0.2377;
+  private static final double kS = 0.32;
+  private static final double kV = 0.05998;
+  private static final double kA = 0.00523;
+  private static final double kG = 0.2;
 
   private static final double GEAR_RATIO = 180;
   private static final double FALCON_TO_DEG = Conversions.ENCODER_TO_DEG / GEAR_RATIO;
 
-  private static final double MAX_POS_ERROR = 0.5;
-  private static final double MAX_VEL_ERROR = 0.51;
-  private static final double MAX_VOLTAGE = 3;
+  private static final double MAX_POS_ERROR = 0.3;
+  private static final double MAX_VEL_ERROR = 0.2;
+  private static final double MAX_VOLTAGE = 10;
 
   private boolean isHoodZeroed;
 

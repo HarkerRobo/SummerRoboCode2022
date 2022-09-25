@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
 public class ZeroClimber extends CommandBase {
-  private static final double ZERO_SPEED = -0.2;
+  private static final double ZERO_SPEED = -0.55;
 
   public ZeroClimber() {
     addRequirements(Climber.getInstance());

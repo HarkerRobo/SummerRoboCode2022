@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
   private static final double kV = 1.1553;
   private static final double kA = 0.147;
 
-  private static final double MAX_ERROR = 0.01;
+  private static final double MAX_ERROR = 0.5;
 
   private MotorVelocitySystem velocitySystem;
 

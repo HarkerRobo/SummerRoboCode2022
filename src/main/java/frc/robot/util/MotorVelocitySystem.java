@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.LinearQuadraticRegulator;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 
 public class MotorVelocitySystem implements Sendable {
@@ -83,6 +84,15 @@ public class MotorVelocitySystem implements Sendable {
     return Math.abs(getVelocityError()) < maxError;
   }
 
+  public void setkS(double kS) {
+    SmartDashboard.putBoolean("die", true);
+    this.kS = kS;
+  }
+
+  public double getkS() {
+    return kS;
+  }
+
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MotorVelocitySystem");
     builder.addDoubleProperty("Velocity", () -> getVelocity(), null);
@@ -103,7 +113,7 @@ public class MotorVelocitySystem implements Sendable {
           maxVoltage = a;
           calculateConstants();
         });
-    builder.addDoubleProperty("kS", () -> kS, (a) -> kS = a);
+    builder.addDoubleProperty("kS", this::getkS, this::setkS);
     builder.addDoubleProperty(
         "kV",
         () -> kV,

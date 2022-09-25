@@ -34,14 +34,15 @@ public class Indexer extends SubsystemBase {
   private static final double BOTTOM_FALCON_TO_CARGO_SPEED =
       Conversions.ENCODER_TO_WHEEL_SPEED / BOTTOM_GEAR_RATIO * BOTTOM_WHEEL_DIAMETER;
 
-  private static final double TOP_kS = 0.062268; // TODO: Tune
-  private static final double TOP_kV = 2.5235; // TODO: Tune
-  private static final double TOP_kA = 0.034295; // TODO: Tune
+  private static final double TOP_kS = 0.062268;
+  private static final double TOP_kV = 2.5235;
+  private static final double TOP_kA = 0.034295;
   private static final double BOTTOM_kS = 0.017587;
-  private static final double BOTTOM_kV = 1.014; // TODO: Tune
-  private static final double BOTTOM_kA = 0.082487; // TODO: Tune
+  private static final double BOTTOM_kV = 1.014;
+  private static final double BOTTOM_kA = 0.082487;
 
-  private static final double MAX_ERROR = 5; // TODO: Tune
+  private static final double MAX_BOTTOM_ERROR = 21;
+  private static final double MAX_TOP_ERROR = 21;
 
   private static MotorVelocitySystem topSystem;
   private static MotorVelocitySystem bottomSystem;
@@ -50,26 +51,26 @@ public class Indexer extends SubsystemBase {
     top =
         new HSFalconBuilder()
             .invert(TOP_INVERT)
-            .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            // .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.INDEXER_TOP, RobotMap.CANBUS);
     addChild("Top Motor", top);
     bottom =
         new HSFalconBuilder()
             .invert(BOTTOM_INVERT)
-            .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            // .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.INDEXER_BOTTOM, RobotMap.CANBUS);
     addChild("Bottom Motor", bottom);
     topSystem =
         new MotorVelocitySystemBuilder()
             .constants(TOP_kV, TOP_kA, TOP_kS)
-            .maxError(MAX_ERROR)
+            .maxError(MAX_TOP_ERROR)
             .unitConversionFactor(TOP_FALCON_TO_CARGO_SPEED)
             .build(top)
             .init();
     bottomSystem =
         new MotorVelocitySystemBuilder()
             .constants(BOTTOM_kV, BOTTOM_kA, BOTTOM_kS)
-            .maxError(MAX_ERROR)
+            .maxError(MAX_BOTTOM_ERROR)
             .unitConversionFactor(BOTTOM_FALCON_TO_CARGO_SPEED)
             .build(bottom)
             .init();

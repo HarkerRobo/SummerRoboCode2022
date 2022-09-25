@@ -32,14 +32,15 @@ public class Climber extends SubsystemBase {
   private static final double kS = 0.126;
   private static final double kV = 0.165;
   private static final double kA = 0.019;
-  private static final double kG = -0.1;
-  private static final double POS_MAX_ERROR = 10000/2048.0;
-  private static final double VEL_MAX_ERROR = 14500/2048.0;
+  private static final double kG = -0.35;
+  private static final double POS_MAX_ERROR = 15.0;
+  private static final double VEL_MAX_ERROR = 5.0;
   private static final double unitConversion = 1.0/2048.0;
+  private static final double MAX_CONTROL_EFFORT = 10.0;
 
   public static final double UP_AND_BACK_HEIGHT = 118000/2048.0;
   public static final double UP_HEIGHT = 112500/2048.0;
-  public static final double MID_HEIGHT = 58000/2048.0;
+  public static final double MID_HEIGHT = 48000/2048.0;
   public static final double DOWN_HEIGHT = 0;
 
   private MotorPositionSystem leftPositionSys;
@@ -49,13 +50,15 @@ public class Climber extends SubsystemBase {
     right =
         new HSFalconBuilder()
             .invert(RIGHT_INVERT)
-            .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .voltageComp(MAX_CONTROL_EFFORT)
+            // .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.RIGHT_CLIMBER, RobotMap.CANBUS);
     addChild("Right Motor", right);
     left =
         new HSFalconBuilder()
             .invert(LEFT_INVERT)
-            .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            // .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .voltageComp(MAX_CONTROL_EFFORT)
             .build(RobotMap.LEFT_CLIMBER, RobotMap.CANBUS);
     addChild("Left Motor", left);
     climber =
@@ -75,7 +78,7 @@ public class Climber extends SubsystemBase {
                 .elevatorGravityConstant(kG)
                 .constants(kV, kA, kS)
                 .unitConversionFactor(unitConversion)
-                .build(right).init();
+                .build(left).init();
     addChild("Left Position System", leftPositionSys);
     rightLimitSwitch = new DigitalInput(RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
     leftLimitSwitch = new DigitalInput(RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);

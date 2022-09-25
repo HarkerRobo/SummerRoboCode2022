@@ -32,7 +32,6 @@ import frc.robot.util.PhotonVisionLimelight;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static double counter = 0;
   private static final Field2d FIELD = new Field2d();
   private Notifier coastDrivetrainNotifier;
 
@@ -72,8 +71,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    counter += 0.02;
     CommandScheduler.getInstance().run();
+    PhotonVisionLimelight.update();
     SmartDashboard.putNumber("distance", PhotonVisionLimelight.getDistance());
     // SmartDashboard.putNumber("Robot loop", counter);
     // Drivetrain.getInstance().updatePoseEstimator();

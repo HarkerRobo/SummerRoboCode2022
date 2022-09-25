@@ -35,17 +35,16 @@ public class ShooterManual extends IndefiniteCommand {
           Shooter.getInstance().setState(State.REVVING);
           break;
         case REVVING:
-          if (Shooter.getInstance().atSpeed(nextSpeed) && Drivetrain.getInstance().isAligned())
+          if (Shooter.getInstance().atSpeed(nextSpeed))// && Drivetrain.getInstance().isAligned())
             Shooter.getInstance().setState(State.SHOOTING);
           break;
         case SHOOTING:
-          if (!(Shooter.getInstance().atSpeed(nextSpeed) && Drivetrain.getInstance().isAligned()))
+          if (!(Shooter.getInstance().atSpeed(nextSpeed)))// && Drivetrain.getInstance().isAligned()))
             Shooter.getInstance().setState(State.REVVING);
       }
     } else {
       Shooter.getInstance().setState(State.IDLE);
     }
-    SmartDashboard.putNumber("shooter counter", Robot.counter);
   }
 
   private double calculateShooterSpeed() {

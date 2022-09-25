@@ -24,10 +24,11 @@ public class Shooter extends SubsystemBase {
   private static final double CURRENT_PEAK = 45;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double kS = 0.13292;
-  private static final double kV = 0.72649;
-  private static final double kA = 0.044263;
-  private static final double MAX_ERROR = 3; // TODO: Tune
+  private static final double kS = 0.6;
+  private static final double kV = 0.5185;
+  private static final double kA = 0.06045;
+  private static final double MAX_ERROR = 7; // TODO: Tune
+  private static final double SHOOT_ERROR = 0.1;
 
   private static final double WHEEL_DIAMETER = 4.0;
 
@@ -53,7 +54,7 @@ public class Shooter extends SubsystemBase {
         new HSFalconBuilder()
             .invert(MASTER_INVERT)
             .neutralMode(NeutralMode.Coast)
-            .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            // .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.SHOOTER_MASTER, RobotMap.CANBUS);
     addChild("Master Motor", master);
     follower =
@@ -89,7 +90,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean atSpeed(double speed) {
     return Math.abs(master.getSelectedSensorVelocity() * MOTOR_TO_METERS_PER_SECOND - speed)
-        < MAX_ERROR;
+        < SHOOT_ERROR;
   }
 
   public void setState(State nextState) {

@@ -25,9 +25,9 @@ public class OI {
   }
 
   public void initBindings() {
-    driver.getButtonA().whenPressed(ClimberStages.ALL_STAGES);
+    driver.getButtonB().whenPressed(ClimberStages.ALL_STAGES);
     driver
-        .getButtonStart()
+        .getButtonX()
         .whenPressed(
             new InstantCommand(
                 () -> {
@@ -38,22 +38,23 @@ public class OI {
     driver.getButtonStart().whenPressed(new ZeroHood());
     // driver.getButtonB().whenPressed(()->Climber.getInstance().setClimberForward());
     // driver.getButtonX().whenPressed(()->Climber.getInstance().setClimberBackward());
-    driver.getButtonB().whenPressed(new SetClimberPos(Climber.UP_HEIGHT));
-    driver.getButtonX().whenPressed(new SetClimberPos(Climber.MID_HEIGHT));
-    driver.getLeftDPadButton().whenPressed(new SetClimberPos(Climber.DOWN_HEIGHT));
+    // driver.getButtonB().whenPressed(new SetClimberPos(Climber.UP_HEIGHT));
+    // driver.getButtonX().whenPressed(new SetClimberPos(Climber.MID_HEIGHT));
+    driver.getLeftDPadButton().whenPressed(new InstantCommand(()->Climber.getInstance().setClimberForward()));
+    driver.getRightDPadButton().whenPressed(new InstantCommand(()->Climber.getInstance().setClimberBackward()));
     driver
         .getUpDPadButton()
         .whenPressed(
             () -> {
-              Climber.getInstance().setRightPercentOutput(0.1);
-              Climber.getInstance().setLeftPercentOutput(0.1);
+              Climber.getInstance().setRightPercentOutput(0.3);
+              Climber.getInstance().setLeftPercentOutput(0.3);
             });
     driver
         .getDownDPadButton()
         .whenPressed(
             () -> {
-              Climber.getInstance().setRightPercentOutput(-0.1);
-              Climber.getInstance().setLeftPercentOutput(-0.1);
+              Climber.getInstance().setRightPercentOutput(-0.5);
+              Climber.getInstance().setLeftPercentOutput(-0.5);
             });
     driver
         .getUpDPadButton()
