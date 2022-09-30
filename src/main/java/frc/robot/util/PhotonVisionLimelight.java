@@ -17,6 +17,7 @@ public class PhotonVisionLimelight {
   private static final double LIMELIGHT_TO_HUB_HEIGHT = Constants.HUB_HEIGHT - LIMELIGHT_HEIGHT;
   private static final double LIMELIGHT_ANGLE = Math.toRadians(38);
   private static Translation2d robotToHub = new Translation2d();
+  public static double dx = 0;
 
   public static void update() {
     if(!LIMELIGHT.getLatestResult().hasTargets()) return;
@@ -100,7 +101,7 @@ public class PhotonVisionLimelight {
 
   private static Translation2d getRobotToTarget(PhotonTrackedTarget target) {
     double dy = Math.toRadians(target.getPitch());
-    double dx = Math.toRadians(target.getYaw());
+    dx = Math.toRadians(target.getYaw());
     double dist = LIMELIGHT_TO_HUB_HEIGHT / Math.tan(dy + LIMELIGHT_ANGLE);
     return new Translation2d(Math.cos(dx) * dist, Math.sin(dx)*dist);
   }

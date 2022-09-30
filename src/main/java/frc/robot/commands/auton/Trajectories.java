@@ -30,8 +30,14 @@ public class Trajectories {
     new Pose2d(new Translation2d(6.41, 5.82), Rotation2d.fromDegrees(128.29))
   };
 
+  public static final Pose2d[] tBA = {
+    new Pose2d(new Translation2d(7.436414, 2.015084), Rotation2d.fromDegrees(90)),
+    new Pose2d(new Translation2d(7.45043, 0.821275), Rotation2d.fromDegrees(90))
+  };
+
   public static final Trajectory hoarderAgainstGremlin = generateTrajectory(hAG, defaultConfig);
   public static final Trajectory hoarderForFiveBall = generateTrajectory(hFFB, defaultConfig);
+  public static final Trajectory twoBallAuto = generateTrajectory(tBA, defaultConfig);
 
   private static Trajectory generateTrajectory(Pose2d[] poses, TrajectoryConfig config) {
     ArrayList<Translation2d> interior = new ArrayList<>();

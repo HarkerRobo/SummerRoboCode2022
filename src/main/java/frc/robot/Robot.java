@@ -9,7 +9,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drivetrain.SwerveManual;
 import frc.robot.commands.hood.HoodManual;
@@ -34,6 +36,7 @@ import frc.robot.util.PhotonVisionLimelight;
 public class Robot extends TimedRobot {
   private static final Field2d FIELD = new Field2d();
   private Notifier coastDrivetrainNotifier;
+  private SendableChooser<CommandBase> autonChooser;
 
   public Robot() {
     super();
@@ -46,6 +49,8 @@ public class Robot extends TimedRobot {
             () -> {
               if (isDisabled()) Drivetrain.getInstance().setNeutralMode(NeutralMode.Coast);
             });
+    autonChooser = new SendableChooser<>();
+    // autonChooser.setDefaultOption("Two Ball Auton", Autons.FIVE_BALL_AUTO);
   }
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -92,8 +97,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
-    // Drivetrain.getInstance()
-    //     .setPose();
+    // Drivetrain.getInstance().setPose(autonChooser);
   }
 
   /** This function is called periodically during autonomous. */

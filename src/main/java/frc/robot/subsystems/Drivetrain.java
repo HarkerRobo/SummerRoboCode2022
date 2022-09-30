@@ -33,7 +33,7 @@ public class Drivetrain extends SubsystemBase {
   private static final double DT_WIDTH = 0.5461; // 0.93345 bumper to bumper
   private static final double DT_LENGTH = 0.5969; // 0.88265
 
-  public static final double MAX_TRANSLATION_VEL = 3.0; // in m/s
+  public static final double MAX_TRANSLATION_VEL = 5.0; // in m/s
   public static final double MAX_ACCELERATION = 2.0; // m/s^2
   public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
   public static final double MAX_ROTATION_ACCELERATION = 1.0 * Math.PI;
@@ -189,6 +189,10 @@ public class Drivetrain extends SubsystemBase {
   public void zeroPigeon() {
     pigeon.setYaw(0);
     pigeon.setAccumZAngle(0);
+  }
+
+  public Pigeon2 getPigeon() {
+    return pigeon;
   }
 
   public static Drivetrain getInstance() {
