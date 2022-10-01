@@ -27,7 +27,7 @@ public class Hood extends SubsystemBase {
   private static final double STALLING_CURRENT = 10;
   private static final double RANGE = 32.25;
 
-  private static final double kS = 0.1; //.32;
+  private static final double kS = 0.1; // .32;
   private static final double kV = 0.05998;
   private static final double kA = 0.00523;
   private static final double kG = 0.2;

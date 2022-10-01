@@ -3,7 +3,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.climber.ClimberStages;
-import frc.robot.commands.climber.SetClimberPos;
 import frc.robot.commands.climber.ZeroClimber;
 import frc.robot.commands.hood.ZeroHood;
 import frc.robot.subsystems.Climber;
@@ -40,8 +39,12 @@ public class OI {
     // driver.getButtonX().whenPressed(()->Climber.getInstance().setClimberBackward());
     // driver.getButtonB().whenPressed(new SetClimberPos(Climber.UP_HEIGHT));
     // driver.getButtonX().whenPressed(new SetClimberPos(Climber.MID_HEIGHT));
-    driver.getLeftDPadButton().whenPressed(new InstantCommand(()->Climber.getInstance().setClimberForward()));
-    driver.getRightDPadButton().whenPressed(new InstantCommand(()->Climber.getInstance().setClimberBackward()));
+    driver
+        .getLeftDPadButton()
+        .whenPressed(new InstantCommand(() -> Climber.getInstance().setClimberForward()));
+    driver
+        .getRightDPadButton()
+        .whenPressed(new InstantCommand(() -> Climber.getInstance().setClimberBackward()));
     driver
         .getUpDPadButton()
         .whenPressed(

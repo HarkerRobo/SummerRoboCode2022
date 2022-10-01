@@ -1,7 +1,5 @@
 package frc.robot.commands.indexer;
 
-import edu.wpi.first.wpilibj.Notifier;
-import frc.robot.RobotMap;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -15,7 +13,8 @@ public class IndexerManual extends IndefiniteCommand {
 
   public IndexerManual() {
     addRequirements(Indexer.getInstance());
-    // topIndexerProximity = new Notifier(()->{if (Indexer.getInstance().isBallInTop()) Indexer.getInstance().setTopOutput(-0.1);});
+    // topIndexerProximity = new Notifier(()->{if (Indexer.getInstance().isBallInTop())
+    // Indexer.getInstance().setTopOutput(-0.1);});
   }
 
   public void execute() {

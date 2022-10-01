@@ -13,6 +13,7 @@ public class ClimberStages {
       addRequirements(Climber.getInstance());
     }
   }
+
   private static class WaitForDriverB extends WaitUntilCommand {
     public WaitForDriverB() {
       super(() -> OI.getInstance().getDriverGamepad().getButtonBState());

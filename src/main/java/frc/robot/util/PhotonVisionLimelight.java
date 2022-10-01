@@ -2,7 +2,6 @@ package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.RobotMap;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
@@ -17,17 +16,16 @@ public class PhotonVisionLimelight {
   private static final double LIMELIGHT_TO_HUB_HEIGHT = Constants.HUB_HEIGHT - LIMELIGHT_HEIGHT;
   private static final double LIMELIGHT_ANGLE = Math.toRadians(38);
   private static Translation2d robotToHub = new Translation2d();
-  public static double dx = 0;
 
   public static void update() {
-    if(!LIMELIGHT.getLatestResult().hasTargets()) return;
+    if (!LIMELIGHT.getLatestResult().hasTargets()) return;
     List<Translation2d> points = new ArrayList<>();
     for (PhotonTrackedTarget trackedTarget : LIMELIGHT.getLatestResult().getTargets()) {
       points.add(getRobotToTarget(trackedTarget));
     }
     Translation2d cameraToTarget = fit(points, PRECISION);
     // Translation2d targetToVehicle = cameraToTarget.plus(cameraToVehicle);
-    robotToHub =  cameraToTarget;
+    robotToHub = cameraToTarget;
   }
 
   public static double getDistance() {
@@ -36,6 +34,10 @@ public class PhotonVisionLimelight {
 
   public static double getXDistance() {
     return robotToHub.getX();
+  }
+
+  public static double getTx() {
+    return LIMELIGHT.getLatestResult().getBestTarget().getYaw();
   }
 
   public static double lastMeasurementLatency() {
@@ -101,8 +103,8 @@ public class PhotonVisionLimelight {
 
   private static Translation2d getRobotToTarget(PhotonTrackedTarget target) {
     double dy = Math.toRadians(target.getPitch());
-    dx = Math.toRadians(target.getYaw());
+    double dx = Math.toRadians(target.getYaw());
     double dist = LIMELIGHT_TO_HUB_HEIGHT / Math.tan(dy + LIMELIGHT_ANGLE);
-    return new Translation2d(Math.cos(dx) * dist, Math.sin(dx)*dist);
+    return new Translation2d(Math.cos(dx) * dist, Math.sin(dx) * dist);
   }
 }

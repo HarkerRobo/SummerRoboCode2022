@@ -1,6 +1,5 @@
 package frc.robot.commands.hood;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Hood;
 import frc.robot.util.InterpolatingTreeMap;
 import frc.robot.util.PhotonVisionLimelight;

@@ -18,11 +18,9 @@ import frc.robot.commands.hood.HoodManual;
 import frc.robot.commands.indexer.IndexerManual;
 import frc.robot.commands.intake.IntakeManual;
 import frc.robot.commands.shooter.ShooterManual;
-// import frc.robot.commands.indexer.IndexerManual;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Indexer;
-// import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.util.PhotonVisionLimelight;
@@ -35,6 +33,7 @@ import frc.robot.util.PhotonVisionLimelight;
  */
 public class Robot extends TimedRobot {
   private static final Field2d FIELD = new Field2d();
+  public static boolean AUTON = false;
   private Notifier coastDrivetrainNotifier;
   private SendableChooser<CommandBase> autonChooser;
 
@@ -96,8 +95,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    AUTON = true;
     Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
-    // Drivetrain.getInstance().setPose(autonChooser);
   }
 
   /** This function is called periodically during autonomous. */
@@ -107,6 +106,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    AUTON = false;
     Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
   }
 
@@ -117,6 +117,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+    AUTON = false;
     coastDrivetrainNotifier.startSingle(3.0);
   }
 

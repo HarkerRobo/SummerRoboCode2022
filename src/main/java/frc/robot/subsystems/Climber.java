@@ -35,12 +35,12 @@ public class Climber extends SubsystemBase {
   private static final double kG = -0.35;
   private static final double POS_MAX_ERROR = 15.0;
   private static final double VEL_MAX_ERROR = 5.0;
-  private static final double unitConversion = 1.0/2048.0;
+  private static final double unitConversion = 1.0 / 2048.0;
   private static final double MAX_CONTROL_EFFORT = 10.0;
 
-  public static final double UP_AND_BACK_HEIGHT = 118000/2048.0;
-  public static final double UP_HEIGHT = 112500/2048.0;
-  public static final double MID_HEIGHT = 48000/2048.0;
+  public static final double UP_AND_BACK_HEIGHT = 118000 / 2048.0;
+  public static final double UP_HEIGHT = 112500 / 2048.0;
+  public static final double MID_HEIGHT = 48000 / 2048.0;
   public static final double DOWN_HEIGHT = 0;
 
   private MotorPositionSystem leftPositionSys;
@@ -65,20 +65,22 @@ public class Climber extends SubsystemBase {
         new DoubleSolenoid(
             PneumaticsModuleType.REVPH, RobotMap.CLIMBER_FORWARD, RobotMap.CLIMBER_BACKWARD);
     rightPositionSys =
-            new MotorPositionSystemBuilder()
-                .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
-                .elevatorGravityConstant(kG)
-                .constants(kV, kA, kS)
-                .unitConversionFactor(unitConversion)
-                .build(right).init();
+        new MotorPositionSystemBuilder()
+            .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
+            .elevatorGravityConstant(kG)
+            .constants(kV, kA, kS)
+            .unitConversionFactor(unitConversion)
+            .build(right)
+            .init();
     addChild("Right Position System", rightPositionSys);
     leftPositionSys =
-            new MotorPositionSystemBuilder()
-                .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
-                .elevatorGravityConstant(kG)
-                .constants(kV, kA, kS)
-                .unitConversionFactor(unitConversion)
-                .build(left).init();
+        new MotorPositionSystemBuilder()
+            .maxError(POS_MAX_ERROR, VEL_MAX_ERROR)
+            .elevatorGravityConstant(kG)
+            .constants(kV, kA, kS)
+            .unitConversionFactor(unitConversion)
+            .build(left)
+            .init();
     addChild("Left Position System", leftPositionSys);
     rightLimitSwitch = new DigitalInput(RobotMap.CLIMBER_RIGHT_LIMIT_SWTICH);
     leftLimitSwitch = new DigitalInput(RobotMap.CLIMBER_LEFT_LIMIT_SWITCH);

@@ -97,8 +97,8 @@ public class Intake extends SubsystemBase {
         setForward();
         break;
       case INTAKE:
-        setRollerOutput(intakeSpeed);
         setBackward();
+        setRollerOutput(intakeSpeed);
         break;
       case OUTTAKE:
         setBackward();

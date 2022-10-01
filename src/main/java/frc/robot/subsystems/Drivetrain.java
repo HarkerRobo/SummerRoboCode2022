@@ -155,8 +155,8 @@ public class Drivetrain extends SubsystemBase {
     return Rotation2d.fromDegrees(getRobotHeading());
   }
 
-  public SwerveDrivePoseEstimator getPoseEstimator() {
-    return poseEstimator;
+  public Pose2d getPoseEstimatorPose2d() {
+    return poseEstimator.getEstimatedPosition();
   }
 
   public SwerveDriveKinematics getKinematics() {
@@ -183,6 +183,7 @@ public class Drivetrain extends SubsystemBase {
     for (int i = 0; i < 4; i++) {
       swerveModules[i].zeroDriveEncoders();
     }
+    pigeon.setYaw(pose.getRotation().getDegrees());
     poseEstimator.resetPosition(pose, getRobotRotation());
   }
 

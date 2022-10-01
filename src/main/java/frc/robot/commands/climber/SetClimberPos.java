@@ -17,8 +17,7 @@ public class SetClimberPos extends CommandBase {
 
   public boolean isFinished() {
     return Climber.getInstance().getLeftPositionSystem().atSetpoint()
-        &&
-        Climber.getInstance().getRightPositionSystem().atSetpoint();
+        && Climber.getInstance().getRightPositionSystem().atSetpoint();
   }
 
   public void end(boolean interrupted) {
