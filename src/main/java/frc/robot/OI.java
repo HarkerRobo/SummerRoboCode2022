@@ -2,9 +2,11 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.climber.ClimberStages;
 import frc.robot.commands.climber.ZeroClimber;
 import frc.robot.commands.hood.ZeroHood;
+import frc.robot.commands.shooter.ShooterAuton;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 // import frc.robot.commands.climber.ClimberStages;
@@ -28,13 +30,15 @@ public class OI {
     driver
         .getButtonX()
         .whenPressed(
-            new InstantCommand(
-                () -> {
-                  Drivetrain.getInstance().setPose(new Pose2d());
-                  Drivetrain.getInstance().zeroPigeon();
-                }));
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      Drivetrain.getInstance().setPose(new Pose2d());
+                      Drivetrain.getInstance().zeroPigeon();
+                    }),
+                new ZeroHood()));
     driver.getButtonSelect().whenPressed(new ZeroClimber());
-    driver.getButtonStart().whenPressed(new ZeroHood());
+    driver.getButtonStart().whilePressed(new ShooterAuton());
     // driver.getButtonB().whenPressed(()->Climber.getInstance().setClimberForward());
     // driver.getButtonX().whenPressed(()->Climber.getInstance().setClimberBackward());
     // driver.getButtonB().whenPressed(new SetClimberPos(Climber.UP_HEIGHT));

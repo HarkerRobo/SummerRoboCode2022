@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.auton.Autons;
 import frc.robot.commands.drivetrain.SwerveManual;
 import frc.robot.commands.hood.HoodManual;
 import frc.robot.commands.indexer.IndexerManual;
@@ -33,7 +34,6 @@ import frc.robot.util.PhotonVisionLimelight;
  */
 public class Robot extends TimedRobot {
   private static final Field2d FIELD = new Field2d();
-  public static boolean AUTON = false;
   private Notifier coastDrivetrainNotifier;
   private SendableChooser<CommandBase> autonChooser;
 
@@ -49,7 +49,6 @@ public class Robot extends TimedRobot {
               if (isDisabled()) Drivetrain.getInstance().setNeutralMode(NeutralMode.Coast);
             });
     autonChooser = new SendableChooser<>();
-    // autonChooser.setDefaultOption("Two Ball Auton", Autons.FIVE_BALL_AUTO);
   }
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -63,6 +62,10 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
     CommandScheduler.getInstance().setDefaultCommand(Indexer.getInstance(), new IndexerManual());
     CommandScheduler.getInstance().setDefaultCommand(Hood.getInstance(), new HoodManual());
+    autonChooser.setDefaultOption("Three Ball Auton", Autons.THREE_BALL_AUTO);
+    SmartDashboard.putData("Auton", autonChooser);
+    SmartDashboard.putNumber("angle to hub", 0);
+    SmartDashboard.putData("Field", FIELD);
     NetworkTableInstance.getDefault().setUpdateRate(RobotMap.ROBOT_LOOP);
   }
 
@@ -78,9 +81,19 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     PhotonVisionLimelight.update();
     SmartDashboard.putNumber("distance", PhotonVisionLimelight.getDistance());
+
     // SmartDashboard.putNumber("Robot loop", counter);
-    // Drivetrain.getInstance().updatePoseEstimator();
-    // FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimator().getEstimatedPosition());
+    Drivetrain.getInstance().updatePoseEstimator();
+    FIELD.setRobotPose(Drivetrain.getInstance().getPoseEstimatorPose2d());
+    SmartDashboard.putNumber(
+        "current pose x",
+        Drivetrain.getInstance().getPoseEstimatorPose2d().getTranslation().getX());
+    SmartDashboard.putNumber(
+        "current pose y",
+        Drivetrain.getInstance().getPoseEstimatorPose2d().getTranslation().getY());
+    SmartDashboard.putNumber(
+        "current pose rotatoin",
+        Drivetrain.getInstance().getPoseEstimatorPose2d().getRotation().getDegrees());
   }
 
   /**
@@ -95,8 +108,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    AUTON = true;
     Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
+    autonChooser.getSelected().schedule();
   }
 
   /** This function is called periodically during autonomous. */
@@ -106,7 +119,6 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    AUTON = false;
     Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
   }
 
@@ -117,7 +129,6 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    AUTON = false;
     coastDrivetrainNotifier.startSingle(3.0);
   }
 

@@ -41,10 +41,11 @@ public class Trajectories {
   // public static final Trajectory hoarderForFiveBall = generateTrajectory(hFFB, defaultConfig);
   // public static final Trajectory threeBallAuto = generateTrajectory(tBA, defaultConfig);
 
-  public static Trajectory driveForwardsMeters =
+  public static Trajectory twoBallTop =
       generateTrajectory(
           List.of(
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0)), new Pose2d(2.0, 0.0, new Rotation2d(0.0))),
+              new Pose2d(6.22, 5.18, Rotation2d.fromDegrees(136.97)),
+              new Pose2d(5.29, 5.89, Rotation2d.fromDegrees(136.97))),
           2.0,
           1.0,
           0.0,

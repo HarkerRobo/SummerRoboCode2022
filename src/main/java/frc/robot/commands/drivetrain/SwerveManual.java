@@ -1,25 +1,19 @@
 package frc.robot.commands.drivetrain;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.OI;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
-import frc.robot.util.PhotonVisionLimelight;
 import harkerrobolib.commands.IndefiniteCommand;
 import harkerrobolib.util.MathUtil;
 
 public class SwerveManual extends IndefiniteCommand {
-  public static final double SPEED_MULTIPLIER = 1;
+  public static final double SPEED_MULTIPLIER = 0.5;
   public static final double MIN_OUTPUT = 0.0001;
-  private static final double PIGEON_KP = 0.07;
-  private static final double MAX_ACCELERATION = Drivetrain.MAX_ACCELERATION;
-
-  public static final double LIMELIGHT_KP = 0.07;
-  public static final double LIMELIGHT_KI = 0.01;
-  public static final double LIMELIGHT_KD = 0.00000;
+  private static final double PIGEON_KP = 0.0003;
+  private static final double MAX_ACCELERATION = Drivetrain.MAX_ACCELERATION + 6;
 
   private double vx;
   private double prevvx;
@@ -32,9 +26,6 @@ public class SwerveManual extends IndefiniteCommand {
 
   private boolean aligningWithHub;
 
-  private static ProfiledPIDController HUB_LOOP =
-      new ProfiledPIDController(LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD, new Constraints(4, 3.5));
-
   // private static SwerveControllerLoop HUB_LOOP = new SwerveControllerLoop();
 
   public SwerveManual() {
@@ -43,7 +34,6 @@ public class SwerveManual extends IndefiniteCommand {
     aligningWithHub = false;
     holdingPigeonAngle = false;
     pigeonAngle = Drivetrain.getInstance().getRobotHeading();
-    HUB_LOOP.setGoal(0);
   }
 
   public void initialize() {
@@ -54,23 +44,21 @@ public class SwerveManual extends IndefiniteCommand {
     prevvx = vx;
     prevvy = vy;
     vx =
-        -MathUtil.mapJoystickOutput(
+        MathUtil.mapJoystickOutput(
             OI.getInstance().getDriverGamepad().getLeftY(), OI.DEFAULT_DEADBAND);
     vy =
         MathUtil.mapJoystickOutput(
-            OI.getInstance().getDriverGamepad().getLeftY(), OI.DEFAULT_DEADBAND);
+            OI.getInstance().getDriverGamepad().getLeftX(), OI.DEFAULT_DEADBAND);
     omega =
         -MathUtil.mapJoystickOutput(
             OI.getInstance().getDriverGamepad().getRightX(), OI.DEFAULT_DEADBAND);
+    if (Shooter.getInstance().getState() != Shooter.State.IDLE && Math.abs(omega) <= MIN_OUTPUT) {
+      omega = Drivetrain.getInstance().alignWithHub();
+    }
     squareInputs();
     scaleToDrivetrainSpeeds();
-    if (omega < MIN_OUTPUT && magnitude(vx, vy) > MIN_OUTPUT) {
-      adjustPigeon();
-    } else {
-      holdingPigeonAngle = false;
-    }
-    if (Shooter.getInstance().getState() != Shooter.State.IDLE && omega <= MIN_OUTPUT)
-      alignWithHub();
+    limitAcceleration();
+    adjustPigeon();
     if (Math.abs(omega) <= MIN_OUTPUT && magnitude(vx, vy) <= MIN_OUTPUT) {
       omega = MIN_OUTPUT;
       vx = vy = 0;
@@ -85,7 +73,7 @@ public class SwerveManual extends IndefiniteCommand {
     Drivetrain.getInstance()
         .setAngleAndDrive(
             ChassisSpeeds.fromFieldRelativeSpeeds(
-                vx, vy, omega, Drivetrain.getInstance().getRobotRotation()));
+                vx, -vy, omega, Drivetrain.getInstance().getRobotRotation()));
   }
 
   private double magnitude(double x, double y) {
@@ -93,25 +81,25 @@ public class SwerveManual extends IndefiniteCommand {
   }
 
   public void limitAcceleration() {
-    double magAcc = magnitude(vx - prevvx, vy - prevvy) / RobotMap.ROBOT_LOOP;
+    double xAcc = (vx - prevvx) / RobotMap.ROBOT_LOOP;
+    double yAcc = (vy - prevvy) / RobotMap.ROBOT_LOOP;
+    double magAcc = magnitude(xAcc, yAcc);
     if (magAcc > MAX_ACCELERATION) {
       double scale = MAX_ACCELERATION / magAcc;
-      vx += (vx - prevvx) / RobotMap.ROBOT_LOOP * scale;
-      vy += (vy - prevvy) / RobotMap.ROBOT_LOOP * scale;
+      vx = prevvx + xAcc * scale * RobotMap.ROBOT_LOOP;
+      vy = prevvy + yAcc * scale * RobotMap.ROBOT_LOOP;
     }
   }
 
   public void adjustPigeon() {
-    if (!holdingPigeonAngle) {
-      holdingPigeonAngle = true;
+    if (Math.abs(omega) < MIN_OUTPUT) {
+      omega = -PIGEON_KP * (Drivetrain.getInstance().getRobotHeading() - pigeonAngle);
+    } else {
       pigeonAngle = Drivetrain.getInstance().getRobotHeading();
     }
-    omega = -PIGEON_KP * (Drivetrain.getInstance().getRobotHeading() - pigeonAngle);
-  }
 
-  public void alignWithHub() {
-    double angleToHub = PhotonVisionLimelight.getTx(); // cw positive
-    omega = -HUB_LOOP.calculate(angleToHub);
+    SmartDashboard.putNumber("pigeonangle", Drivetrain.getInstance().getRobotHeading());
+    SmartDashboard.putNumber("held pigeonangle", pigeonAngle);
   }
 
   public void squareInputs() {

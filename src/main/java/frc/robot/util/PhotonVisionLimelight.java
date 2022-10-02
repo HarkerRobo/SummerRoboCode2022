@@ -37,6 +37,7 @@ public class PhotonVisionLimelight {
   }
 
   public static double getTx() {
+    if (LIMELIGHT.getLatestResult().getBestTarget() == null) return 0.0;
     return LIMELIGHT.getLatestResult().getBestTarget().getYaw();
   }
 

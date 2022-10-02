@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,17 +49,19 @@ public class Indexer extends SubsystemBase {
   private static MotorVelocitySystem topSystem;
   private static MotorVelocitySystem bottomSystem;
 
+  private Debouncer indexerBalls;
+
   private Indexer() {
     top =
         new HSFalconBuilder()
             .invert(TOP_INVERT)
-            // .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.INDEXER_TOP, RobotMap.CANBUS);
     addChild("Top Motor", top);
     bottom =
         new HSFalconBuilder()
             .invert(BOTTOM_INVERT)
-            // .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.INDEXER_BOTTOM, RobotMap.CANBUS);
     addChild("Bottom Motor", bottom);
     topSystem =
@@ -78,12 +82,17 @@ public class Indexer extends SubsystemBase {
     addChild("Bottom System", bottomSystem);
     topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);
     bottomProximity = new DigitalInput(RobotMap.BOTTOM_PROXIMITY);
+    indexerBalls = new Debouncer(0.25, DebounceType.kRising);
     // colorSensor = new ColorSensor(RobotMap.COLOR_A, RobotMap.COLOR_B, RobotMap.COLOR_PROXIMITY);
     // colorSensor.setColor(DriverStation.getAlliance().equals(Alliance.Red) ? true : false);
   }
 
   public void setTopOutput(double topOutput) {
     topSystem.set(topOutput);
+  }
+
+  public boolean isEmpty() {
+    return indexerBalls.calculate(!isBallInTop() && !isBallInBottom());
   }
 
   public void setBottomOutput(double bottomOutput) {

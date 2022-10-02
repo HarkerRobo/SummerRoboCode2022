@@ -30,19 +30,20 @@ public class SwerveModule implements Sendable {
   private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
   private static final double ROTATION_MOTOR_CURRENT_PEAK_DUR = 0.1;
 
-  private static final double DRIVE_MOTOR_CURRENT_CONTINUOUS = 100;
-  private static final double DRIVE_MOTOR_CURRENT_PEAK = 100;
-  private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0;
+  private static final double DRIVE_MOTOR_CURRENT_CONTINUOUS = 40;
+  private static final double DRIVE_MOTOR_CURRENT_PEAK = 80;
+  private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0.1;
 
   private static final double DRIVE_kS = 0.3;
-  private static final double DRIVE_kV = 2.2819;
+  private static final double DRIVE_kV = 2.2819; // 2.2819
   private static final double DRIVE_kA = 0.3621;
+  private static final double DRIVE_kD = 1.3;
 
   private static final double ROTATION_kS = 0.40104;
   private static final double ROTATION_kV = 0.0057859;
   private static final double ROTATION_kA = 0.00016558;
 
-  private static final double DRIVE_MAX_ERROR = 5;
+  private static final double DRIVE_MAX_ERROR = 2;
 
   private static final double ROTATION_MAX_VEL_ERROR = 0.13;
   private static final double ROTATION_MAX_POS_ERROR = 0.1;
@@ -59,10 +60,10 @@ public class SwerveModule implements Sendable {
     rotation =
         new HSFalconBuilder()
             .invert(Drivetrain.ROTATION_INVERTS[swerveID])
-            // .supplyLimit(
-            //     ROTATION_MOTOR_CURRENT_PEAK,
-            //     ROTATION_MOTOR_CURRENT_CONTINUOUS,
-            //     ROTATION_MOTOR_CURRENT_PEAK_DUR)
+            .supplyLimit(
+                ROTATION_MOTOR_CURRENT_PEAK,
+                ROTATION_MOTOR_CURRENT_CONTINUOUS,
+                ROTATION_MOTOR_CURRENT_PEAK_DUR)
             .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_100Ms)
             .build(RobotMap.ROTATION_IDS[swerveID], RobotMap.CANBUS);
     SendableRegistry.addLW(
@@ -70,17 +71,17 @@ public class SwerveModule implements Sendable {
     drive =
         new HSFalconBuilder()
             .invert(Drivetrain.DRIVE_INVERTS[swerveID])
-            // .supplyLimit(
-            //     DRIVE_MOTOR_CURRENT_PEAK,
-            //     DRIVE_MOTOR_CURRENT_CONTINUOUS,
-            //     DRIVE_MOTOR_CURRENT_PEAK_DUR)
+            .supplyLimit(
+                DRIVE_MOTOR_CURRENT_PEAK,
+                DRIVE_MOTOR_CURRENT_CONTINUOUS,
+                DRIVE_MOTOR_CURRENT_PEAK_DUR)
             .build(RobotMap.TRANSLATION_IDS[swerveID], RobotMap.CANBUS);
     SendableRegistry.addLW(
         drive, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Drive Motor");
     canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
     driveSystem =
         new MotorVelocitySystemBuilder()
-            .constants(DRIVE_kV, DRIVE_kA, DRIVE_kS)
+            .constants(DRIVE_kV, DRIVE_kA, DRIVE_kS, DRIVE_kD)
             .unitConversionFactor(DRIVE_FALCON_TO_MPS)
             .maxError(DRIVE_MAX_ERROR)
             .build(drive)

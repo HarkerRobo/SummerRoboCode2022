@@ -5,6 +5,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,10 +15,13 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.InterpolatingTreeMap;
+import frc.robot.util.PhotonVisionLimelight;
 import frc.robot.util.SwerveModule;
 
 public class Drivetrain extends SubsystemBase {
@@ -27,13 +31,13 @@ public class Drivetrain extends SubsystemBase {
   public static final boolean[] DRIVE_INVERTS = {true, true, true, false};
 
   public static final double[] CANCODER_OFFSETS = {
-    195.468750, 178.330078, 109.951172, 32.255859
+    149.719, 178.330078, 109.951172, 32.255859
   }; // in deg
 
   private static final double DT_WIDTH = 0.5461; // 0.93345 bumper to bumper
   private static final double DT_LENGTH = 0.5969; // 0.88265
 
-  public static final double MAX_TRANSLATION_VEL = 5.0; // in m/s
+  public static final double MAX_TRANSLATION_VEL = 4.0; // in m/s
   public static final double MAX_ACCELERATION = 2.0; // m/s^2
   public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
   public static final double MAX_ROTATION_ACCELERATION = 1.0 * Math.PI;
@@ -47,8 +51,15 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator;
   private Pigeon2 pigeon;
 
+  public static final double LIMELIGHT_KP = 0.12;
+  public static final double LIMELIGHT_KI = 0.01;
+  public static final double LIMELIGHT_KD = 0.000000;
+
   private InterpolatingTreeMap headingHistory;
   private static final int MAX_HISTORY_SIZE = 500;
+
+  private static ProfiledPIDController HUB_LOOP =
+      new ProfiledPIDController(LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD, new Constraints(4, 3.5));
 
   private static final boolean PIGEON_UP = false;
 
@@ -60,6 +71,8 @@ public class Drivetrain extends SubsystemBase {
     for (int i = 0; i < 4; i++) {
       addChild(SwerveModule.swerveIDToName(i) + " Module", swerveModules[i]);
     }
+
+    HUB_LOOP.setGoal(0);
 
     kinematics =
         new SwerveDriveKinematics(
@@ -107,6 +120,12 @@ public class Drivetrain extends SubsystemBase {
 
   public InterpolatingTreeMap getHeadingHistory() {
     return headingHistory;
+  }
+
+  public double alignWithHub() {
+    double angleToHub = PhotonVisionLimelight.getTx(); // cw positive
+    SmartDashboard.putNumber("angle to hub", angleToHub);
+    return HUB_LOOP.calculate(angleToHub);
   }
 
   public void setAngleAndDrive(ChassisSpeeds chassisSpeeds) {
@@ -184,7 +203,7 @@ public class Drivetrain extends SubsystemBase {
       swerveModules[i].zeroDriveEncoders();
     }
     pigeon.setYaw(pose.getRotation().getDegrees());
-    poseEstimator.resetPosition(pose, getRobotRotation());
+    poseEstimator.resetPosition(pose, pose.getRotation());
   }
 
   public void zeroPigeon() {

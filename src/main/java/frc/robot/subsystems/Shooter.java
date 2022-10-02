@@ -2,13 +2,17 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
+import frc.robot.util.InterpolatingTreeMap;
 import frc.robot.util.MotorVelocitySystem;
 import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
+import frc.robot.util.PhotonVisionLimelight;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Shooter extends SubsystemBase {
@@ -17,11 +21,13 @@ public class Shooter extends SubsystemBase {
   private HSFalcon master;
   private HSFalcon follower;
 
+  private InterpolatingTreeMap shooterVals;
+
   private static final boolean MASTER_INVERT = false;
   private static final boolean FOLLOWER_INVERT = true;
 
   private static final double CURRENT_CONTINUOUS = 40;
-  private static final double CURRENT_PEAK = 45;
+  private static final double CURRENT_PEAK = 100;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
   private static final double kS = 0.05; // .6;
@@ -44,6 +50,8 @@ public class Shooter extends SubsystemBase {
 
   private State state;
 
+  private Debouncer speedDebounce;
+
   public static enum State {
     IDLE,
     REVVING,
@@ -55,7 +63,7 @@ public class Shooter extends SubsystemBase {
         new HSFalconBuilder()
             .invert(MASTER_INVERT)
             .neutralMode(NeutralMode.Coast)
-            // .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.SHOOTER_MASTER, RobotMap.CANBUS);
     addChild("Master Motor", master);
     follower =
@@ -77,6 +85,22 @@ public class Shooter extends SubsystemBase {
     master.config_kD(RobotMap.SLOT_INDEX, 5);
     addChild("Velocity System", velocitySystem);
     state = State.IDLE;
+    shooterVals = new InterpolatingTreeMap();
+    shooterVals.put(1.15, 10.5);
+    shooterVals.put(2.8, 10.3);
+    shooterVals.put(3.2, 11.0);
+    shooterVals.put(3.4, 11.5);
+    shooterVals.put(3.7, 11.7);
+    shooterVals.put(3.9, 11.8);
+    shooterVals.put(4.19, 12.0);
+    shooterVals.put(4.57, 12.1);
+    shooterVals.put(4.85, 12.6);
+    shooterVals.put(5.2, 12.7);
+    shooterVals.put(5.4, 13.1);
+    shooterVals.put(5.78, 13.5);
+    shooterVals.put(6.26, 14.0);
+
+    speedDebounce = new Debouncer(0.01, DebounceType.kRising);
   }
 
   public void set(double speed) {
@@ -92,8 +116,13 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean atSpeed(double speed) {
-    return Math.abs(master.getSelectedSensorVelocity() * MOTOR_TO_METERS_PER_SECOND - speed)
-        < SHOOT_ERROR;
+    return speedDebounce.calculate(
+        Math.abs(master.getSelectedSensorVelocity() * MOTOR_TO_METERS_PER_SECOND - speed)
+            < SHOOT_ERROR);
+  }
+
+  public double calculateShooterSpeed() {
+    return shooterVals.get(PhotonVisionLimelight.getDistance());
   }
 
   public void setState(State nextState) {

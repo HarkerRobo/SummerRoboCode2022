@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
 import java.util.function.BiFunction;
@@ -23,7 +24,7 @@ public class SwervePosController extends CommandBase {
   public static final double Y_KI = 0;
   public static final double Y_KD = 0;
 
-  public static final double THETA_KP = 4.7;
+  public static final double THETA_KP = 2.7;
   public static final double THETA_KI = 0.00;
   public static final double THETA_KD = 0.0;
 
@@ -66,6 +67,7 @@ public class SwervePosController extends CommandBase {
       Drivetrain.getInstance()
           .setPose(
               new Pose2d(trajectory.sample(0.0).poseMeters.getTranslation(), startHeading.get()));
+    else System.out.println("no initial heading specified");
     timer.reset();
     timer.start();
   }
@@ -88,8 +90,8 @@ public class SwervePosController extends CommandBase {
                 currentPose.getRotation().getRadians(), angleRef.getRadians()),
             -clampAdd,
             clampAdd);
-    // m_poseError = poseRef.relativeTo(currentPose);
-    // m_rotationError = angleRef.minus(currentPose.getRotation());
+    // poseError = poseRef.relativeTo(currentPose);
+    Rotation2d rotationError = angleRef.minus(currentPose.getRotation());
 
     // Calculate feedback velocities (based on position error).
     double xFeedback = xController.calculate(currentPose.getX(), goal.poseMeters.getX());
@@ -102,9 +104,12 @@ public class SwervePosController extends CommandBase {
     Drivetrain.getInstance().setAngleAndDrive(adjustedSpeeds);
     // Pose2d poseError = autonomusController.m_poseError;
     // Rotation2d rotError = autonomusController.m_rotationError;
+
     // SmartDashboard.putNumber("Traj-X-Error", Units.metersToInches(poseError.getX()));
     // SmartDashboard.putNumber("Traj-Y-Error", Units.metersToInches(poseError.getY()));
-    // SmartDashboard.putNumber("Traj-Theta-Error", rotError.getDegrees());
+    SmartDashboard.putNumber("Trajectory Theta", goal.poseMeters.getRotation().getDegrees());
+    SmartDashboard.putNumber("Current Theta", currentPose.getRotation().getDegrees());
+    // SmartDashboard.putNumber("Traj-Theta-Error", rotationError.getDegrees());
   }
 
   @Override

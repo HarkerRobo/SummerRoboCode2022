@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hood;
 
 public class ZeroHood extends CommandBase {
-  private static final double ZERO_SPEED = -0.08;
+  private static final double ZERO_SPEED = -0.1;
 
   public ZeroHood() {
     addRequirements(Hood.getInstance());

@@ -41,7 +41,7 @@ public class Climber extends SubsystemBase {
   public static final double UP_AND_BACK_HEIGHT = 118000 / 2048.0;
   public static final double UP_HEIGHT = 112500 / 2048.0;
   public static final double MID_HEIGHT = 48000 / 2048.0;
-  public static final double DOWN_HEIGHT = 0;
+  public static final double DOWN_HEIGHT = 0.1;
 
   private MotorPositionSystem leftPositionSys;
   private MotorPositionSystem rightPositionSys;
