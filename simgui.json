@@ -2,12 +2,35 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/LiveWindow/Ungrouped/Scheduler": "Scheduler"
+      "/LiveWindow/Ungrouped/DigitalInput[6]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/SmartDashboard/Auton": "String Chooser",
+      "/SmartDashboard/Field": "Field2d"
     }
   },
   "NetworkTables": {
     "LiveWindow": {
-      "Drivetrain": {
+      "Hood": {
+        "Hood Position System": {
+          "open": true
+        },
+        "open": true
+      },
+      "Intake": {
+        "Motor System": {
+          "open": true
+        },
+        "open": true
+      },
+      "Shooter": {
+        "Velocity System": {
+          "open": true
+        },
         "open": true
       },
       "open": true

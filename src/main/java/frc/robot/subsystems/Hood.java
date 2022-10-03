@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
+import frc.robot.util.InterpolatingTreeMap;
 import frc.robot.util.MotorPositionSystem;
+import frc.robot.util.PhotonVisionLimelight;
 import frc.robot.util.MotorPositionSystem.MotorPositionSystemBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
@@ -39,6 +41,8 @@ public class Hood extends SubsystemBase {
   private static final double MAX_VEL_ERROR = 0.2;
   private static final double MAX_VOLTAGE = 10;
 
+  private InterpolatingTreeMap hoodVals;
+
   private boolean isHoodZeroed;
 
   private MotorPositionSystem positionSystem;
@@ -62,6 +66,21 @@ public class Hood extends SubsystemBase {
     addChild("Hood Position System", positionSystem);
     isHoodZeroed = false;
     initMotors();
+    hoodVals = new InterpolatingTreeMap();
+    hoodVals.put(1.15, 0.0);
+    hoodVals.put(2.8, 23.0);
+    hoodVals.put(3.2, 24.5);
+    hoodVals.put(3.4, 25.5);
+    hoodVals.put(3.7, 26.0);
+    hoodVals.put(3.9, 27.0);
+    hoodVals.put(4.19, 28.7);
+    hoodVals.put(4.57, 29.0);
+    hoodVals.put(4.85, 30.0);
+    hoodVals.put(5.2, 32.0);
+    hoodVals.put(5.4, 32.0);
+    hoodVals.put(5.78, 32.0);
+    hoodVals.put(6.26, 32.0);
+    hoodVals.put(3.2, 11.0);
   }
 
   public void initMotors() {
@@ -88,6 +107,11 @@ public class Hood extends SubsystemBase {
 
   public double getHoodVelocity() {
     return positionSystem.getVelocity();
+  }
+
+  public double calculateHoodPosition() {
+    // return SmartDashboard.getNumber("angle", 0.0);
+    return hoodVals.get(PhotonVisionLimelight.getDistance());
   }
 
   public boolean isHoodStalling() {

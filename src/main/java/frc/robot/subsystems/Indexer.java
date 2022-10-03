@@ -64,22 +64,22 @@ public class Indexer extends SubsystemBase {
             .statorLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.INDEXER_BOTTOM, RobotMap.CANBUS);
     addChild("Bottom Motor", bottom);
-    topSystem =
-        new MotorVelocitySystemBuilder()
-            .constants(TOP_kV, TOP_kA, TOP_kS)
-            .maxError(MAX_TOP_ERROR)
-            .unitConversionFactor(TOP_FALCON_TO_CARGO_SPEED)
-            .build(top)
-            .init();
-    bottomSystem =
-        new MotorVelocitySystemBuilder()
-            .constants(BOTTOM_kV, BOTTOM_kA, BOTTOM_kS)
-            .maxError(MAX_BOTTOM_ERROR)
-            .unitConversionFactor(BOTTOM_FALCON_TO_CARGO_SPEED)
-            .build(bottom)
-            .init();
-    addChild("Top System", topSystem);
-    addChild("Bottom System", bottomSystem);
+    // topSystem =
+    //     new MotorVelocitySystemBuilder()
+    //         .constants(TOP_kV, TOP_kA, TOP_kS)
+    //         .maxError(MAX_TOP_ERROR)
+    //         .unitConversionFactor(TOP_FALCON_TO_CARGO_SPEED)
+    //         .build(top)
+    //         .init();
+    // bottomSystem =
+    //     new MotorVelocitySystemBuilder()
+    //         .constants(BOTTOM_kV, BOTTOM_kA, BOTTOM_kS)
+    //         .maxError(MAX_BOTTOM_ERROR)
+    //         .unitConversionFactor(BOTTOM_FALCON_TO_CARGO_SPEED)
+    //         .build(bottom)
+    //         .init();
+    // addChild("Top System", topSystem);
+    // addChild("Bottom System", bottomSystem);
     topProximity = new DigitalInput(RobotMap.TOP_PROXIMITY);
     bottomProximity = new DigitalInput(RobotMap.BOTTOM_PROXIMITY);
     indexerBalls = new Debouncer(0.25, DebounceType.kRising);
@@ -88,7 +88,8 @@ public class Indexer extends SubsystemBase {
   }
 
   public void setTopOutput(double topOutput) {
-    topSystem.set(topOutput);
+    top.set(ControlMode.PercentOutput, topOutput);
+    // topSystem.set(topOutput);
   }
 
   public boolean isEmpty() {
@@ -96,7 +97,8 @@ public class Indexer extends SubsystemBase {
   }
 
   public void setBottomOutput(double bottomOutput) {
-    bottomSystem.set(bottomOutput);
+    bottom.set(ControlMode.PercentOutput, bottomOutput);
+    // bottomSystem.set(bottomOutput);
   }
 
   public void setBothOutput(double output) {

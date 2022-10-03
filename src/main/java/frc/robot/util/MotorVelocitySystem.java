@@ -145,6 +145,13 @@ public class MotorVelocitySystem implements Sendable {
           this.kF = a;
           configConstants();
         });
+    builder.addDoubleProperty(
+          "kD",
+          () -> kD,
+          (a) -> {
+            this.kD = a;
+            configConstants();
+          });
     builder.addDoubleProperty("unitConversion", () -> unitConversion, null);
   }
 
@@ -166,11 +173,7 @@ public class MotorVelocitySystem implements Sendable {
     }
 
     public MotorVelocitySystemBuilder constants(double kV, double kA, double kS) {
-      this.kV = kV;
-      this.kA = kA;
-      this.kS = kS;
-      this.kD = 0;
-      return this;
+      return constants(kV, kA, kS, 0.0);
     }
 
     public MotorVelocitySystemBuilder unitConversionFactor(double factor) {

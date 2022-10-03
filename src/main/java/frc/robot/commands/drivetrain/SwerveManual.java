@@ -52,9 +52,6 @@ public class SwerveManual extends IndefiniteCommand {
     omega =
         -MathUtil.mapJoystickOutput(
             OI.getInstance().getDriverGamepad().getRightX(), OI.DEFAULT_DEADBAND);
-    if (Shooter.getInstance().getState() != Shooter.State.IDLE && Math.abs(omega) <= MIN_OUTPUT) {
-      omega = Drivetrain.getInstance().alignWithHub();
-    }
     squareInputs();
     scaleToDrivetrainSpeeds();
     limitAcceleration();
@@ -69,6 +66,9 @@ public class SwerveManual extends IndefiniteCommand {
       // for (int i = 0; i < 4; i++) states[i].angle =
       // states[i].angle.plus(Rotation2d.fromDegrees(90));
       // Drivetrain.getInstance().setAngleAndDrive(states);
+    }
+    if (Shooter.getInstance().getState() != Shooter.State.IDLE && Math.abs(omega) <= MIN_OUTPUT) {
+      omega = Drivetrain.getInstance().alignWithHub();
     }
     Drivetrain.getInstance()
         .setAngleAndDrive(
