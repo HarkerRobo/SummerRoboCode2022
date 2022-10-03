@@ -41,7 +41,7 @@ public class Hood extends SubsystemBase {
   private static final double MAX_VEL_ERROR = 0.2;
   private static final double MAX_VOLTAGE = 10;
 
-  private InterpolatingTreeMap hoodVals;
+  private InterpolatingTreeMap hoodVal;
 
   private boolean isHoodZeroed;
 
@@ -66,7 +66,12 @@ public class Hood extends SubsystemBase {
     addChild("Hood Position System", positionSystem);
     isHoodZeroed = false;
     initMotors();
-    hoodVals = new InterpolatingTreeMap();
+    this.hoodVal = insertHoodVals();
+
+  }
+
+  private InterpolatingTreeMap insertHoodVals() {
+    InterpolatingTreeMap hoodVals = new InterpolatingTreeMap();
     hoodVals.put(1.15, 0.0);
     hoodVals.put(2.8, 23.0);
     hoodVals.put(3.2, 24.5);
@@ -81,6 +86,7 @@ public class Hood extends SubsystemBase {
     hoodVals.put(5.78, 32.0);
     hoodVals.put(6.26, 32.0);
     hoodVals.put(3.2, 11.0);
+    return hoodVals;
   }
 
   public void initMotors() {
@@ -111,7 +117,7 @@ public class Hood extends SubsystemBase {
 
   public double calculateHoodPosition() {
     // return SmartDashboard.getNumber("angle", 0.0);
-    return hoodVals.get(PhotonVisionLimelight.getDistance());
+    return hoodVal.get(PhotonVisionLimelight.getDistance());
   }
 
   public boolean isHoodStalling() {

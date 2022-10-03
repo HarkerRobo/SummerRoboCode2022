@@ -67,7 +67,6 @@ public class SwervePosController extends CommandBase {
       Drivetrain.getInstance()
           .setPose(
               new Pose2d(trajectory.sample(0.0).poseMeters.getTranslation(), startHeading.get()));
-    else System.out.println("no initial heading specified");
     timer.reset();
     timer.start();
   }

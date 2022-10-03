@@ -27,7 +27,7 @@ public class MotorPositionSystem extends MotorVelocitySystem {
       double maxVoltage,
       double kG,
       boolean arm) {
-    super(motor, kS, kV, kA, 0, unitConversion, maxVelError, maxVoltage);
+    super(motor, kS, kV, kA, unitConversion, maxVelError, maxVoltage);
     this.kG = kG;
     this.arm = arm;
     this.maxPosError = maxPosError;

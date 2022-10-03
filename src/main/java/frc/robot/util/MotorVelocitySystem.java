@@ -13,14 +13,13 @@ import frc.robot.RobotMap;
 
 public class MotorVelocitySystem implements Sendable {
   protected BaseMotorController motor;
-  protected double kS, kP, kV, kA, kF, kD, unitConversion, velocitySetpoint, maxError, maxVoltage;
+  protected double kS, kP, kV, kA, kF, unitConversion, velocitySetpoint, maxError, maxVoltage;
 
   protected MotorVelocitySystem(
       BaseMotorController motor,
       double kS,
       double kV,
       double kA,
-      double kD,
       double unitConversion,
       double maxError,
       double maxVoltage) {
@@ -28,7 +27,6 @@ public class MotorVelocitySystem implements Sendable {
     this.kS = kS;
     this.kV = kV;
     this.kA = kA;
-    this.kD = kD;
     this.unitConversion = unitConversion;
     this.maxError = maxError;
     this.maxVoltage = maxVoltage;
@@ -59,7 +57,6 @@ public class MotorVelocitySystem implements Sendable {
   public void configConstants() {
     motor.config_kP(RobotMap.SLOT_INDEX, kP);
     motor.config_kF(RobotMap.SLOT_INDEX, kF);
-    motor.config_kD(RobotMap.SLOT_INDEX, kD);
   }
 
   public void set(double output) {
@@ -145,13 +142,6 @@ public class MotorVelocitySystem implements Sendable {
           this.kF = a;
           configConstants();
         });
-    builder.addDoubleProperty(
-          "kD",
-          () -> kD,
-          (a) -> {
-            this.kD = a;
-            configConstants();
-          });
     builder.addDoubleProperty("unitConversion", () -> unitConversion, null);
   }
 
@@ -159,21 +149,15 @@ public class MotorVelocitySystem implements Sendable {
     private double kV,
         kA,
         kS,
-        kD,
         maxError,
         unitConversion = 1.0,
         maxVoltage = RobotMap.MAX_MOTOR_VOLTAGE;
 
-    public MotorVelocitySystemBuilder constants(double kV, double kA, double kS, double kD) {
+    public MotorVelocitySystemBuilder constants(double kV, double kA, double kS) {
       this.kV = kV;
       this.kA = kA;
       this.kS = kS;
-      this.kD = kD;
       return this;
-    }
-
-    public MotorVelocitySystemBuilder constants(double kV, double kA, double kS) {
-      return constants(kV, kA, kS, 0.0);
     }
 
     public MotorVelocitySystemBuilder unitConversionFactor(double factor) {
@@ -192,7 +176,7 @@ public class MotorVelocitySystem implements Sendable {
     }
 
     public MotorVelocitySystem build(BaseMotorController motor) {
-      return new MotorVelocitySystem(motor, kS, kV, kA, kD, unitConversion, maxError, maxVoltage);
+      return new MotorVelocitySystem(motor, kS, kV, kA, unitConversion, maxError, maxVoltage);
     }
   }
 }

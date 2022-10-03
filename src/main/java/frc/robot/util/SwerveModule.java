@@ -4,6 +4,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
@@ -24,7 +27,7 @@ public class SwerveModule implements Sendable {
   private int swerveID;
 
   private MotorPositionSystem rotationSystem;
-  private MotorVelocitySystem driveSystem;
+  // private MotorVelocitySystem driveSystem;
 
   private static final double ROTATION_MOTOR_CURRENT_CONTINUOUS = 25;
   private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
@@ -35,15 +38,18 @@ public class SwerveModule implements Sendable {
   private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0.1;
 
   private static final double DRIVE_kS = 0.3;
-  private static final double DRIVE_kV = 2.2819; // 2.2819
+  private static final double DRIVE_kV = 2.2819;
   private static final double DRIVE_kA = 0.3621;
-  private static final double DRIVE_kD = 1.3;
+
+  private static final double DRIVE_kP = 0.01;
+  private static final double DRIVE_kI = 0.0;
+  private static final double DRIVE_kD = 0.0;
 
   private static final double ROTATION_kS = 0.40104;
   private static final double ROTATION_kV = 0.0057859;
   private static final double ROTATION_kA = 0.00016558;
 
-  private static final double DRIVE_MAX_ERROR = 2;
+  // private static final double DRIVE_MAX_ERROR = 2;
 
   private static final double ROTATION_MAX_VEL_ERROR = 0.13;
   private static final double ROTATION_MAX_POS_ERROR = 0.1;
@@ -55,6 +61,8 @@ public class SwerveModule implements Sendable {
       Conversions.ENCODER_TO_WHEEL_SPEED / DRIVE_GEAR_RATIO * WHEEL_DIAMETER;
   private static final double ROT_MOTOR_TO_DEG = Conversions.ENCODER_TO_DEG / ROTATION_GEAR_RATIO;
 
+  private static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(DRIVE_kS, DRIVE_kV, DRIVE_kA);
+  private static final PIDController PID = new PIDController(DRIVE_kP, DRIVE_kI, DRIVE_kD);
   public SwerveModule(int swerveID) {
     this.swerveID = swerveID;
     rotation =
@@ -79,13 +87,13 @@ public class SwerveModule implements Sendable {
     SendableRegistry.addLW(
         drive, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Drive Motor");
     canCoder = new CANCoder(RobotMap.CANCODER_IDS[swerveID], RobotMap.CANBUS);
-    driveSystem =
-        new MotorVelocitySystemBuilder()
-            .constants(DRIVE_kV, DRIVE_kA, DRIVE_kS, DRIVE_kD)
-            .unitConversionFactor(DRIVE_FALCON_TO_MPS)
-            .maxError(DRIVE_MAX_ERROR)
-            .build(drive)
-            .init();
+    // driveSystem =
+    //     new MotorVelocitySystemBuilder()
+    //         .constants(DRIVE_kV, DRIVE_kA, DRIVE_kS)
+    //         .unitConversionFactor(DRIVE_FALCON_TO_MPS)
+    //         .maxError(DRIVE_MAX_ERROR)
+    //         .build(drive)
+    //         .init();
     rotationSystem =
         new MotorPositionSystemBuilder()
             .constants(ROTATION_kV, ROTATION_kA, ROTATION_kS)
@@ -95,28 +103,20 @@ public class SwerveModule implements Sendable {
             .init();
     SendableRegistry.addLW(
         rotationSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Rotation System");
-    SendableRegistry.addLW(
-        driveSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Drive System");
+    // SendableRegistry.addLW(
+    //     driveSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Drive System");
   }
 
   public void initLiveWindow() {}
 
-  public void setAngleAndDrive(
-      double rotationAngle, double driveOutput, boolean drivePercentOutput) {
+  public void setAngleAndDrive(double rotationAngle, double driveOutput) {
     rotationSystem.set(rotationAngle);
-    if (drivePercentOutput) {
-      drive.set(ControlMode.PercentOutput, driveOutput / Drivetrain.MAX_TRANSLATION_VEL);
-    } else {
-      driveSystem.set(driveOutput);
-    }
+    drive.setVoltage(FEEDFORWARD.calculate(driveOutput) + PID.calculate(getCurrentSpeed(), driveOutput));
+      // driveSystem.set(driveOutput);
   }
 
   public void zeroDriveEncoders() {
     drive.setSelectedSensorPosition(0);
-  }
-
-  public void setAngleAndDrive(double rotationAngle, double driveOutput) {
-    setAngleAndDrive(rotationAngle, driveOutput, false);
   }
 
   public double getCurrentAngle() {

@@ -2,6 +2,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -21,7 +24,7 @@ public class Shooter extends SubsystemBase {
   private HSFalcon master;
   private HSFalcon follower;
 
-  private InterpolatingTreeMap shooterVals;
+  private InterpolatingTreeMap shooterVal;
 
   private static final boolean MASTER_INVERT = false;
   private static final boolean FOLLOWER_INVERT = true;
@@ -33,7 +36,11 @@ public class Shooter extends SubsystemBase {
   private static final double kS = 0.05; // .6;
   private static final double kV = 0.52;
   private static final double kA = 0.006045;
-  private static final double kD = 5;
+
+  private static final double kP = 0.03; // .6;
+  private static final double kI = 0.0;
+  private static final double kD = 0.0;
+
   private static final double MAX_ERROR = 0.07; // TODO: Tune
   private static final double SHOOT_ERROR = 0.07;
 
@@ -44,9 +51,10 @@ public class Shooter extends SubsystemBase {
   private static final double MOTOR_TO_METERS_PER_SECOND =
       Conversions.ENCODER_TO_WHEEL_SPEED * WHEEL_DIAMETER / SHOOTER_GEAR_RATIO;
 
-  public static final double CUSTOM_RADIUS = 1.0;
+  // private MotorVelocitySystem velocitySystem;
 
-  private MotorVelocitySystem velocitySystem;
+  private static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(kS, kV, kA);
+  private static final PIDController PID = new PIDController(kP, kI, kD);
 
   private State state;
 
@@ -64,6 +72,7 @@ public class Shooter extends SubsystemBase {
             .invert(MASTER_INVERT)
             .neutralMode(NeutralMode.Coast)
             .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .velocityWindow(8)
             .build(RobotMap.SHOOTER_MASTER, RobotMap.CANBUS);
     addChild("Master Motor", master);
     follower =
@@ -74,16 +83,22 @@ public class Shooter extends SubsystemBase {
             .build(RobotMap.SHOOTER_FOLLOWER, RobotMap.CANBUS);
     follower.follow(master);
     addChild("Follower Motor", follower);
-    velocitySystem =
-        new MotorVelocitySystemBuilder()
-            .constants(kV, kA, kS, kD)
-            .unitConversionFactor(MOTOR_TO_METERS_PER_SECOND)
-            .maxError(MAX_ERROR)
-            .build(master)
-            .init();
-    addChild("Velocity System", velocitySystem);
+    shooterVal = insertShooterVals();
+    // velocitySystem =
+    //     new MotorVelocitySystemBuilder()
+    //         .constants(kV, kA, kS)
+    //         .unitConversionFactor(MOTOR_TO_METERS_PER_SECOND)
+    //         .maxError(MAX_ERROR)
+    //         .build(master)
+    //         .init();
+    // addChild("Velocity System", velocitySystem);
     state = State.IDLE;
-    shooterVals = new InterpolatingTreeMap();
+
+    speedDebounce = new Debouncer(0.01, DebounceType.kRising);
+  }
+
+  private InterpolatingTreeMap insertShooterVals() {
+    InterpolatingTreeMap shooterVals = new InterpolatingTreeMap();
     shooterVals.put(1.15, 10.5);
     shooterVals.put(2.8, 10.3);
     shooterVals.put(3.2, 11.0);
@@ -97,16 +112,16 @@ public class Shooter extends SubsystemBase {
     shooterVals.put(5.4, 13.1);
     shooterVals.put(5.78, 13.5);
     shooterVals.put(6.26, 14.0);
-
-    speedDebounce = new Debouncer(0.01, DebounceType.kRising);
+    return shooterVals;
   }
 
   public void set(double speed) {
-    velocitySystem.set(speed);
+    master.setVoltage(FEEDFORWARD.calculate(speed) + PID.calculate(getSpeed(), speed));
+    // velocitySystem.set(speed);
   }
 
   public double getSpeed() {
-    return velocitySystem.getVelocity();
+    return master.getSelectedSensorVelocity() * MOTOR_TO_METERS_PER_SECOND;
   }
 
   public void turnOffMotors() {
@@ -120,7 +135,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public double calculateShooterSpeed() {
-    return shooterVals.get(PhotonVisionLimelight.getDistance());
+    return shooterVal.get(PhotonVisionLimelight.getDistance());
   }
 
   public void setState(State nextState) {

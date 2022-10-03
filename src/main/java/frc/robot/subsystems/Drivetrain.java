@@ -55,9 +55,6 @@ public class Drivetrain extends SubsystemBase {
   public static final double LIMELIGHT_KI = 0.01;
   public static final double LIMELIGHT_KD = 0.000000;
 
-  private InterpolatingTreeMap headingHistory;
-  private static final int MAX_HISTORY_SIZE = 500;
-
   private static ProfiledPIDController HUB_LOOP =
       new ProfiledPIDController(LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD, new Constraints(4, 3.5));
 
@@ -95,7 +92,6 @@ public class Drivetrain extends SubsystemBase {
             ODOMETRY_STATE_STDEV,
             ODOMETRY_ENCODER_STDEV,
             ODOMETRY_VISION_STDEV);
-    headingHistory = new InterpolatingTreeMap();
   }
 
   public void updatePoseEstimator() {
@@ -116,10 +112,6 @@ public class Drivetrain extends SubsystemBase {
     //             headingHistory.get(
     //                 Timer.getFPGATimestamp() - PhotonVisionLimelight.lastMeasurementLatency()))),
     //     Timer.getFPGATimestamp() - PhotonVisionLimelight.lastMeasurementLatency());
-  }
-
-  public InterpolatingTreeMap getHeadingHistory() {
-    return headingHistory;
   }
 
   public double alignWithHub() {
