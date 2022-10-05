@@ -41,7 +41,7 @@ public class SwerveModule implements Sendable {
   private static final double DRIVE_kV = 2.2819;
   private static final double DRIVE_kA = 0.3621;
 
-  private static final double DRIVE_kP = 0.01;
+  private static final double DRIVE_kP = 0.01; // TODO: Tune
   private static final double DRIVE_kI = 0.0;
   private static final double DRIVE_kD = 0.0;
 
@@ -61,6 +61,7 @@ public class SwerveModule implements Sendable {
       Conversions.ENCODER_TO_WHEEL_SPEED / DRIVE_GEAR_RATIO * WHEEL_DIAMETER;
   private static final double ROT_MOTOR_TO_DEG = Conversions.ENCODER_TO_DEG / ROTATION_GEAR_RATIO;
 
+  private double desiredTranslation;
   private static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(DRIVE_kS, DRIVE_kV, DRIVE_kA);
   private static final PIDController PID = new PIDController(DRIVE_kP, DRIVE_kI, DRIVE_kD);
   public SwerveModule(int swerveID) {
@@ -101,6 +102,7 @@ public class SwerveModule implements Sendable {
             .maxError(ROTATION_MAX_POS_ERROR, ROTATION_MAX_VEL_ERROR)
             .build(rotation)
             .init();
+    desiredTranslation = 0;
     SendableRegistry.addLW(
         rotationSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Rotation System");
     // SendableRegistry.addLW(
@@ -111,6 +113,7 @@ public class SwerveModule implements Sendable {
 
   public void setAngleAndDrive(double rotationAngle, double driveOutput) {
     rotationSystem.set(rotationAngle);
+    desiredTranslation = driveOutput;
     drive.setVoltage(FEEDFORWARD.calculate(driveOutput) + PID.calculate(getCurrentSpeed(), driveOutput));
       // driveSystem.set(driveOutput);
   }
@@ -158,6 +161,10 @@ public class SwerveModule implements Sendable {
     return canCoder;
   }
 
+  public double getDesiredSpeed() {
+    return desiredTranslation;
+  }
+
   public static String swerveIDToName(int swerveID) {
     String output = "";
     if (swerveID < 2) output += "Front ";
@@ -169,5 +176,8 @@ public class SwerveModule implements Sendable {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("SwerveModule");
+    builder.addDoubleProperty("translation velocity", ()->getCurrentSpeed(), null);
+    builder.addDoubleProperty("translation desired velocity", ()->getDesiredSpeed(), null);
+    builder.addDoubleProperty("translation kP", ()->DRIVE_kP, null);
   }
 }

@@ -33,15 +33,14 @@ public class Shooter extends SubsystemBase {
   private static final double CURRENT_PEAK = 100;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double kS = 0.05; // .6;
+  private static final double kS = 0.6;
   private static final double kV = 0.52;
   private static final double kA = 0.006045;
 
-  private static final double kP = 0.03; // .6;
+  private static final double kP = 0.2; // TODO: tune
   private static final double kI = 0.0;
   private static final double kD = 0.0;
 
-  private static final double MAX_ERROR = 0.07; // TODO: Tune
   private static final double SHOOT_ERROR = 0.07;
 
   private static final double WHEEL_DIAMETER = 4.0;
@@ -155,5 +154,7 @@ public class Shooter extends SubsystemBase {
     builder.setSmartDashboardType("Shooter");
     builder.addStringProperty("State", () -> state.name(), (a) -> state = State.valueOf(a));
     builder.addDoubleProperty("Unit Conversion", () -> MOTOR_TO_METERS_PER_SECOND, null);
+    builder.addDoubleProperty("velocity", ()->getSpeed(), null);
+    builder.addDoubleProperty("desired velocity", ()->calculateShooterSpeed(), null);
   }
 }

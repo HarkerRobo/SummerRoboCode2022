@@ -92,7 +92,7 @@ public class SwerveManual extends IndefiniteCommand {
   }
 
   public void adjustPigeon() {
-    if (Math.abs(omega) < MIN_OUTPUT) {
+    if (Math.abs(omega) <= MIN_OUTPUT) {
       omega = -PIGEON_KP * (Drivetrain.getInstance().getRobotHeading() - pigeonAngle);
     } else {
       pigeonAngle = Drivetrain.getInstance().getRobotHeading();
