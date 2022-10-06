@@ -41,7 +41,7 @@ public class SwerveModule implements Sendable {
   private static final double DRIVE_kV = 2.2819;
   private static final double DRIVE_kA = 0.3621;
 
-  private static final double DRIVE_kP = 0.01; // TODO: Tune
+  private static final double DRIVE_kP = 0.1; // TODO: Tune
   private static final double DRIVE_kI = 0.0;
   private static final double DRIVE_kD = 0.0;
 
@@ -102,7 +102,6 @@ public class SwerveModule implements Sendable {
             .maxError(ROTATION_MAX_POS_ERROR, ROTATION_MAX_VEL_ERROR)
             .build(rotation)
             .init();
-    desiredTranslation = 0;
     SendableRegistry.addLW(
         rotationSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Rotation System");
     // SendableRegistry.addLW(
@@ -177,7 +176,7 @@ public class SwerveModule implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("SwerveModule");
     builder.addDoubleProperty("translation velocity", ()->getCurrentSpeed(), null);
-    builder.addDoubleProperty("translation desired velocity", ()->getDesiredSpeed(), null);
+    builder.addDoubleProperty("translation desired velocity", ()->PID.getSetpoint(), null);
     builder.addDoubleProperty("translation kP", ()->DRIVE_kP, null);
   }
 }

@@ -155,6 +155,6 @@ public class Shooter extends SubsystemBase {
     builder.addStringProperty("State", () -> state.name(), (a) -> state = State.valueOf(a));
     builder.addDoubleProperty("Unit Conversion", () -> MOTOR_TO_METERS_PER_SECOND, null);
     builder.addDoubleProperty("velocity", ()->getSpeed(), null);
-    builder.addDoubleProperty("desired velocity", ()->calculateShooterSpeed(), null);
+    builder.addDoubleProperty("desired velocity", ()->PID.getSetpoint(), null);
   }
 }

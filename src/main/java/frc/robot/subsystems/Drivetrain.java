@@ -52,11 +52,11 @@ public class Drivetrain extends SubsystemBase {
   private Pigeon2 pigeon;
 
   public static final double LIMELIGHT_KP = 0.12;
-  public static final double LIMELIGHT_KI = 0.01;
+  public static final double LIMELIGHT_KI = 0.00;
   public static final double LIMELIGHT_KD = 0.000000;
 
   private static ProfiledPIDController HUB_LOOP =
-      new ProfiledPIDController(LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD, new Constraints(4, 3.5));
+      new ProfiledPIDController(LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD, new Constraints(MAX_ROTATION_VEL, MAX_ROTATION_ACCELERATION));
 
   private static final boolean PIGEON_UP = false;
 
