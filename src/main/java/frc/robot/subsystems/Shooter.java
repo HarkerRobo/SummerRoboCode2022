@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -33,11 +34,11 @@ public class Shooter extends SubsystemBase {
   private static final double CURRENT_PEAK = 100;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double kS = 0.6;
-  private static final double kV = 0.52;
-  private static final double kA = 0.006045;
+  private static final double kS = 0.66;//.27;
+  private static final double kV = 0.64;
+  private static final double kA = 0.06045;
 
-  private static final double kP = 0.2; // TODO: tune
+  private static final double kP = 0.17;
   private static final double kI = 0.0;
   private static final double kD = 0.0;
 
@@ -72,6 +73,7 @@ public class Shooter extends SubsystemBase {
             .neutralMode(NeutralMode.Coast)
             .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .velocityWindow(8)
+            .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_50Ms)
             .build(RobotMap.SHOOTER_MASTER, RobotMap.CANBUS);
     addChild("Master Motor", master);
     follower =
@@ -92,7 +94,7 @@ public class Shooter extends SubsystemBase {
     //         .init();
     // addChild("Velocity System", velocitySystem);
     state = State.IDLE;
-
+    master.configOpenloopRamp(0.7);
     speedDebounce = new Debouncer(0.01, DebounceType.kRising);
   }
 
@@ -119,6 +121,10 @@ public class Shooter extends SubsystemBase {
     // velocitySystem.set(speed);
   }
 
+  public void resetPID() {
+    PID.reset();
+  }
+
   public double getSpeed() {
     return master.getSelectedSensorVelocity() * MOTOR_TO_METERS_PER_SECOND;
   }
@@ -129,8 +135,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean atSpeed(double speed) {
     return speedDebounce.calculate(
-        Math.abs(master.getSelectedSensorVelocity() * MOTOR_TO_METERS_PER_SECOND - speed)
-            < SHOOT_ERROR);
+        Math.abs(speed-PID.getSetpoint())<SHOOT_ERROR);
   }
 
   public double calculateShooterSpeed() {

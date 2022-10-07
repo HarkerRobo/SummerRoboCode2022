@@ -66,6 +66,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auton", autonChooser);
     SmartDashboard.putNumber("angle to hub", 0);
     SmartDashboard.putData("Field", FIELD);
+    SmartDashboard.putNumber("speed", 0);
     NetworkTableInstance.getDefault().setUpdateRate(RobotMap.ROBOT_LOOP);
   }
 

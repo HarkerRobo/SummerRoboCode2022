@@ -6,12 +6,14 @@ import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.util.MotorPositionSystem.MotorPositionSystemBuilder;
@@ -37,7 +39,7 @@ public class SwerveModule implements Sendable {
   private static final double DRIVE_MOTOR_CURRENT_PEAK = 80;
   private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0.1;
 
-  private static final double DRIVE_kS = 0.3;
+  private static final double DRIVE_kS = 0.2;
   private static final double DRIVE_kV = 2.2819;
   private static final double DRIVE_kA = 0.3621;
 
@@ -48,6 +50,10 @@ public class SwerveModule implements Sendable {
   private static final double ROTATION_kS = 0.40104;
   private static final double ROTATION_kV = 0.0057859;
   private static final double ROTATION_kA = 0.00016558;
+
+  // private static final double ROTATION_kP = 0.3;
+  // private static final double ROTATION_kI = 0.0;
+  // private static final double ROTATION_kD = 0.00;
 
   // private static final double DRIVE_MAX_ERROR = 2;
 
@@ -61,9 +67,12 @@ public class SwerveModule implements Sendable {
       Conversions.ENCODER_TO_WHEEL_SPEED / DRIVE_GEAR_RATIO * WHEEL_DIAMETER;
   private static final double ROT_MOTOR_TO_DEG = Conversions.ENCODER_TO_DEG / ROTATION_GEAR_RATIO;
 
-  private double desiredTranslation;
   private static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(DRIVE_kS, DRIVE_kV, DRIVE_kA);
+  // private static final SimpleMotorFeedforward ROTATION_FEEDFORWARD = new SimpleMotorFeedforward(ROTATION_kS, ROTATION_kV, ROTATION_kA);
+
   private static final PIDController PID = new PIDController(DRIVE_kP, DRIVE_kI, DRIVE_kD);
+  // private static final PIDController ROTATION_PID = new PIDController(ROTATION_kP, ROTATION_kI, ROTATION_kD);
+
   public SwerveModule(int swerveID) {
     this.swerveID = swerveID;
     rotation =
@@ -108,25 +117,20 @@ public class SwerveModule implements Sendable {
     //     driveSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Drive System");
   }
 
-  public void initLiveWindow() {}
-
   public void setAngleAndDrive(double rotationAngle, double driveOutput) {
     rotationSystem.set(rotationAngle);
-    desiredTranslation = driveOutput;
+    //ROTATION_FEEDFORWARD.calculate(rotationAngle)+
+    // rotation.setVoltage(ROTATION_PID.calculate(getCurrentAngle(), rotationAngle));
     drive.setVoltage(FEEDFORWARD.calculate(driveOutput) + PID.calculate(getCurrentSpeed(), driveOutput));
       // driveSystem.set(driveOutput);
-  }
-
-  public void zeroDriveEncoders() {
-    drive.setSelectedSensorPosition(0);
   }
 
   public double getCurrentAngle() {
     return rotationSystem.getPosition();
   }
 
-  public double getCurrentAngleVelocity() {
-    return rotationSystem.getVelocity();
+  public void zeroDriveEncoders() {
+    drive.setSelectedSensorPosition(0);
   }
 
   public Rotation2d getCurrentRotation() {
@@ -145,6 +149,7 @@ public class SwerveModule implements Sendable {
     double position = canCoder.getAbsolutePosition() - Drivetrain.CANCODER_OFFSETS[swerveID];
     rotation.setSelectedSensorPosition(
         position / ROT_MOTOR_TO_DEG); // DEGREE.to(TALONFX, position * ROTATION_GEAR_RATIO));
+    SmartDashboard.putNumber("cancoder", position);
     canCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, RobotMap.MAX_CAN_FRAME_PERIOD);
   }
 
@@ -160,10 +165,6 @@ public class SwerveModule implements Sendable {
     return canCoder;
   }
 
-  public double getDesiredSpeed() {
-    return desiredTranslation;
-  }
-
   public static String swerveIDToName(int swerveID) {
     String output = "";
     if (swerveID < 2) output += "Front ";
@@ -177,6 +178,9 @@ public class SwerveModule implements Sendable {
     builder.setSmartDashboardType("SwerveModule");
     builder.addDoubleProperty("translation velocity", ()->getCurrentSpeed(), null);
     builder.addDoubleProperty("translation desired velocity", ()->PID.getSetpoint(), null);
-    builder.addDoubleProperty("translation kP", ()->DRIVE_kP, null);
+    builder.addDoubleProperty("translation error", ()->PID.getPositionError(), null);
+    // builder.addDoubleProperty("rotation desired position", ()->ROTATION_PID.getSetpoint(), null);
+    // builder.addDoubleProperty("rotation error", ()->ROTATION_PID.getPositionError(), null);
+    // builder.addDoubleProperty("rotation position", ()->getCurrentAngle(), null);
   }
 }

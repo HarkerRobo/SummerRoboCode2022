@@ -24,7 +24,7 @@ public class SwervePosController extends CommandBase {
   public static final double Y_KI = 0;
   public static final double Y_KD = 0;
 
-  public static final double THETA_KP = 2.7;
+  public static final double THETA_KP = 0.7;
   public static final double THETA_KI = 0.00;
   public static final double THETA_KD = 0.0;
 
@@ -97,9 +97,10 @@ public class SwervePosController extends CommandBase {
     double yFeedback = yController.calculate(currentPose.getY(), goal.poseMeters.getY());
 
     // Return next output.
+    SmartDashboard.putNumber("thetaFF", thetaFF);
     ChassisSpeeds adjustedSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            xFF + xFeedback, yFF + yFeedback, thetaFF, currentPose.getRotation());
+            xFF + xFeedback, yFF + yFeedback,  thetaFF, currentPose.getRotation());
     Drivetrain.getInstance().setAngleAndDrive(adjustedSpeeds);
     // Pose2d poseError = autonomusController.m_poseError;
     // Rotation2d rotError = autonomusController.m_rotationError;

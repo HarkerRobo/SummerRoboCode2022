@@ -6,8 +6,9 @@ import frc.robot.subsystems.Shooter;
 import harkerrobolib.commands.IndefiniteCommand;
 
 public class IndexerManual extends IndefiniteCommand {
-  public static final double BOTTOM_INDEXER_SPEED = 0.6; // 6.0; // meters per second
-  public static final double TOP_INDEXER_SPEED = 0.3; // 2.0;
+  public static final double BOTTOM_INDEXER_SPEED = 0.45; // 6.0; // meters per second
+  public static final double TOP_INDEXER_SPEED = 0.25; // 2.0;
+  public static final double INDEXER_SHOOTER_SPEED = 0.8;
   public static final double INDEXER_OUTTAKE_SPEED = -0.6; // -16; // meters per second
   // private Notifier topIndexerProximity;
 
@@ -19,7 +20,7 @@ public class IndexerManual extends IndefiniteCommand {
 
   public void execute() {
     if (Shooter.getInstance().getState() == Shooter.State.SHOOTING) {
-      Indexer.getInstance().setBothOutput(BOTTOM_INDEXER_SPEED);
+      Indexer.getInstance().setBothOutput(INDEXER_SHOOTER_SPEED);
       return;
     }
     switch (Intake.getInstance().getState()) {

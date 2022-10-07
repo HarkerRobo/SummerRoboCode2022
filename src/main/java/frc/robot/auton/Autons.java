@@ -14,8 +14,8 @@ public class Autons {
           new ShooterAuton(),
           new SwervePosController(
                   Trajectories.twoBallTop,
-                  (point, time) -> Rotation2d.fromDegrees(147),
-                  () -> Rotation2d.fromDegrees(135))
+                  (point, time) -> Rotation2d.fromDegrees(136.97),
+                  () -> Rotation2d.fromDegrees(136.97))
               .deadlineWith(new IntakeAuton()),
           new ShooterAuton());
 }

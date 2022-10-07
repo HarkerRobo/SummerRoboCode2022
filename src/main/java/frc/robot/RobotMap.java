@@ -2,7 +2,7 @@ package frc.robot;
 
 public final class RobotMap {
   public static final String CANBUS = "BINGCHILLING";
-  public static final double ROBOT_LOOP = 0.01;
+  public static final double ROBOT_LOOP = 0.02;
   public static final double TALON_FX_LOOP = 0.001;
   public static final double MAX_MOTOR_VOLTAGE = 10.0;
   public static final int MAX_CAN_FRAME_PERIOD = 255;

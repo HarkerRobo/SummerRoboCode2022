@@ -51,7 +51,7 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator;
   private Pigeon2 pigeon;
 
-  public static final double LIMELIGHT_KP = 0.12;
+  public static final double LIMELIGHT_KP = 0.11;
   public static final double LIMELIGHT_KI = 0.00;
   public static final double LIMELIGHT_KD = 0.000000;
 
@@ -126,17 +126,18 @@ public class Drivetrain extends SubsystemBase {
 
   public void setAngleAndDrive(SwerveModuleState[] states) {
     for (int i = 0; i < 4; i++) {
+      states[i] = SwerveModuleState.optimize(states[i], swerveModules[i].getCurrentRotation());
       double driveOutput = states[i].speedMetersPerSecond;
       double angle = states[i].angle.getDegrees();
-      double diff = angle - swerveModules[i].getCurrentAngle();
-      diff = diff % 360.0;
-      if (Math.abs(diff) > 270.0) {
-        diff -= Math.signum(diff) * 360.0;
-      } else if (Math.abs(diff) > 90.0) {
-        diff -= Math.signum(diff) * 180.0;
-        driveOutput = -driveOutput;
-      }
-      swerveModules[i].setAngleAndDrive(diff + swerveModules[i].getCurrentAngle(), driveOutput);
+      // double diff = angle - swerveModules[i].getCurrentAngle();
+      // diff = diff % 360.0;
+      // if (Math.abs(diff) > 270.0) {
+      //   diff -= Math.signum(diff) * 360.0;
+      // } else if (Math.abs(diff) > 90.0) {
+      //   diff -= Math.signum(diff) * 180.0;
+      //   driveOutput = -driveOutput;
+      // }
+      swerveModules[i].setAngleAndDrive(angle, driveOutput);
     }
   }
 
