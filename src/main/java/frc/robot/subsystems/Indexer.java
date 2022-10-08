@@ -10,7 +10,6 @@ import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.MotorVelocitySystem;
-import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Indexer extends SubsystemBase {

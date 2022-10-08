@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
@@ -14,8 +13,6 @@ import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.InterpolatingTreeMap;
-import frc.robot.util.MotorVelocitySystem;
-import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
 import frc.robot.util.PhotonVisionLimelight;
 import harkerrobolib.wrappers.HSFalcon;
 
@@ -34,7 +31,7 @@ public class Shooter extends SubsystemBase {
   private static final double CURRENT_PEAK = 100;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double kS = 0.66;//.27;
+  private static final double kS = 0.66; // .27;
   private static final double kV = 0.64;
   private static final double kA = 0.06045;
 
@@ -134,8 +131,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean atSpeed(double speed) {
-    return speedDebounce.calculate(
-        Math.abs(speed-PID.getSetpoint())<SHOOT_ERROR);
+    return speedDebounce.calculate(Math.abs(speed - PID.getSetpoint()) < SHOOT_ERROR);
   }
 
   public double calculateShooterSpeed() {
@@ -159,7 +155,7 @@ public class Shooter extends SubsystemBase {
     builder.setSmartDashboardType("Shooter");
     builder.addStringProperty("State", () -> state.name(), (a) -> state = State.valueOf(a));
     builder.addDoubleProperty("Unit Conversion", () -> MOTOR_TO_METERS_PER_SECOND, null);
-    builder.addDoubleProperty("velocity", ()->getSpeed(), null);
-    builder.addDoubleProperty("desired velocity", ()->PID.getSetpoint(), null);
+    builder.addDoubleProperty("velocity", () -> getSpeed(), null);
+    builder.addDoubleProperty("desired velocity", () -> PID.getSetpoint(), null);
   }
 }

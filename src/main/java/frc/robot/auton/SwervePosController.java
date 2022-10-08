@@ -24,7 +24,7 @@ public class SwervePosController extends CommandBase {
   public static final double Y_KI = 0;
   public static final double Y_KD = 0;
 
-  public static final double THETA_KP = 0.7;
+  public static final double THETA_KP = 0.07;
   public static final double THETA_KI = 0.00;
   public static final double THETA_KD = 0.0;
 
@@ -78,6 +78,7 @@ public class SwervePosController extends CommandBase {
     double yFF = goal.velocityMetersPerSecond * goal.poseMeters.getRotation().getSin();
     Rotation2d angleRef =
         refHeading.apply(Drivetrain.getInstance().getPoseEstimatorPose2d(), timer.get());
+
     Pose2d currentPose = Drivetrain.getInstance().getPoseEstimatorPose2d();
     double clampAdd =
         1
@@ -100,14 +101,14 @@ public class SwervePosController extends CommandBase {
     SmartDashboard.putNumber("thetaFF", thetaFF);
     ChassisSpeeds adjustedSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            xFF + xFeedback, yFF + yFeedback,  thetaFF, currentPose.getRotation());
+            xFF + xFeedback, yFF + yFeedback, thetaFF, currentPose.getRotation());
     Drivetrain.getInstance().setAngleAndDrive(adjustedSpeeds);
     // Pose2d poseError = autonomusController.m_poseError;
     // Rotation2d rotError = autonomusController.m_rotationError;
 
     // SmartDashboard.putNumber("Traj-X-Error", Units.metersToInches(poseError.getX()));
     // SmartDashboard.putNumber("Traj-Y-Error", Units.metersToInches(poseError.getY()));
-    SmartDashboard.putNumber("Trajectory Theta", goal.poseMeters.getRotation().getDegrees());
+    SmartDashboard.putNumber("Trajectory Theta", angleRef.getDegrees());
     SmartDashboard.putNumber("Current Theta", currentPose.getRotation().getDegrees());
     // SmartDashboard.putNumber("Traj-Theta-Error", rotationError.getDegrees());
   }

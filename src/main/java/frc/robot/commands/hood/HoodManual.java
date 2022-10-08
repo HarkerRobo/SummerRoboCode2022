@@ -1,8 +1,6 @@
 package frc.robot.commands.hood;
 
 import frc.robot.subsystems.Hood;
-import frc.robot.util.InterpolatingTreeMap;
-import frc.robot.util.PhotonVisionLimelight;
 import harkerrobolib.commands.IndefiniteCommand;
 
 public class HoodManual extends IndefiniteCommand {

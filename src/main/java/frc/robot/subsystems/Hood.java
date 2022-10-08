@@ -3,15 +3,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.InterpolatingTreeMap;
 import frc.robot.util.MotorPositionSystem;
-import frc.robot.util.PhotonVisionLimelight;
 import frc.robot.util.MotorPositionSystem.MotorPositionSystemBuilder;
+import frc.robot.util.PhotonVisionLimelight;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Hood extends SubsystemBase {
@@ -68,7 +67,6 @@ public class Hood extends SubsystemBase {
     isHoodZeroed = false;
     initMotors();
     this.hoodVal = insertHoodVals();
-
   }
 
   private InterpolatingTreeMap insertHoodVals() {

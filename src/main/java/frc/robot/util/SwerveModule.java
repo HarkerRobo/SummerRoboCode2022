@@ -1,12 +1,9 @@
 package frc.robot.util;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
-
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -17,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.util.MotorPositionSystem.MotorPositionSystemBuilder;
-import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class SwerveModule implements Sendable {
@@ -67,11 +63,14 @@ public class SwerveModule implements Sendable {
       Conversions.ENCODER_TO_WHEEL_SPEED / DRIVE_GEAR_RATIO * WHEEL_DIAMETER;
   private static final double ROT_MOTOR_TO_DEG = Conversions.ENCODER_TO_DEG / ROTATION_GEAR_RATIO;
 
-  private static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(DRIVE_kS, DRIVE_kV, DRIVE_kA);
-  // private static final SimpleMotorFeedforward ROTATION_FEEDFORWARD = new SimpleMotorFeedforward(ROTATION_kS, ROTATION_kV, ROTATION_kA);
+  private static final SimpleMotorFeedforward FEEDFORWARD =
+      new SimpleMotorFeedforward(DRIVE_kS, DRIVE_kV, DRIVE_kA);
+  // private static final SimpleMotorFeedforward ROTATION_FEEDFORWARD = new
+  // SimpleMotorFeedforward(ROTATION_kS, ROTATION_kV, ROTATION_kA);
 
   private static final PIDController PID = new PIDController(DRIVE_kP, DRIVE_kI, DRIVE_kD);
-  // private static final PIDController ROTATION_PID = new PIDController(ROTATION_kP, ROTATION_kI, ROTATION_kD);
+  // private static final PIDController ROTATION_PID = new PIDController(ROTATION_kP, ROTATION_kI,
+  // ROTATION_kD);
 
   public SwerveModule(int swerveID) {
     this.swerveID = swerveID;
@@ -119,10 +118,11 @@ public class SwerveModule implements Sendable {
 
   public void setAngleAndDrive(double rotationAngle, double driveOutput) {
     rotationSystem.set(rotationAngle);
-    //ROTATION_FEEDFORWARD.calculate(rotationAngle)+
+    // ROTATION_FEEDFORWARD.calculate(rotationAngle)+
     // rotation.setVoltage(ROTATION_PID.calculate(getCurrentAngle(), rotationAngle));
-    drive.setVoltage(FEEDFORWARD.calculate(driveOutput) + PID.calculate(getCurrentSpeed(), driveOutput));
-      // driveSystem.set(driveOutput);
+    drive.setVoltage(
+        FEEDFORWARD.calculate(driveOutput) + PID.calculate(getCurrentSpeed(), driveOutput));
+    // driveSystem.set(driveOutput);
   }
 
   public double getCurrentAngle() {
@@ -176,9 +176,9 @@ public class SwerveModule implements Sendable {
 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("SwerveModule");
-    builder.addDoubleProperty("translation velocity", ()->getCurrentSpeed(), null);
-    builder.addDoubleProperty("translation desired velocity", ()->PID.getSetpoint(), null);
-    builder.addDoubleProperty("translation error", ()->PID.getPositionError(), null);
+    builder.addDoubleProperty("translation velocity", () -> getCurrentSpeed(), null);
+    builder.addDoubleProperty("translation desired velocity", () -> PID.getSetpoint(), null);
+    builder.addDoubleProperty("translation error", () -> PID.getPositionError(), null);
     // builder.addDoubleProperty("rotation desired position", ()->ROTATION_PID.getSetpoint(), null);
     // builder.addDoubleProperty("rotation error", ()->ROTATION_PID.getPositionError(), null);
     // builder.addDoubleProperty("rotation position", ()->getCurrentAngle(), null);

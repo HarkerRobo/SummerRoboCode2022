@@ -1,6 +1,5 @@
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.OI;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.State;
@@ -16,7 +15,7 @@ public class ShooterManual extends IndefiniteCommand {
 
   public void execute() {
     double possibleShooterSpeed = Shooter.getInstance().calculateShooterSpeed();
-    //possibleShooterSpeed = SmartDashboard.getNumber("speed", smartdashboard);
+    // possibleShooterSpeed = SmartDashboard.getNumber("speed", smartdashboard);
     updateShooterState(possibleShooterSpeed);
     if (Shooter.getInstance().getState() != State.IDLE) {
       Shooter.getInstance().set(possibleShooterSpeed);

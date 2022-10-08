@@ -6,7 +6,7 @@ import harkerrobolib.commands.IndefiniteCommand;
 
 public class IntakeManual extends IndefiniteCommand {
 
-  public static final double INTAKE_SPEED = 3.0; // meters per second
+  public static final double INTAKE_SPEED = 2.0; // meters per second
 
   public IntakeManual() {
     addRequirements(Intake.getInstance());
