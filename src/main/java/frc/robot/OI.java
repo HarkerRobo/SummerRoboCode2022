@@ -35,9 +35,9 @@ public class OI {
                     () -> {
                       Drivetrain.getInstance().setPose(new Pose2d());
                       Drivetrain.getInstance().zeroPigeon();
-                    }),
-                new ZeroHood()));
+                    })));
     driver.getButtonSelect().whenPressed(new ZeroClimber());
+    driver.getButtonA().whenPressed(new ZeroHood());
     driver.getButtonStart().whilePressed(new ShooterAuton());
     // driver.getButtonB().whenPressed(()->Climber.getInstance().setClimberForward());
     // driver.getButtonX().whenPressed(()->Climber.getInstance().setClimberBackward());

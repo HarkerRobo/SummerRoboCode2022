@@ -38,7 +38,7 @@ public class Hood extends SubsystemBase {
   private static final double GEAR_RATIO = 180;
   private static final double FALCON_TO_DEG = Conversions.ENCODER_TO_DEG / GEAR_RATIO;
 
-  private static final double MAX_POS_ERROR = 0.3;
+  private static final double MAX_POS_ERROR = 0.1;
   private static final double MAX_VEL_ERROR = 0.2;
   private static final double MAX_VOLTAGE = 10;
 
@@ -72,20 +72,20 @@ public class Hood extends SubsystemBase {
 
   private InterpolatingTreeMap insertHoodVals() {
     InterpolatingTreeMap hoodVals = new InterpolatingTreeMap();
-    hoodVals.put(1.15, 0.0);
-    hoodVals.put(2.8, 23.0);
-    hoodVals.put(3.2, 24.5);
-    hoodVals.put(3.4, 25.5);
-    hoodVals.put(3.7, 26.0);
-    hoodVals.put(3.9, 27.0);
-    hoodVals.put(4.19, 28.7);
-    hoodVals.put(4.57, 29.0);
-    hoodVals.put(4.85, 30.0);
-    hoodVals.put(5.2, 32.0);
-    hoodVals.put(5.4, 32.0);
-    hoodVals.put(5.78, 32.0);
-    hoodVals.put(6.26, 32.0);
-    hoodVals.put(3.2, 11.0);
+    hoodVals.put(2.3, 14.1);
+    hoodVals.put(2.6, 14.4);
+    hoodVals.put(2.8, 14.7);
+    hoodVals.put(3.1, 15.0);
+    hoodVals.put(3.5, 15.1);
+    hoodVals.put(3.8, 15.4);
+    hoodVals.put(4.1, 15.8);
+    hoodVals.put(4.38, 16.1);
+    hoodVals.put(4.62, 16.3);
+    hoodVals.put(5.0, 16.4);
+    hoodVals.put(5.3, 16.4);
+    hoodVals.put(5.6, 16.4);
+    hoodVals.put(5.83, 16.5);
+
     return hoodVals;
   }
 
@@ -116,8 +116,8 @@ public class Hood extends SubsystemBase {
   }
 
   public double calculateHoodPosition() {
-    return SmartDashboard.getNumber("angle", 0.0);
-    // return hoodVal.get(PhotonVisionLimelight.getDistance());
+    
+    return hoodVal.get(PhotonVisionLimelight.getDistance());
   }
 
   public boolean isHoodStalling() {

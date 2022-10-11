@@ -97,19 +97,19 @@ public class Shooter extends SubsystemBase {
 
   private InterpolatingTreeMap insertShooterVals() {
     InterpolatingTreeMap shooterVals = new InterpolatingTreeMap();
-    shooterVals.put(1.15, 10.5);
-    shooterVals.put(2.8, 10.3);
-    shooterVals.put(3.2, 11.0);
-    shooterVals.put(3.4, 11.5);
-    shooterVals.put(3.7, 11.7);
-    shooterVals.put(3.9, 11.8);
-    shooterVals.put(4.19, 12.0);
-    shooterVals.put(4.57, 12.1);
-    shooterVals.put(4.85, 12.6);
-    shooterVals.put(5.2, 12.7);
-    shooterVals.put(5.4, 13.1);
-    shooterVals.put(5.78, 13.5);
-    shooterVals.put(6.26, 14.0);
+    shooterVals.put(2.3, 13.4);
+    shooterVals.put(2.6, 13.6);
+    shooterVals.put(2.8, 13.8);
+    shooterVals.put(3.1, 14.0);
+    shooterVals.put(3.5, 14.1);
+    shooterVals.put(3.8, 14.4);
+    shooterVals.put(4.1, 14.8);
+    shooterVals.put(4.38, 15.0);
+    shooterVals.put(4.62, 15.3);
+    shooterVals.put(5.0, 15.5);
+    shooterVals.put(5.3, 16.2);
+    shooterVals.put(5.6, 16.3);
+    shooterVals.put(5.83, 16.5);
     return shooterVals;
   }
 
