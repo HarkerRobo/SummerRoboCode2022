@@ -11,9 +11,9 @@ import harkerrobolib.util.MathUtil;
 
 public class SwerveManual extends IndefiniteCommand {
   public static final double SPEED_MULTIPLIER = 0.65;
-  public static final double MIN_OUTPUT = 0.000000000001;
-  private static final double PIGEON_KP = 0.03;
-  private static final double MAX_ACCELERATION = Drivetrain.MAX_ACCELERATION + 10;
+  public static final double MIN_OUTPUT = 0.000000001;
+  private static final double PIGEON_KP = 0.007;
+  private static final double MAX_ACCELERATION = Drivetrain.MAX_ACCELERATION + 15;
 
   private double vx;
   private double prevvx;

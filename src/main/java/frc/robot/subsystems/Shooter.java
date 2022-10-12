@@ -92,7 +92,7 @@ public class Shooter extends SubsystemBase {
     // addChild("Velocity System", velocitySystem);
     state = State.IDLE;
     master.configOpenloopRamp(0.7);
-    speedDebounce = new Debouncer(0.01, DebounceType.kRising);
+    speedDebounce = new Debouncer(0.017, DebounceType.kRising);
   }
 
   private InterpolatingTreeMap insertShooterVals() {
