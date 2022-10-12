@@ -72,19 +72,16 @@ public class Hood extends SubsystemBase {
 
   private InterpolatingTreeMap insertHoodVals() {
     InterpolatingTreeMap hoodVals = new InterpolatingTreeMap();
-    hoodVals.put(2.3, 14.1);
-    hoodVals.put(2.6, 14.4);
-    hoodVals.put(2.8, 14.7);
-    hoodVals.put(3.1, 15.0);
-    hoodVals.put(3.5, 15.1);
-    hoodVals.put(3.8, 15.4);
-    hoodVals.put(4.1, 15.8);
-    hoodVals.put(4.38, 16.1);
-    hoodVals.put(4.62, 16.3);
-    hoodVals.put(5.0, 16.4);
-    hoodVals.put(5.3, 16.4);
-    hoodVals.put(5.6, 16.4);
-    hoodVals.put(5.83, 16.5);
+    hoodVals.put(1.39, 12.0);
+    hoodVals.put(1.43, 14.0);
+    hoodVals.put(1.71, 17.0);
+    hoodVals.put(2.17, 22.0);
+    hoodVals.put(2.42, 24.0);
+    hoodVals.put(2.71, 25.6);
+    hoodVals.put(3.00, 28.5);
+    hoodVals.put(3.31, 31.4);
+    hoodVals.put(3.62, 32.0);
+    hoodVals.put(3.89, 32.0);
 
     return hoodVals;
   }
@@ -116,7 +113,7 @@ public class Hood extends SubsystemBase {
   }
 
   public double calculateHoodPosition() {
-    
+    // return SmartDashboard.getNumber("angle", 0.0);
     return hoodVal.get(PhotonVisionLimelight.getDistance());
   }
 

@@ -31,15 +31,15 @@ public class Shooter extends SubsystemBase {
   private static final double CURRENT_PEAK = 100;
   private static final double CURRENT_PEAK_DUR = 0.5;
 
-  private static final double kS = 0.66; // .27;
-  private static final double kV = 0.64;
+  private static final double kS = 0.3; // .27;
+  private static final double kV = 0.66;
   private static final double kA = 0.06045;
 
-  private static final double kP = 0.17;
+  private static final double kP = 0.32;
   private static final double kI = 0.0;
   private static final double kD = 0.0;
 
-  private static final double SHOOT_ERROR = 0.07;
+  private static final double SHOOT_ERROR = 0.15;
 
   private static final double WHEEL_DIAMETER = 4.0;
 
@@ -97,29 +97,22 @@ public class Shooter extends SubsystemBase {
 
   private InterpolatingTreeMap insertShooterVals() {
     InterpolatingTreeMap shooterVals = new InterpolatingTreeMap();
-    shooterVals.put(2.3, 13.4);
-    shooterVals.put(2.6, 13.6);
-    shooterVals.put(2.8, 13.8);
-    shooterVals.put(3.1, 14.0);
-    shooterVals.put(3.5, 14.1);
-    shooterVals.put(3.8, 14.4);
-    shooterVals.put(4.1, 14.8);
-    shooterVals.put(4.38, 15.0);
-    shooterVals.put(4.62, 15.3);
-    shooterVals.put(5.0, 15.5);
-    shooterVals.put(5.3, 16.2);
-    shooterVals.put(5.6, 16.3);
-    shooterVals.put(5.83, 16.5);
+    shooterVals.put(1.39, 9.0);
+    shooterVals.put(1.43, 9.5);
+    shooterVals.put(1.71, 9.7);
+    shooterVals.put(2.17, 10.3);
+    shooterVals.put(2.42, 10.5);
+    shooterVals.put(2.71, 10.6);
+    shooterVals.put(3.00, 10.8);
+    shooterVals.put(3.31, 11.2);
+    shooterVals.put(3.62, 11.8);
+    shooterVals.put(3.89, 12.3);
     return shooterVals;
   }
 
   public void set(double speed) {
     master.setVoltage(FEEDFORWARD.calculate(speed) + PID.calculate(getSpeed(), speed));
     // velocitySystem.set(speed);
-  }
-
-  public void resetPID() {
-    PID.reset();
   }
 
   public double getSpeed() {
@@ -131,7 +124,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean atSpeed(double speed) {
-    return speedDebounce.calculate(Math.abs(speed - PID.getSetpoint()) < SHOOT_ERROR);
+    return speedDebounce.calculate(Math.abs(speed - getSpeed()) < SHOOT_ERROR);
   }
 
   public double calculateShooterSpeed() {

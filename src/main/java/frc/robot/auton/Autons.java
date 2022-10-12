@@ -14,7 +14,6 @@ public class Autons {
   public static final SequentialCommandGroup THREE_BALL_AUTO =
       new SequentialCommandGroup(
           new ZeroHood(),
-          new WaitCommand(1),
           new ShooterAuton(),
           new SwervePosController(
                   Trajectories.twoBallTop,

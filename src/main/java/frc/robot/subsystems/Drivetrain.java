@@ -50,7 +50,7 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator;
   private Pigeon2 pigeon;
 
-  public static final double LIMELIGHT_KP = 0.11;
+  public static final double LIMELIGHT_KP = 0.07;
   public static final double LIMELIGHT_KI = 0.00;
   public static final double LIMELIGHT_KD = 0.000000;
 

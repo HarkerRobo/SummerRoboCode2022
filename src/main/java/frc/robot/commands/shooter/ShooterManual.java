@@ -8,15 +8,13 @@ import harkerrobolib.commands.IndefiniteCommand;
 
 public class ShooterManual extends IndefiniteCommand {
 
-  private double smartdashboard;
-
   public ShooterManual() {
     addRequirements(Shooter.getInstance());
   }
 
   public void execute() {
     double possibleShooterSpeed = Shooter.getInstance().calculateShooterSpeed();
-    //possibleShooterSpeed = SmartDashboard.getNumber("speed", smartdashboard);
+    // possibleShooterSpeed = SmartDashboard.getNumber("speed", smartdashboard);
     updateShooterState(possibleShooterSpeed);
     if (Shooter.getInstance().getState() != State.IDLE) {
       Shooter.getInstance().set(possibleShooterSpeed);
