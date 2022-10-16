@@ -29,10 +29,10 @@ public class Shooter extends SubsystemBase {
 
   private static final double CURRENT_CONTINUOUS = 40;
   private static final double CURRENT_PEAK = 100;
-  private static final double CURRENT_PEAK_DUR = 0.5;
+  private static final double CURRENT_PEAK_DUR = 0.4;
 
   private static final double kS = 0.3; // .27;
-  private static final double kV = 0.66;
+  private static final double kV = 0.65;
   private static final double kA = 0.06045;
 
   private static final double kP = 0.32;
@@ -56,6 +56,8 @@ public class Shooter extends SubsystemBase {
   private State state;
 
   private Debouncer speedDebounce;
+
+  private double shooterOffset;
 
   public static enum State {
     IDLE,
@@ -93,11 +95,12 @@ public class Shooter extends SubsystemBase {
     state = State.IDLE;
     master.configOpenloopRamp(0.7);
     speedDebounce = new Debouncer(0.017, DebounceType.kRising);
+    shooterOffset = 0;
   }
 
   private InterpolatingTreeMap insertShooterVals() {
     InterpolatingTreeMap shooterVals = new InterpolatingTreeMap();
-    shooterVals.put(1.39, 9.0);
+    shooterVals.put(1.39, 9.2);
     shooterVals.put(1.43, 9.5);
     shooterVals.put(1.71, 9.7);
     shooterVals.put(2.17, 10.3);
@@ -128,11 +131,15 @@ public class Shooter extends SubsystemBase {
   }
 
   public double calculateShooterSpeed() {
-    return shooterVal.get(PhotonVisionLimelight.getDistance());
+    return shooterVal.get(PhotonVisionLimelight.getDistance()) + shooterOffset;
   }
 
   public void setState(State nextState) {
     state = nextState;
+  }
+
+  public void addShooterOffset(double a) {
+    shooterOffset += a;
   }
 
   public State getState() {

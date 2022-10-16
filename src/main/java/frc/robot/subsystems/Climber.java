@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
@@ -51,13 +52,13 @@ public class Climber extends SubsystemBase {
         new HSFalconBuilder()
             .invert(RIGHT_INVERT)
             .voltageComp(MAX_CONTROL_EFFORT)
-            // .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .build(RobotMap.RIGHT_CLIMBER, RobotMap.CANBUS);
     addChild("Right Motor", right);
     left =
         new HSFalconBuilder()
             .invert(LEFT_INVERT)
-            // .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
+            .supplyLimit(CURRENT_PEAK, CURRENT_CONTINUOUS, CURRENT_PEAK_DUR)
             .voltageComp(MAX_CONTROL_EFFORT)
             .build(RobotMap.LEFT_CLIMBER, RobotMap.CANBUS);
     addChild("Left Motor", left);
@@ -141,6 +142,10 @@ public class Climber extends SubsystemBase {
 
   public void setRightPercentOutput(double output) {
     right.set(ControlMode.PercentOutput, output);
+  }
+
+  public Value getSolenoidState() {
+    return climber.get();
   }
 
   public HSFalcon getRightClimber() {

@@ -5,10 +5,11 @@ import frc.robot.RobotMap;
 import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
+import org.photonvision.common.hardware.VisionLEDMode;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class PhotonVisionLimelight {
-  private static final PhotonCamera LIMELIGHT = new PhotonCamera(RobotMap.LIMELIGHT_NAME);
+  public static final PhotonCamera LIMELIGHT = new PhotonCamera(RobotMap.LIMELIGHT_NAME);
   private static final double PRECISION = 0.05;
 
   private static final Translation2d cameraToVehicle = new Translation2d(0.32, 0.0);
@@ -34,6 +35,10 @@ public class PhotonVisionLimelight {
 
   public static double getXDistance() {
     return robotToHub.getX();
+  }
+
+  public static void turnOnLED() {
+    LIMELIGHT.setLED(VisionLEDMode.kOn);
   }
 
   public static double getTx() {

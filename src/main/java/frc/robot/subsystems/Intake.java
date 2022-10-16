@@ -23,9 +23,9 @@ public class Intake extends SubsystemBase {
   public static final double FALCON_VEL_TO_CARGO_SPEED =
       Conversions.ENCODER_TO_WHEEL_SPEED / GEAR_RATIO * (WHEEL_DIAMETER / 2.0);
 
-  private static final double CONTINUOUS_CURRENT_LIMIT = 60;
-  private static final double PEAK_CURRENT = 60;
-  private static final double PEAK_DUR = 0;
+  private static final double CONTINUOUS_CURRENT_LIMIT = 30;
+  private static final double PEAK_CURRENT = 40;
+  private static final double PEAK_DUR = 0.1;
   private static final boolean INVERT = true;
 
   private static final double kS = 0.0836; // tune later
@@ -54,16 +54,16 @@ public class Intake extends SubsystemBase {
             .supplyLimit(PEAK_CURRENT, CONTINUOUS_CURRENT_LIMIT, PEAK_DUR)
             .velocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_100Ms)
             .build(RobotMap.INTAKE_MOTOR);
-    velocitySystem =
-        new MotorVelocitySystemBuilder()
-            .constants(kV, kA, kS)
-            .maxError(MAX_ERROR)
-            .unitConversionFactor(FALCON_VEL_TO_CARGO_SPEED)
-            .build(roller)
-            .init();
+    // velocitySystem =
+    //     new MotorVelocitySystemBuilder()
+    //         .constants(kV, kA, kS)
+    //         .maxError(MAX_ERROR)
+    //         .unitConversionFactor(FALCON_VEL_TO_CARGO_SPEED)
+    //         .build(roller)
+    //         .init();
     state = State.NEUTRAL;
     addChild("Motor", roller);
-    addChild("Motor System", velocitySystem);
+    // addChild("Motor System", velocitySystem);
   }
 
   public void setForward() {
@@ -75,12 +75,13 @@ public class Intake extends SubsystemBase {
   }
 
   public void setRollerOutput(double rollerOutput) {
-    velocitySystem.set(rollerOutput);
+    roller.set(ControlMode.PercentOutput, rollerOutput);
+    // velocitySystem.set(rollerOutput);
   }
 
-  public void turnOffMotor() {
-    roller.set(ControlMode.PercentOutput, 0);
-  }
+  // public void turnOffMotor() {
+  //   roller.set(ControlMode.PercentOutput, 0);
+  // }
 
   public State getState() {
     return state;
@@ -93,7 +94,7 @@ public class Intake extends SubsystemBase {
   public void actOnState(double intakeSpeed) {
     switch (Intake.getInstance().getState()) {
       case NEUTRAL:
-        turnOffMotor();
+        setRollerOutput(0);
         setForward();
         break;
       case INTAKE:

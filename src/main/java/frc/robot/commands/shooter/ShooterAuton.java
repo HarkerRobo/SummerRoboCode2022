@@ -1,14 +1,14 @@
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 
 public class ShooterAuton extends CommandBase {
-  private Debouncer debouncerIndexer;
 
   public ShooterAuton() {
     addRequirements(Shooter.getInstance(), Drivetrain.getInstance());
@@ -19,11 +19,11 @@ public class ShooterAuton extends CommandBase {
   }
 
   public void execute() {
-    double speed = Shooter.getInstance().calculateShooterSpeed();
-    Shooter.getInstance().set(speed);
     ChassisSpeeds chassis = new ChassisSpeeds(0, 0, Drivetrain.getInstance().alignWithHub());
     Drivetrain.getInstance().setAngleAndDrive(chassis);
-    if (Shooter.getInstance().atSpeed(speed))
+    double speed = Shooter.getInstance().calculateShooterSpeed();
+    Shooter.getInstance().set(speed);
+    if (Shooter.getInstance().atSpeed(speed) && Hood.getInstance().atHoodAngle())
       Shooter.getInstance().setState(Shooter.State.SHOOTING);
     else Shooter.getInstance().setState(Shooter.State.REVVING);
   }

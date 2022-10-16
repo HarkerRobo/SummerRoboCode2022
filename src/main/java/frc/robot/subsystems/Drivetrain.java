@@ -5,7 +5,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,7 +15,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,11 +26,10 @@ public class Drivetrain extends SubsystemBase {
   public static Drivetrain instance;
 
   public static final boolean[] ROTATION_INVERTS = {false, false, false, false};
-  public static final boolean[] DRIVE_INVERTS = {true, true, true, false};
+  public static final boolean[] DRIVE_INVERTS = {false, true, true, false};
 
   public static final double[] CANCODER_OFFSETS = {
-    149.719, 178.330078, 109.951172, 32.255859
-  }; // in deg
+    285.468750+45, 178.330078, 109.951172, 32.255859}; // in deg
 
   private static final double DT_WIDTH = 0.5461; // 0.93345 bumper to bumper
   private static final double DT_LENGTH = 0.5969; // 0.88265
@@ -50,17 +48,12 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator;
   private Pigeon2 pigeon;
 
-  public static final double LIMELIGHT_KP = 0.07;
+  public static final double LIMELIGHT_KP = 0.1;
   public static final double LIMELIGHT_KI = 0.00;
   public static final double LIMELIGHT_KD = 0.000000;
 
-  private static ProfiledPIDController HUB_LOOP =
-      new ProfiledPIDController(
-          LIMELIGHT_KP,
-          LIMELIGHT_KI,
-          LIMELIGHT_KD,
-          new Constraints(MAX_ROTATION_VEL, MAX_ROTATION_ACCELERATION));
-
+  private static PIDController HUB_LOOP =
+      new PIDController(LIMELIGHT_KP, LIMELIGHT_KI, LIMELIGHT_KD);
   private static final boolean PIGEON_UP = false;
 
   private Drivetrain() {
@@ -71,9 +64,6 @@ public class Drivetrain extends SubsystemBase {
     for (int i = 0; i < 4; i++) {
       addChild(SwerveModule.swerveIDToName(i) + " Module", swerveModules[i]);
     }
-
-    HUB_LOOP.setGoal(0);
-
     kinematics =
         new SwerveDriveKinematics(
             new Translation2d(DT_LENGTH / 2, DT_WIDTH / 2),
@@ -120,7 +110,7 @@ public class Drivetrain extends SubsystemBase {
   public double alignWithHub() {
     double angleToHub = PhotonVisionLimelight.getTx(); // cw positive
     SmartDashboard.putNumber("angle to hub", angleToHub);
-    return HUB_LOOP.calculate(angleToHub);
+    return HUB_LOOP.calculate(angleToHub, 0.0);
   }
 
   public void setAngleAndDrive(ChassisSpeeds chassisSpeeds) {
@@ -129,18 +119,26 @@ public class Drivetrain extends SubsystemBase {
 
   public void setAngleAndDrive(SwerveModuleState[] states) {
     for (int i = 0; i < 4; i++) {
-      states[i] = SwerveModuleState.optimize(states[i], swerveModules[i].getCurrentRotation());
-      double driveOutput = states[i].speedMetersPerSecond;
+      // states[i] = optimize(states[i], swerveModules[i].getCurrentAngle());
       double angle = states[i].angle.getDegrees();
-      // double diff = angle - swerveModules[i].getCurrentAngle();
-      // diff = diff % 360.0;
-      // if (Math.abs(diff) > 270.0) {
-      //   diff -= Math.signum(diff) * 360.0;
-      // } else if (Math.abs(diff) > 90.0) {
-      //   diff -= Math.signum(diff) * 180.0;
-      //   driveOutput = -driveOutput;
-      // }
-      swerveModules[i].setAngleAndDrive(angle, driveOutput);
+      double currentAngle = swerveModules[i].getCurrentAngle();
+      double speed = states[i].speedMetersPerSecond;
+      while (angle - currentAngle > 180) {
+        angle -= 360;
+      }
+
+      while (angle - currentAngle < -180) {
+        angle += 360;
+      }
+
+      if (angle - currentAngle > 90) {
+        angle -= 180;
+        speed *= -1;
+      } else if (angle - currentAngle < -90) {
+        angle += 180;
+        speed *= -1;
+      }
+      swerveModules[i].setAngleAndDrive(angle, speed);
     }
   }
 

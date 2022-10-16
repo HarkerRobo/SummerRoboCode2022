@@ -3,12 +3,13 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.climber.ClimberStages;
+import frc.robot.commands.climber.ToggleClimber;
 import frc.robot.commands.climber.ZeroClimber;
 import frc.robot.commands.hood.ZeroHood;
 import frc.robot.commands.shooter.ShooterAuton;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Shooter;
 // import frc.robot.commands.climber.ClimberStages;
 import harkerrobolib.joysticks.XboxGamepad;
 
@@ -26,7 +27,7 @@ public class OI {
   }
 
   public void initBindings() {
-    driver.getButtonB().whenPressed(ClimberStages.ALL_STAGES);
+    // driver.getButtonB().whenPressed(ClimberStages.ALL_STAGES);
     driver
         .getButtonX()
         .whenPressed(
@@ -38,17 +39,12 @@ public class OI {
                     })));
     driver.getButtonSelect().whenPressed(new ZeroClimber());
     driver.getButtonA().whenPressed(new ZeroHood());
-    driver.getButtonStart().whilePressed(new ShooterAuton());
+    // driver.getButtonStart().whilePressed(new ShooterAuton());
     // driver.getButtonB().whenPressed(()->Climber.getInstance().setClimberForward());
     // driver.getButtonX().whenPressed(()->Climber.getInstance().setClimberBackward());
     // driver.getButtonB().whenPressed(new SetClimberPos(Climber.UP_HEIGHT));
     // driver.getButtonX().whenPressed(new SetClimberPos(Climber.MID_HEIGHT));
-    driver
-        .getLeftDPadButton()
-        .whenPressed(new InstantCommand(() -> Climber.getInstance().setClimberForward()));
-    driver
-        .getRightDPadButton()
-        .whenPressed(new InstantCommand(() -> Climber.getInstance().setClimberBackward()));
+    driver.getRightDPadButton().whenPressed(new ToggleClimber());
     driver
         .getUpDPadButton()
         .whenPressed(
@@ -77,6 +73,14 @@ public class OI {
               Climber.getInstance().setRightPercentOutput(0);
               Climber.getInstance().setLeftPercentOutput(0);
             });
+
+    operator
+        .getUpDPadButton()
+        .whenPressed(new InstantCommand(() -> Shooter.getInstance().addShooterOffset(0.2)));
+    operator
+        .getDownDPadButton()
+        .whenPressed(new InstantCommand(() -> Shooter.getInstance().addShooterOffset(-0.2)));
+    driver.getButtonStart().whilePressed(new ShooterAuton());
   }
 
   public XboxGamepad getDriverGamepad() {

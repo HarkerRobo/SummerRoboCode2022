@@ -5,7 +5,9 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auton.Autons;
+import frc.robot.auton.Trajectories;
 import frc.robot.commands.drivetrain.SwerveManual;
 import frc.robot.commands.hood.HoodManual;
 import frc.robot.commands.indexer.IndexerManual;
@@ -68,6 +71,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Field", FIELD);
     SmartDashboard.putNumber("speed", 0);
     NetworkTableInstance.getDefault().setUpdateRate(RobotMap.ROBOT_LOOP);
+    DataLogManager.start();
+    PhotonVisionLimelight.turnOnLED();
   }
 
   /**
@@ -82,6 +87,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     PhotonVisionLimelight.update();
     SmartDashboard.putNumber("distance", PhotonVisionLimelight.getDistance());
+    SmartDashboard.putNumber("hood angle", Hood.getInstance().calculateHoodPosition());
 
     // SmartDashboard.putNumber("Robot loop", counter);
     Drivetrain.getInstance().updatePoseEstimator();
@@ -110,6 +116,11 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
+    Drivetrain.getInstance()
+        .setPose(
+            new Pose2d(
+                Trajectories.twoBallTop.sample(0.0).poseMeters.getTranslation(),
+                Trajectories.twoBallTop.sample(0.0).poseMeters.getRotation()));
     autonChooser.getSelected().schedule();
   }
 
@@ -120,6 +131,8 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    autonChooser.getSelected().cancel();
+    Drivetrain.getInstance().setPose(Drivetrain.getInstance().getPoseEstimatorPose2d());
     Drivetrain.getInstance().setNeutralMode(NeutralMode.Brake);
   }
 
@@ -139,7 +152,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {}
+  public void testInit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 
   /** This function is called periodically during test mode. */
   @Override

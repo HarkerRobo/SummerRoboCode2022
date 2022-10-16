@@ -18,7 +18,7 @@ public class Trajectories {
   public static Trajectory twoBallTop =
       generateTrajectory(
           List.of(
-              new Pose2d(6.22, 5.18, Rotation2d.fromDegrees(136.97)),
+              new Pose2d(6.07, 5.22, Rotation2d.fromDegrees(136.97)), // 6.22, 5.18
               new Pose2d(5.29, 5.89, Rotation2d.fromDegrees(136.97))),
           2.0,
           1.0,

@@ -1,5 +1,6 @@
 package frc.robot.commands.hood;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Hood;
 import harkerrobolib.commands.IndefiniteCommand;
 
@@ -10,6 +11,8 @@ public class HoodManual extends IndefiniteCommand {
   }
 
   public void execute() {
+    SmartDashboard.putBoolean("yeetmcfeetus", true);
+    SmartDashboard.putNumber("hood pos calculate", Hood.getInstance().calculateHoodPosition());
     Hood.getInstance().setHoodPosition(Hood.getInstance().calculateHoodPosition());
   }
 

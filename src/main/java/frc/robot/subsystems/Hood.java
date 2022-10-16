@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
@@ -27,7 +26,7 @@ public class Hood extends SubsystemBase {
   private static final double CURRENT_PEAK = 10;
   private static final double CURRENT_PEAK_DUR = 0.05;
 
-  private static final double STALLING_CURRENT = 12;
+  private static final double STALLING_CURRENT = 10;
   private static final double RANGE = 32.25;
 
   private static final double kS = 0.1; // .32;
@@ -41,6 +40,8 @@ public class Hood extends SubsystemBase {
   private static final double MAX_POS_ERROR = 0.1;
   private static final double MAX_VEL_ERROR = 0.2;
   private static final double MAX_VOLTAGE = 10;
+
+  private static final double MAX_AUTON_ERROR = 2.1;
 
   private InterpolatingTreeMap hoodVal;
 
@@ -110,6 +111,10 @@ public class Hood extends SubsystemBase {
 
   public double getHoodVelocity() {
     return positionSystem.getVelocity();
+  }
+
+  public boolean atHoodAngle() {
+    return Math.abs(calculateHoodPosition()-getHoodPosition()) < MAX_AUTON_ERROR;
   }
 
   public double calculateHoodPosition() {

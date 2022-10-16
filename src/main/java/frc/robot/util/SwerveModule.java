@@ -31,8 +31,8 @@ public class SwerveModule implements Sendable {
   private static final double ROTATION_MOTOR_CURRENT_PEAK = 40;
   private static final double ROTATION_MOTOR_CURRENT_PEAK_DUR = 0.1;
 
-  private static final double DRIVE_MOTOR_CURRENT_CONTINUOUS = 40;
-  private static final double DRIVE_MOTOR_CURRENT_PEAK = 80;
+  private static final double DRIVE_MOTOR_CURRENT_CONTINUOUS = 30;
+  private static final double DRIVE_MOTOR_CURRENT_PEAK = 60;
   private static final double DRIVE_MOTOR_CURRENT_PEAK_DUR = 0.1;
 
   private static final double DRIVE_kS = 0.2;
@@ -43,7 +43,7 @@ public class SwerveModule implements Sendable {
   private static final double DRIVE_kI = 0.0;
   private static final double DRIVE_kD = 0.0;
 
-  private static final double ROTATION_kS = 0.40104;
+  private static final double ROTATION_kS = 0;//0.40104;
   private static final double ROTATION_kV = 0.0057859;
   private static final double ROTATION_kA = 0.00016558;
 
@@ -53,10 +53,10 @@ public class SwerveModule implements Sendable {
 
   // private static final double DRIVE_MAX_ERROR = 2;
 
-  private static final double ROTATION_MAX_VEL_ERROR = 0.13;
-  private static final double ROTATION_MAX_POS_ERROR = 0.1;
+  private static final double ROTATION_MAX_VEL_ERROR = 0.4;
+  private static final double ROTATION_MAX_POS_ERROR = 0.5;
 
-  private static final double WHEEL_DIAMETER = 4.0;
+  private static final double WHEEL_DIAMETER = 3.872;
   private static final double ROTATION_GEAR_RATIO = 12.8;
   private static final double DRIVE_GEAR_RATIO = 6.75;
   private static final double DRIVE_FALCON_TO_MPS =
@@ -110,6 +110,8 @@ public class SwerveModule implements Sendable {
             .maxError(ROTATION_MAX_POS_ERROR, ROTATION_MAX_VEL_ERROR)
             .build(rotation)
             .init();
+    rotation.config_kF(RobotMap.SLOT_INDEX, 0);
+    // rotationSystem.setkP(0.25);
     SendableRegistry.addLW(
         rotationSystem, "Drivetrain/" + swerveIDToName(swerveID) + " Module", "Rotation System");
     // SendableRegistry.addLW(

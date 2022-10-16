@@ -97,6 +97,12 @@ public class MotorPositionSystem extends MotorVelocitySystem {
     return super.atSetpoint() && Math.abs(getPositionError()) < maxPosError;
   }
 
+  // public void setkP(double kP) {
+  //   this.kP = kP;
+  //   kD = 0;
+  //   configConstants();
+  // }
+
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.setSmartDashboardType("MotorPositionSystem");

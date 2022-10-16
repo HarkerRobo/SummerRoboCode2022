@@ -16,7 +16,7 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public class SwervePosController extends CommandBase {
-  public static final double X_KP = 2.5;
+  public static final double X_KP = 4.5;
   public static final double X_KI = 0;
   public static final double X_KD = 0;
 
@@ -24,7 +24,7 @@ public class SwervePosController extends CommandBase {
   public static final double Y_KI = 0;
   public static final double Y_KD = 0;
 
-  public static final double THETA_KP = 0.07;
+  public static final double THETA_KP = 3.7;
   public static final double THETA_KI = 0.00;
   public static final double THETA_KD = 0.0;
 
@@ -52,7 +52,7 @@ public class SwervePosController extends CommandBase {
     this.trajectory = trajectory;
     this.refHeading = refHeading;
     this.startHeading = startHeading;
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    thetaController.enableContinuousInput(0, 2*Math.PI);
     addRequirements(Drivetrain.getInstance());
   }
 
@@ -63,10 +63,6 @@ public class SwervePosController extends CommandBase {
 
   @Override
   public void initialize() {
-    if (startHeading != null)
-      Drivetrain.getInstance()
-          .setPose(
-              new Pose2d(trajectory.sample(0.0).poseMeters.getTranslation(), startHeading.get()));
     timer.reset();
     timer.start();
   }
