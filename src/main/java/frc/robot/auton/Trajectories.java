@@ -25,6 +25,26 @@ public class Trajectories {
           0.0,
           0.0);
 
+  public static Trajectory testAuto =
+      generateTrajectory(
+          List.of(
+              new Pose2d(8.25, 4.21, Rotation2d.fromDegrees(-90)),
+              new Pose2d(8.27, 2.27, Rotation2d.fromDegrees(0))),
+          2,
+          1,
+          0,
+          0);
+
+  public static Trajectory testAuto1 =
+      generateTrajectory(
+          List.of(
+              new Pose2d(8.27, 2.27, Rotation2d.fromDegrees(0)),
+              new Pose2d(9.64, 2.27, Rotation2d.fromDegrees(45))),
+          2.0,
+          1.0,
+          0.0,
+          0.0);
+
   public static Trajectory generateTrajectory(
       List<Pose2d> points,
       double maxVel,

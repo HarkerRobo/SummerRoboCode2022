@@ -114,7 +114,7 @@ public class Hood extends SubsystemBase {
   }
 
   public boolean atHoodAngle() {
-    return Math.abs(calculateHoodPosition()-getHoodPosition()) < MAX_AUTON_ERROR;
+    return Math.abs(calculateHoodPosition() - getHoodPosition()) < MAX_AUTON_ERROR;
   }
 
   public double calculateHoodPosition() {

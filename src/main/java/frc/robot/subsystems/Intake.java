@@ -10,7 +10,6 @@ import frc.robot.RobotMap;
 import frc.robot.util.Conversions;
 import frc.robot.util.HSFalconBuilder;
 import frc.robot.util.MotorVelocitySystem;
-import frc.robot.util.MotorVelocitySystem.MotorVelocitySystemBuilder;
 import harkerrobolib.wrappers.HSFalcon;
 
 public class Intake extends SubsystemBase {
@@ -103,7 +102,7 @@ public class Intake extends SubsystemBase {
         break;
       case OUTTAKE:
         setBackward();
-        setRollerOutput(-intakeSpeed);
+        setRollerOutput(-intakeSpeed + 0.3);
         break;
     }
   }

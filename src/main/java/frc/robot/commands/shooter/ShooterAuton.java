@@ -1,8 +1,8 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.drivetrain.SwerveManual;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Indexer;
@@ -19,7 +19,10 @@ public class ShooterAuton extends CommandBase {
   }
 
   public void execute() {
-    ChassisSpeeds chassis = new ChassisSpeeds(0, 0, Drivetrain.getInstance().alignWithHub());
+    double omega = Drivetrain.getInstance().alignWithHub();
+    omega *= Drivetrain.getInstance().alignWithHub();
+    omega *= SwerveManual.SPEED_MULTIPLIER;
+    ChassisSpeeds chassis = new ChassisSpeeds(0, 0, omega);
     Drivetrain.getInstance().setAngleAndDrive(chassis);
     double speed = Shooter.getInstance().calculateShooterSpeed();
     Shooter.getInstance().set(speed);
@@ -35,5 +38,6 @@ public class ShooterAuton extends CommandBase {
   public void end(boolean interruped) {
     Shooter.getInstance().setState(Shooter.State.IDLE);
     Shooter.getInstance().turnOffMotors();
+    Drivetrain.getInstance().setAngleAndDrive(new ChassisSpeeds(0, 0, SwerveManual.MIN_OUTPUT));
   }
 }

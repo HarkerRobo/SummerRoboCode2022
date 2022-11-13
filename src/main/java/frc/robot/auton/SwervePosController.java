@@ -9,7 +9,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
 import java.util.function.BiFunction;
@@ -52,7 +51,7 @@ public class SwervePosController extends CommandBase {
     this.trajectory = trajectory;
     this.refHeading = refHeading;
     this.startHeading = startHeading;
-    thetaController.enableContinuousInput(0, 2*Math.PI);
+    thetaController.enableContinuousInput(0, 2 * Math.PI);
     addRequirements(Drivetrain.getInstance());
   }
 
@@ -94,7 +93,6 @@ public class SwervePosController extends CommandBase {
     double yFeedback = yController.calculate(currentPose.getY(), goal.poseMeters.getY());
 
     // Return next output.
-    SmartDashboard.putNumber("thetaFF", thetaFF);
     ChassisSpeeds adjustedSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             xFF + xFeedback, yFF + yFeedback, thetaFF, currentPose.getRotation());
@@ -104,8 +102,6 @@ public class SwervePosController extends CommandBase {
 
     // SmartDashboard.putNumber("Traj-X-Error", Units.metersToInches(poseError.getX()));
     // SmartDashboard.putNumber("Traj-Y-Error", Units.metersToInches(poseError.getY()));
-    SmartDashboard.putNumber("Trajectory Theta", angleRef.getDegrees());
-    SmartDashboard.putNumber("Current Theta", currentPose.getRotation().getDegrees());
     // SmartDashboard.putNumber("Traj-Theta-Error", rotationError.getDegrees());
   }
 

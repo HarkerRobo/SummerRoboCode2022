@@ -6,7 +6,7 @@ import frc.robot.subsystems.Shooter;
 import harkerrobolib.commands.IndefiniteCommand;
 
 public class IndexerManual extends IndefiniteCommand {
-  public static final double BOTTOM_INDEXER_SPEED = 0.55; // 0.45; // meters per second
+  public static final double BOTTOM_INDEXER_SPEED = 0.6; // 0.45; // meters per second
   public static final double TOP_INDEXER_SPEED = 0.35; // 0.25;
   public static final double INDEXER_SHOOTER_SPEED = 0.8;
   public static final double INDEXER_OUTTAKE_SPEED = -0.6; // -16; // meters per second

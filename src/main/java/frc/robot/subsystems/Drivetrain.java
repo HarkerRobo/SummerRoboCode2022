@@ -26,10 +26,11 @@ public class Drivetrain extends SubsystemBase {
   public static Drivetrain instance;
 
   public static final boolean[] ROTATION_INVERTS = {false, false, false, false};
-  public static final boolean[] DRIVE_INVERTS = {false, true, true, false};
+  public static final boolean[] DRIVE_INVERTS = {true, true, true, false};
 
   public static final double[] CANCODER_OFFSETS = {
-    285.468750+45, 178.330078, 109.951172, 32.255859}; // in deg
+    218.32 + 45, 178.330078, 109.951172, 32.255859
+  }; // in deg
 
   private static final double DT_WIDTH = 0.5461; // 0.93345 bumper to bumper
   private static final double DT_LENGTH = 0.5969; // 0.88265
@@ -39,8 +40,8 @@ public class Drivetrain extends SubsystemBase {
   public static final double MAX_ROTATION_VEL = 1.5 * Math.PI; // in rad/s
   public static final double MAX_ROTATION_ACCELERATION = 1.0 * Math.PI;
 
-  private static final Matrix<N3, N1> ODOMETRY_STATE_STDEV = VecBuilder.fill(1.0, 1.0, 1.0);
-  private static final Matrix<N1, N1> ODOMETRY_ENCODER_STDEV = VecBuilder.fill(1.0);
+  private static final Matrix<N3, N1> ODOMETRY_STATE_STDEV = VecBuilder.fill(0.7, 0.7, 0.05);
+  private static final Matrix<N1, N1> ODOMETRY_ENCODER_STDEV = VecBuilder.fill(0.01);
   private static final Matrix<N3, N1> ODOMETRY_VISION_STDEV = VecBuilder.fill(1.0, 1.0, 1.0);
 
   private SwerveModule[] swerveModules;
@@ -119,7 +120,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void setAngleAndDrive(SwerveModuleState[] states) {
     for (int i = 0; i < 4; i++) {
-      // states[i] = optimize(states[i], swerveModules[i].getCurrentAngle());
+      // states[i] = SwerveModuleState.optimize(states[i], Rotation2d.fromDegrees(swerveModules[i].getCurrentAngle()));
       double angle = states[i].angle.getDegrees();
       double currentAngle = swerveModules[i].getCurrentAngle();
       double speed = states[i].speedMetersPerSecond;

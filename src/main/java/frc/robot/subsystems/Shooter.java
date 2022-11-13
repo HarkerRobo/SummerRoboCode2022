@@ -35,11 +35,11 @@ public class Shooter extends SubsystemBase {
   private static final double kV = 0.65;
   private static final double kA = 0.06045;
 
-  private static final double kP = 0.32;
+  private static final double kP = 0.31;
   private static final double kI = 0.0;
   private static final double kD = 0.0;
 
-  private static final double SHOOT_ERROR = 0.15;
+  private static final double SHOOT_ERROR = 0.19;
 
   private static final double WHEEL_DIAMETER = 4.0;
 

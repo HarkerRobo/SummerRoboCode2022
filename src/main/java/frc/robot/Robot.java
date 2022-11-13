@@ -61,15 +61,13 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     CommandScheduler.getInstance().setDefaultCommand(Drivetrain.getInstance(), new SwerveManual());
     CommandScheduler.getInstance().setDefaultCommand(Intake.getInstance(), new IntakeManual());
-    SmartDashboard.putNumber("angle", 0.0);
     CommandScheduler.getInstance().setDefaultCommand(Shooter.getInstance(), new ShooterManual());
     CommandScheduler.getInstance().setDefaultCommand(Indexer.getInstance(), new IndexerManual());
     CommandScheduler.getInstance().setDefaultCommand(Hood.getInstance(), new HoodManual());
-    autonChooser.setDefaultOption("Three Ball Auton", Autons.THREE_BALL_AUTO);
+    autonChooser.setDefaultOption("Test Auton", Autons.TEST_AUTON);
+    autonChooser.addOption("Three Ball Auton", Autons.THREE_BALL_AUTO);
     SmartDashboard.putData("Auton", autonChooser);
-    SmartDashboard.putNumber("angle to hub", 0);
     SmartDashboard.putData("Field", FIELD);
-    SmartDashboard.putNumber("speed", 0);
     NetworkTableInstance.getDefault().setUpdateRate(RobotMap.ROBOT_LOOP);
     DataLogManager.start();
     PhotonVisionLimelight.turnOnLED();
@@ -87,7 +85,6 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     PhotonVisionLimelight.update();
     SmartDashboard.putNumber("distance", PhotonVisionLimelight.getDistance());
-    SmartDashboard.putNumber("hood angle", Hood.getInstance().calculateHoodPosition());
 
     // SmartDashboard.putNumber("Robot loop", counter);
     Drivetrain.getInstance().updatePoseEstimator();
@@ -119,8 +116,8 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance()
         .setPose(
             new Pose2d(
-                Trajectories.twoBallTop.sample(0.0).poseMeters.getTranslation(),
-                Trajectories.twoBallTop.sample(0.0).poseMeters.getRotation()));
+                Trajectories.testAuto.sample(0.0).poseMeters.getTranslation(),
+                Trajectories.testAuto.sample(0.0).poseMeters.getRotation()));
     autonChooser.getSelected().schedule();
   }
 
